@@ -94,7 +94,7 @@ const Login: React.FC = () => {
                   className="h-20 mb-8 mx-auto"
                 />
                 <h1 className="text-4xl font-bold text-white mb-4">
-                  Bienvenido/a a VitalMape
+                  Bienvenido/a
                 </h1>
                 <p className="text-blue-100 text-xl leading-relaxed">
                   Donde los datos se convierten en decisiones inteligentes
