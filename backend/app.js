@@ -459,12 +459,10 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
     
-    // Bloquear creación de usuarios Administrador desde la API pública por seguridad
+    // TEMPORAL: Permitir creación de administradores para configuración inicial
+    // TODO: Remover después de crear el administrador
     if (estamento === 'Administrador') {
-      return res.status(403).json({ 
-        error: 'No autorizado',
-        message: 'No se pueden crear usuarios administradores desde el registro público'
-      });
+      console.log('⚠️ Creando usuario Administrador (modo temporal)');
     }
     
     // Generar nombre de usuario automáticamente desde nombres y apellidos
