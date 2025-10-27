@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { getApiBaseUrl } from '../services/api';
 
 const TestLogin: React.FC = () => {
   const [result, setResult] = useState<string>('');
@@ -10,7 +11,8 @@ const TestLogin: React.FC = () => {
     setResult('Probando login...');
     
     try {
-      const response = await axios.post('http://localhost:3001/api/auth/login', {
+  const API_URL = getApiBaseUrl();
+  const response = await axios.post(`${API_URL}/auth/login`, {
         usuario: 'admin',
         contraseña: 'admin123'
       }, {

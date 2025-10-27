@@ -10,14 +10,25 @@
     "build": "npm install",
     "postinstall": "npm rebuild pg",
     "db:migrate": "node migrations/run-migrations.js",
-    "db:seed": "node migrations/seed-data.js"
+    "db:seed": "node migrations/seed-data.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linter configured\" && exit 0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x",
+    "npm": ">=8.0.0"
   },
-  "keywords": ["uti", "hospital", "api", "nodejs", "express", "postgresql"],
-  "author": "Matías Cerezo Prado",
+  "keywords": ["uti", "hospital", "api", "nodejs", "express", "postgresql", "sequelize", "jwt"],
+  "author": "Matías Cerezo Prado <mcerezopr@gmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tu-usuario/vitalmape-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/vitalmape-backend/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/vitalmape-backend#readme",
   "dependencies": {
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",

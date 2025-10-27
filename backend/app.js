@@ -1,6 +1,12 @@
 // Cargar variables de entorno ANTES que todo
 require('dotenv').config();
 
+// Ejecutar migraciones automáticamente en producción
+if (process.env.NODE_ENV === 'production') {
+  console.log('🚀 Ejecutando migraciones automáticas...');
+  require('./auto-migrate');
+}
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -36,27 +42,41 @@ const procedimientosSistemaRoutes = require('./routes/procedimientosSistema');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Middleware CORS - ACTUALIZADO
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://vitalmape.zeabur.app',
-    'https://tu-frontend.vercel.app'
+    'https://vitalmapeuti.onrender.com',
+    'https://vitalmapeuti-back.onrender.com',
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint para Railway
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'VitalMape UTI Backend is running',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Sincronizar base de datos
 const sincronizarDB = async () => {
   try {
     await sequelize.authenticate();
+    console.log('✅ Conexión a la base de datos establecida');
     
     // Sincronizar modelos (crear tablas si no existen)
     await sequelize.sync({ force: false }); // No recrear tablas existentes
+    console.log('✅ Modelos sincronizados');
   } catch (error) {
-    console.error('Error al conectar con la base de datos:', error);
+    console.error('❌ Error al conectar con la base de datos:', error);
   }
 };
 
@@ -97,10 +117,13 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { usuario, contraseña } = req.body;
     
+    console.log('🔐 Intento de login:', usuario);
+    
     // Buscar usuario por nombre de usuario
     const usuarioEncontrado = await Usuario.findOne({ where: { usuario } });
     
     if (!usuarioEncontrado) {
+      console.log('❌ Usuario no encontrado:', usuario);
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
     
@@ -108,6 +131,7 @@ app.post('/api/auth/login', async (req, res) => {
     const contraseñaValida = await usuarioEncontrado.verificarContraseña(contraseña);
     
     if (!contraseñaValida) {
+      console.log('❌ Contraseña incorrecta para:', usuario);
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
     
@@ -124,6 +148,7 @@ app.post('/api/auth/login', async (req, res) => {
       { expiresIn: '24h' }
     );
     
+    console.log('✅ Login exitoso:', usuario);
     
     // Excluir contraseña de la respuesta
     const usuarioResponse = {
@@ -141,6 +166,7 @@ app.post('/api/auth/login', async (req, res) => {
       mensaje: 'Login exitoso'
     });
   } catch (error) {
+    console.error('❌ Error en login:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -175,6 +201,7 @@ app.get('/api/auth/profile', verificarToken, async (req, res) => {
     
     res.json(usuario);
   } catch (error) {
+    console.error('Error al obtener perfil:', error);
     res.status(500).json({ error: 'Error al obtener perfil' });
   }
 });
@@ -258,7 +285,7 @@ app.post('/api/email/bienvenida', verificarToken, async (req, res) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
     
-    // const resultado = await enviarCorreoBienvenida(usuario, contraseña);
+    const resultado = await enviarCorreoBienvenida(usuario, contraseña);
     
     if (resultado.success) {
       res.json({ mensaje: 'Correo de bienvenida enviado exitosamente' });
@@ -266,6 +293,7 @@ app.post('/api/email/bienvenida', verificarToken, async (req, res) => {
       res.status(500).json({ error: 'Error al enviar correo', detalles: resultado.error });
     }
   } catch (error) {
+    console.error('Error en envío de correo:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -383,6 +411,7 @@ app.post('/api/email/notificacion', verificarToken, async (req, res) => {
       res.status(500).json({ error: 'Error al enviar notificación', detalles: resultado.error });
     }
   } catch (error) {
+    console.error('Error en envío de notificación:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -395,6 +424,7 @@ app.get('/api/usuarios', async (req, res) => {
     });
     res.json(usuarios);
   } catch (error) {
+    console.error('Error al obtener usuarios:', error);
     res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 });
@@ -409,6 +439,7 @@ app.get('/api/usuarios/check-username/:usuario', async (req, res) => {
     
     res.json({ exists: !!usuarioExistente });
   } catch (error) {
+    console.error('Error al verificar usuario:', error);
     res.status(500).json({ error: 'Error al verificar usuario' });
   }
 });
@@ -417,6 +448,8 @@ app.get('/api/usuarios/check-username/:usuario', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { nombres, apellidos, estamento, correo, contraseña } = req.body;
+    
+    console.log('📝 Registro de nuevo usuario:', { nombres, apellidos, estamento, correo });
     
     // Validar campos requeridos (sin usuario, se genera automáticamente)
     if (!nombres || !apellidos || !estamento || !correo || !contraseña) {
@@ -462,6 +495,8 @@ app.post('/api/auth/register', async (req, res) => {
       contador++;
     }
     
+    console.log('👤 Usuario generado:', usuarioFinal);
+    
     const nuevoUsuario = await Usuario.create({
       nombres,
       apellidos,
@@ -478,10 +513,18 @@ app.post('/api/auth/register', async (req, res) => {
         console.log(`✅ Correo de bienvenida enviado a ${correo}`);
       } else {
         console.error('❌ Error enviando correo de bienvenida:', resultadoCorreo.error);
+        // Si el correo falla, fallar el registro
+        return res.status(500).json({ 
+          error: 'Error al enviar correo de bienvenida', 
+          message: 'No se pudo completar el registro. Inténtalo más tarde.' 
+        });
       }
     } catch (emailError) {
       console.error('❌ Error en envío de correo:', emailError);
-      // No fallar el registro si el correo falla
+      return res.status(500).json({ 
+        error: 'Error en el servicio de correo', 
+        message: 'No se pudo completar el registro. Inténtalo más tarde.' 
+      });
     }
     
     // Excluir contraseña de la respuesta
@@ -496,9 +539,11 @@ app.post('/api/auth/register', async (req, res) => {
       updatedAt: nuevoUsuario.updatedAt
     };
     
+    console.log('✅ Usuario registrado exitosamente:', usuarioFinal);
+    
     res.status(201).json(usuarioResponse);
   } catch (error) {
-    console.error('Error al crear usuario:', error);
+    console.error('❌ Error al crear usuario:', error);
     
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({ 
@@ -532,6 +577,7 @@ app.get('/api/pacientes', async (req, res) => {
     });
     res.json(pacientes);
   } catch (error) {
+    console.error('Error al obtener pacientes:', error);
     res.status(500).json({ error: 'Error al obtener pacientes' });
   }
 });
@@ -545,6 +591,7 @@ app.get('/api/pacientes/:id', async (req, res) => {
     }
     res.json(paciente);
   } catch (error) {
+    console.error('Error al obtener paciente:', error);
     res.status(500).json({ error: 'Error al obtener paciente' });
   }
 });
@@ -576,6 +623,7 @@ app.post('/api/pacientes', async (req, res) => {
     
     res.status(201).json(nuevoPaciente);
   } catch (error) {
+    console.error('Error al crear paciente:', error);
     if (error.name === 'SequelizeValidationError') {
       res.status(400).json({ error: 'Datos de validación incorrectos', detalles: error.errors });
     } else if (error.name === 'SequelizeUniqueConstraintError') {
@@ -597,6 +645,7 @@ app.put('/api/pacientes/:id', async (req, res) => {
     await paciente.update(req.body);
     res.json(paciente);
   } catch (error) {
+    console.error('Error al actualizar paciente:', error);
     if (error.name === 'SequelizeValidationError') {
       res.status(400).json({ error: 'Datos de validación incorrectos', detalles: error.errors });
     } else if (error.name === 'SequelizeUniqueConstraintError') {
@@ -618,6 +667,7 @@ app.delete('/api/pacientes/:id', async (req, res) => {
     await paciente.destroy();
     res.json({ mensaje: 'Paciente eliminado correctamente' });
   } catch (error) {
+    console.error('Error al eliminar paciente:', error);
     res.status(500).json({ error: 'Error al eliminar paciente' });
   }
 });
@@ -633,6 +683,7 @@ app.get('/api/pacientes/uti/activos', async (req, res) => {
     });
     res.json(pacientesActivos);
   } catch (error) {
+    console.error('Error al obtener pacientes activos:', error);
     res.status(500).json({ error: 'Error al obtener pacientes activos' });
   }
 });
@@ -647,6 +698,7 @@ app.get('/api/nas', async (req, res) => {
     });
     res.json(nas);
   } catch (error) {
+    console.error('Error al obtener registros NAS:', error);
     res.status(500).json({ error: 'Error al obtener registros NAS' });
   }
 });
@@ -660,6 +712,7 @@ app.get('/api/nas/:id', async (req, res) => {
     }
     res.json(nas);
   } catch (error) {
+    console.error('Error al obtener registro NAS:', error);
     res.status(500).json({ error: 'Error al obtener registro NAS' });
   }
 });
@@ -727,6 +780,7 @@ app.post('/api/nas', async (req, res) => {
     
     res.status(201).json(nuevoNAS);
   } catch (error) {
+    console.error('Error al crear registro NAS:', error);
     if (error.name === 'SequelizeValidationError') {
       res.status(400).json({ error: 'Datos de validación incorrectos', detalles: error.errors });
     } else {
@@ -744,8 +798,9 @@ app.put('/api/nas/:id', async (req, res) => {
     }
     
     await nas.update(req.body);
-    res.json(nas);
+res.json(nas);
   } catch (error) {
+    console.error('Error al actualizar registro NAS:', error);
     if (error.name === 'SequelizeValidationError') {
       res.status(400).json({ error: 'Datos de validación incorrectos', detalles: error.errors });
     } else {
@@ -765,6 +820,7 @@ app.delete('/api/nas/:id', async (req, res) => {
     await nas.destroy();
     res.json({ mensaje: 'Registro NAS eliminado correctamente' });
   } catch (error) {
+    console.error('Error al eliminar registro NAS:', error);
     res.status(500).json({ error: 'Error al eliminar registro NAS' });
   }
 });
@@ -778,6 +834,7 @@ app.get('/api/nas/paciente/:pacienteId', async (req, res) => {
     });
     res.json(nas);
   } catch (error) {
+    console.error('Error al obtener registros NAS del paciente:', error);
     res.status(500).json({ error: 'Error al obtener registros NAS del paciente' });
   }
 });
@@ -797,26 +854,28 @@ app.get('/api/nas/estadisticas', async (req, res) => {
       promedioPuntuacion: promedioPuntuacion[0]?.dataValues?.promedio || 0
     });
   } catch (error) {
+    console.error('Error al obtener estadísticas NAS:', error);
     res.status(500).json({ error: 'Error al obtener estadísticas NAS' });
   }
 });
 
 // ========== CONFIGURACIÓN PARA SINGLE PAGE APPLICATION (SPA) ==========
+// COMENTADO: Frontend ahora está separado y se despliega independientemente
 
 // Servir archivos estáticos del frontend build en producción
-const frontendBuildPath = path.join(__dirname, '../frontend/build');
-app.use(express.static(frontendBuildPath));
+// const frontendBuildPath = path.join(__dirname, '../frontend/build');
+// app.use(express.static(frontendBuildPath));
 
 // Manejar todas las rutas que no son de API para SPA usando middleware
 // Esto permite que los botones del navegador (atrás, adelante, F5) funcionen correctamente
-app.use((req, res, next) => {
-  // Solo para rutas que no empiecen con /api
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(frontendBuildPath, 'index.html'));
-  } else {
-    next(); // Continuar a otros middlewares para APIs
-  }
-});
+// app.use((req, res, next) => {
+//   // Solo para rutas que no empiecen con /api
+//   if (!req.path.startsWith('/api')) {
+//     res.sendFile(path.join(frontendBuildPath, 'index.html'));
+//   } else {
+//     next(); // Continuar a otros middlewares para APIs
+//   }
+// });
 
 // Endpoint temporal para probar verificación de contraseñas
 app.post('/api/auth/test-password', async (req, res) => {
@@ -896,7 +955,8 @@ app.post('/api/auth/import-user', async (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   await sincronizarDB();
 });
 

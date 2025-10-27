@@ -1,16 +1,7 @@
 import axios from 'axios';
+import { getApiBaseUrl } from './api';
 
 // Detecta automáticamente la URL del backend
-const getApiBaseUrl = () => {
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL.replace('/api', '');
-  }
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:3001';
-  }
-  return `http://${window.location.hostname}:3001`;
-};
-
 const API_URL = getApiBaseUrl(); // URL del backend
 
 const api = axios.create({

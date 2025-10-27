@@ -1,4 +1,4 @@
-import api from './api';
+import api, { getApiBaseUrl } from './api';
 
 // Tipos TypeScript para la categorización
 export interface CategorizacionKinesiologia {
@@ -88,6 +88,7 @@ export interface EstadisticasResponse {
 
 class CategorizacionKinesiologiaAPI {
   private baseURL = '/categorizacion-kinesiologia';
+  private API_URL = getApiBaseUrl();
 
   // Crear nueva categorización
   async crear(categorización: CategorizacionRequest): Promise<CategorizacionKinesiologia> {
@@ -103,7 +104,7 @@ class CategorizacionKinesiologiaAPI {
       console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
       
       // Usar fetch directamente para evitar problemas con axios
-      const response = await fetch('http://localhost:3001/api/categorizacion-kinesiologia', {
+  const response = await fetch(`${this.API_URL}/categorizacion-kinesiologia`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -156,7 +157,7 @@ class CategorizacionKinesiologiaAPI {
       if (params.fechaDesde) queryParams.append('fechaDesde', params.fechaDesde);
       if (params.fechaHasta) queryParams.append('fechaHasta', params.fechaHasta);
       
-      const url = `http://localhost:3001/api/categorizacion-kinesiologia/paciente/${rut}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+  const url = `${this.API_URL}/categorizacion-kinesiologia/paciente/${rut}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
       console.log('🌐 URL:', url);
       

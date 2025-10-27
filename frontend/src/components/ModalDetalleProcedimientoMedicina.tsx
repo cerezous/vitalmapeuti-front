@@ -4,6 +4,7 @@ import medicinaAPI from '../services/medicinaAPI';
 import { useAuth } from '../contexts/AuthContext';
 import { pacienteService, Paciente } from '../services/api';
 import axios from 'axios';
+import { getApiBaseUrl } from '../services/api';
 
 interface ModalDetalleProcedimientoMedicinaProps {
   isOpen: boolean;
@@ -302,23 +303,10 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
 
       // Actualizar procedimientos existentes que fueron editados
       const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id > 0);
+      const API_URL = getApiBaseUrl();
       for (const proc of procedimientosExistentes) {
         try {
-          // Usar la misma lógica de detección de URL que medicinaAPI
-          const getApiBaseUrl = () => {
-            if (process.env.REACT_APP_API_URL) {
-              return process.env.REACT_APP_API_URL;
-            }
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-              return 'http://localhost:3001/api';
-            }
-            return `http://${window.location.hostname}:3001/api`;
-          };
-          
-          const API_URL = getApiBaseUrl();
           const token = localStorage.getItem('token');
-          
-          
           const response = await axios.put(
             `${API_URL}/medicina/${proc.id}`,
             {
@@ -334,7 +322,6 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
               }
             }
           );
-          
         } catch (error: any) {
           console.error(`Error al actualizar procedimiento ${proc.id}:`, error);
           if (axios.isAxiosError(error)) {

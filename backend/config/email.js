@@ -34,7 +34,10 @@ const transporter = nodemailer.createTransport({
     },
     tls: {
         rejectUnauthorized: false
-    }
+    },
+    connectionTimeout: 10000, // 10 segundos para conectar
+    greetingTimeout: 5000,    // 5 segundos para saludo
+    socketTimeout: 10000       // 10 segundos para operaciones
 });
 
 // Verificar configuración del transporter
@@ -73,7 +76,7 @@ function validarEmail(email) {
 }
 
 // Función para reintentar envío de correo
-async function enviarConReintentos(mailOptions, maxReintentos = 3) {
+async function enviarConReintentos(mailOptions, maxReintentos = 2) {
     for (let intento = 1; intento <= maxReintentos; intento++) {
         try {
             const info = await transporter.sendMail(mailOptions);
@@ -86,8 +89,8 @@ async function enviarConReintentos(mailOptions, maxReintentos = 3) {
                 return { success: false, error: error.message, intentos: intento };
             }
             
-            // Esperar antes del siguiente intento (backoff exponencial)
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, intento) * 1000));
+            // Esperar antes del siguiente intento (tiempo fijo más corto)
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
 }
