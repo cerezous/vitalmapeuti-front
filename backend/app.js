@@ -904,6 +904,42 @@ app.post('/api/auth/test-password', async (req, res) => {
   }
 });
 
+// Endpoint temporal para actualizar estamento de usuario (SOLO PARA DESARROLLO)
+app.put('/api/auth/update-estamento', async (req, res) => {
+  try {
+    const { usuario, nuevoEstamento } = req.body;
+    
+    const usuarioEncontrado = await Usuario.findOne({ where: { usuario } });
+    if (!usuarioEncontrado) {
+      return res.status(404).json({ 
+        error: 'Usuario no encontrado',
+        message: `El usuario ${usuario} no existe en la base de datos`
+      });
+    }
+    
+    await usuarioEncontrado.update({ estamento: nuevoEstamento });
+    
+    res.json({
+      message: 'Estamento actualizado exitosamente',
+      usuario: {
+        id: usuarioEncontrado.id,
+        usuario: usuarioEncontrado.usuario,
+        nombres: usuarioEncontrado.nombres,
+        apellidos: usuarioEncontrado.apellidos,
+        correo: usuarioEncontrado.correo,
+        estamento: usuarioEncontrado.estamento
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error al actualizar estamento:', error);
+    res.status(500).json({
+      error: 'Error interno del servidor',
+      message: error.message
+    });
+  }
+});
+
 // Endpoint temporal para importar usuarios (SOLO PARA DESARROLLO)
 app.post('/api/auth/import-user', async (req, res) => {
   try {
