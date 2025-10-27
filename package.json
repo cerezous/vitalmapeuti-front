@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Frontend para Sistema VitalMape UTI",
   "private": true,
-  "homepage": "/",
+  "homepage": ".",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
