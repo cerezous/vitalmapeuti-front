@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiBaseUrl } from './apiBaseUrl';
+import { getApiBaseUrl } from './api';
 
 // Detecta automáticamente la URL del backend
 const API_URL = getApiBaseUrl(); // URL del backend

@@ -1,5 +1,4 @@
-import api from './api';
-import { getApiBaseUrl } from './apiBaseUrl';
+import api, { getApiBaseUrl } from './api';
 
 // Tipos TypeScript para la categorización
 export interface CategorizacionKinesiologia {

@@ -112,7 +112,7 @@ const Login: React.FC = () => {
                 {/* Logo para móviles */}
                 <div className="lg:hidden text-center mb-8">
                   <img 
-                    src="/vitalmape_logo.png" 
+                    src="/logodefinitivo4.png" 
                     alt="VitalMape Logo" 
                     className="h-20 sm:h-24 mx-auto"
                   />

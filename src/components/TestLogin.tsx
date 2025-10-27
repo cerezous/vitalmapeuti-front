@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { getApiBaseUrl } from '../services/apiBaseUrl';
+import { getApiBaseUrl } from '../services/api';
 
 const TestLogin: React.FC = () => {
   const [result, setResult] = useState<string>('');

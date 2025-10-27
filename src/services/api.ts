@@ -42,13 +42,16 @@ const API_BASE_URL = getApiBaseUrl();
 // Debug: mostrar la URL que se está usando
 console.log('🎯 API_BASE_URL FINAL:', API_BASE_URL);
 
+// Exportar la función para usar en otros archivos
+export { getApiBaseUrl };
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   // Agregar timeout para evitar requests eternos
-  timeout: 10000,
+  timeout: 30000,
 });
 
 // Interceptor para agregar el token (excluyendo rutas públicas)

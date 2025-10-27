@@ -4,7 +4,7 @@ import medicinaAPI from '../services/medicinaAPI';
 import { useAuth } from '../contexts/AuthContext';
 import { pacienteService, Paciente } from '../services/api';
 import axios from 'axios';
-import { getApiBaseUrl } from '../services/apiBaseUrl';
+import { getApiBaseUrl } from '../services/api';
 
 interface ModalDetalleProcedimientoMedicinaProps {
   isOpen: boolean;
