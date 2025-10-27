@@ -1,8 +1,6 @@
 import axios from 'axios';
 
 // Detecta automáticamente la URL del backend
-// Si accedes desde tu celular o red local, usará la IP de donde se cargó el frontend
-// Si accedes desde localhost, usará localhost
 const getApiBaseUrl = () => {
   console.log('🔍 DEBUG API URL:', {
     'REACT_APP_API_URL': process.env.REACT_APP_API_URL,
@@ -11,19 +9,29 @@ const getApiBaseUrl = () => {
     'NODE_ENV': process.env.NODE_ENV
   });
   
-  // Si hay una variable de entorno, úsala (para producción)
+  // 1. Si hay una variable de entorno, úsala (PRIORIDAD)
   if (process.env.REACT_APP_API_URL) {
     console.log('✅ Usando REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
     return process.env.REACT_APP_API_URL;
   }
   
-  // Si estamos en localhost, usar localhost
+  // 2. Si estamos en localhost, usar localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     console.log('🏠 Usando localhost API');
     return 'http://localhost:3001/api';
   }
   
-  // Si estamos en una IP de red local, usar esa IP
+  // 3. Si estamos en producción, usar la URL de tu backend en producción
+  if (window.location.hostname.includes('netlify.app') || 
+      window.location.hostname.includes('vercel.app') ||
+      window.location.hostname.includes('onrender.com') ||
+      !window.location.hostname.includes('192.168')) {
+    const productionUrl = 'https://vitalmapeuti-back.onrender.com/api';
+    console.log('🌍 Usando producción API:', productionUrl);
+    return productionUrl;
+  }
+  
+  // 4. Si estamos en una IP de red local, usar esa IP (desarrollo móvil)
   const fallbackUrl = `http://${window.location.hostname}:3001/api`;
   console.log('🌐 Usando fallback URL:', fallbackUrl);
   return fallbackUrl;
@@ -32,13 +40,15 @@ const getApiBaseUrl = () => {
 const API_BASE_URL = getApiBaseUrl();
 
 // Debug: mostrar la URL que se está usando
-console.log('API_BASE_URL:', API_BASE_URL);
+console.log('🎯 API_BASE_URL FINAL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  // Agregar timeout para evitar requests eternos
+  timeout: 10000,
 });
 
 // Interceptor para agregar el token (excluyendo rutas públicas)
@@ -68,7 +78,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('❌ Error en response:', error.config?.url, error.response?.status, error.message);
+    console.error('❌ Error en response:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message,
+      data: error.response?.data
+    });
+    
     if (error.response?.status === 401) {
       console.log('🔒 Token inválido, limpiando localStorage y redirigiendo a login');
       localStorage.removeItem('token');
@@ -76,7 +92,8 @@ api.interceptors.response.use(
       window.location.href = '/login';
     } else if (error.response?.status === 403) {
       console.warn('⚠️ Sin autorización (403) para:', error.config?.url);
-      // No redirigir automáticamente en 403, solo loguear el warning
+    } else if (!error.response) {
+      console.error('🔴 Error de red o CORS:', error.message);
     }
     return Promise.reject(error);
   }
@@ -246,7 +263,6 @@ class PacienteService {
   }
 
   async crearPaciente(pacienteData: PacienteInput): Promise<Paciente> {
-    
     try {
       const response = await api.post<ApiResponse<Paciente>>('/pacientes', pacienteData);
       

@@ -75,8 +75,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (usuario: string, contraseña: string) => {
     try {
+      // Determinar la URL de la API basada en el entorno
+      let apiUrl = 'http://localhost:3001/api/auth/login';
+      
+      if (window.location.hostname === 'vitalmapeuti.onrender.com') {
+        apiUrl = 'https://vitalmapeuti-back.onrender.com/api/auth/login';
+      }
+      
       // Usar axios directamente como en TestLogin para evitar problemas del interceptor
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
