@@ -33,14 +33,19 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  console.log('🔐 AuthProvider inicializado');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🔄 AuthProvider useEffect ejecutándose');
     const initAuth = async () => {
       try {
+        console.log('🔍 Verificando usuario actual...');
         const currentUser = authService.getCurrentUser();
         const hasToken = authService.isAuthenticated();
+        console.log('👤 Usuario actual:', currentUser);
+        console.log('🔑 Tiene token:', hasToken);
         
         if (currentUser && hasToken) {
           try {

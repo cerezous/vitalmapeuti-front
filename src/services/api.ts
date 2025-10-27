@@ -4,18 +4,29 @@ import axios from 'axios';
 // Si accedes desde tu celular o red local, usará la IP de donde se cargó el frontend
 // Si accedes desde localhost, usará localhost
 const getApiBaseUrl = () => {
+  console.log('🔍 DEBUG API URL:', {
+    'REACT_APP_API_URL': process.env.REACT_APP_API_URL,
+    'window.location.hostname': window.location.hostname,
+    'window.location.origin': window.location.origin,
+    'NODE_ENV': process.env.NODE_ENV
+  });
+  
   // Si hay una variable de entorno, úsala (para producción)
   if (process.env.REACT_APP_API_URL) {
+    console.log('✅ Usando REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
     return process.env.REACT_APP_API_URL;
   }
   
   // Si estamos en localhost, usar localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('🏠 Usando localhost API');
     return 'http://localhost:3001/api';
   }
   
   // Si estamos en una IP de red local, usar esa IP
-  return `http://${window.location.hostname}:3001/api`;
+  const fallbackUrl = `http://${window.location.hostname}:3001/api`;
+  console.log('🌐 Usando fallback URL:', fallbackUrl);
+  return fallbackUrl;
 };
 
 const API_BASE_URL = getApiBaseUrl();
