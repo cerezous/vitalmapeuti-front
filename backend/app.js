@@ -920,8 +920,8 @@ app.post('/api/auth/import-user', async (req, res) => {
     
     // Crear usuario con contraseña ya hasheada usando query directo para evitar hooks
     const [nuevoUsuario] = await sequelize.query(
-      `INSERT INTO usuarios (usuario, contraseña, nombres, apellidos, correo, estamento, createdAt, updatedAt) 
-       VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      `INSERT INTO usuarios (usuario, contraseña, nombres, apellidos, correo, estamento, "createdAt", "updatedAt") 
+       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
       {
         replacements: [usuario, contraseña, nombres, apellidos, correo, estamento],
         type: sequelize.QueryTypes.INSERT
