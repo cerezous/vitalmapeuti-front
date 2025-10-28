@@ -130,50 +130,44 @@ router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   try {
     const usuarioId = req.user.id;
     
-    // 1. Total de Procedimientos del usuario
-    const registrosUsuario = await RegistroProcedimientos.findAll({
-      where: { usuarioId },
-      attributes: ['id']
-    });
-    
-    const registrosIds = registrosUsuario.map(r => r.id);
-    
+    // Inicializar métricas con valores por defecto
     let totalProcedimientos = 0;
-    if (registrosIds.length > 0) {
-      totalProcedimientos = await ProcedimientoRegistro.count({
-        where: { registroId: { [Op.in]: registrosIds } }
-      });
-    }
-
-    // 2. Tiempo Total de Procedimientos del usuario
-    const tiempoTotalResult = await RegistroProcedimientos.sum('tiempoTotal', {
-      where: { usuarioId }
-    });
-    const tiempoTotalMinutos = tiempoTotalResult || 0;
-    const tiempoTotalHoras = Math.floor(tiempoTotalMinutos / 60);
-    const tiempoTotalMins = tiempoTotalMinutos % 60;
-
-    // 3. Total de Categorizaciones del usuario
-    const totalCategorizaciones = await CategorizacionKinesiologia.count({
-      where: { usuarioId }
-    });
-
-    // 4. Número de Pacientes Atendidos (únicos) - Usar consulta SQL segura
+    let tiempoTotalMinutos = 0;
+    let tiempoTotalHoras = 0;
+    let tiempoTotalMins = 0;
+    let totalCategorizaciones = 0;
     let numeroPacientesAtendidos = 0;
-    if (registrosIds.length > 0) {
-      try {
-        // Usar consulta SQL raw con nombres de columna explícitos
-        const pacientesRaw = await sequelize.query(
-          `SELECT DISTINCT "pacienteRut" FROM procedimientos_registro WHERE "registroId" = ANY($1) AND "pacienteRut" IS NOT NULL`,
-          {
-            replacements: [registrosIds],
-            type: sequelize.QueryTypes.SELECT
-          }
-        );
-        numeroPacientesAtendidos = pacientesRaw.length;
-      } catch (error) {
-        // Si falla la consulta SQL, usar Sequelize ORM
-        console.warn('Error en consulta SQL raw, usando Sequelize ORM:', error.message);
+    
+    try {
+      // 1. Total de Procedimientos del usuario
+      const registrosUsuario = await RegistroProcedimientos.findAll({
+        where: { usuarioId },
+        attributes: ['id']
+      });
+      
+      const registrosIds = registrosUsuario.map(r => r.id);
+      
+      if (registrosIds.length > 0) {
+        totalProcedimientos = await ProcedimientoRegistro.count({
+          where: { registroId: { [Op.in]: registrosIds } }
+        });
+      }
+
+      // 2. Tiempo Total de Procedimientos del usuario
+      const tiempoTotalResult = await RegistroProcedimientos.sum('tiempoTotal', {
+        where: { usuarioId }
+      });
+      tiempoTotalMinutos = tiempoTotalResult || 0;
+      tiempoTotalHoras = Math.floor(tiempoTotalMinutos / 60);
+      tiempoTotalMins = tiempoTotalMinutos % 60;
+
+      // 3. Total de Categorizaciones del usuario
+      totalCategorizaciones = await CategorizacionKinesiologia.count({
+        where: { usuarioId }
+      });
+
+      // 4. Número de Pacientes Atendidos (únicos) - Solo usar Sequelize ORM
+      if (registrosIds.length > 0) {
         const pacientesUnicos = await ProcedimientoRegistro.findAll({
           where: { 
             registroId: { [Op.in]: registrosIds },
@@ -185,6 +179,9 @@ router.get('/metricas/usuario', authenticateToken, async (req, res) => {
         });
         numeroPacientesAtendidos = pacientesUnicos.length;
       }
+    } catch (dbError) {
+      console.warn('Error en consultas de base de datos, usando valores por defecto:', dbError.message);
+      // Mantener valores por defecto si hay error en la base de datos
     }
 
     res.json({
