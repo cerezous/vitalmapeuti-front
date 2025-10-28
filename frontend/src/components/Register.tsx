@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
 
-const Register: React.FC = () => {
+const Register = () => {
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
@@ -11,7 +11,7 @@ const Register: React.FC = () => {
     contraseña: '',
     confirmarContraseña: '',
   });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -20,7 +20,7 @@ const Register: React.FC = () => {
   // Solo estamentos permitidos para registro público (excluye Administrador por seguridad)
   const estamentos = ['Kinesiología', 'Enfermería', 'Medicina', 'Auxiliares', 'TENS'];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -36,7 +36,7 @@ const Register: React.FC = () => {
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+    const newErrors = {};
 
     if (!formData.nombres.trim()) {
       newErrors.nombres = 'Los nombres son requeridos';
@@ -76,7 +76,7 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -101,11 +101,11 @@ const Register: React.FC = () => {
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-    } catch (error: any) {
+    } catch (error) {
       if (error.response?.data?.errors) {
         // Errores de validación del backend
-        const backendErrors: { [key: string]: string } = {};
-        error.response.data.errors.forEach((err: any) => {
+        const backendErrors = {};
+        error.response.data.errors.forEach((err) => {
           if (err.path) {
             backendErrors[err.path] = err.message;
           }

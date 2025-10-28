@@ -10,15 +10,6 @@ import RootRoute from './components/RootRoute';
 import TestTailwind from './components/TestTailwind';
 import TestLogin from './components/TestLogin';
 
-// Debug logs
-console.log('🚀 App.tsx cargado');
-console.log('🌍 Environment:', {
-  NODE_ENV: process.env.NODE_ENV,
-  REACT_APP_API_URL: process.env.REACT_APP_API_URL,
-  window_location: window.location.href,
-  window_origin: window.location.origin
-});
-
 function App() {
   return (
     <AuthProvider>

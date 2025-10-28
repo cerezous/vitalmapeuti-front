@@ -71,7 +71,7 @@ const Login: React.FC = () => {
     try {
       await login(formData.usuario, formData.contraseña);
       navigate(from, { replace: true });
-    } catch (error: any) {
+    } catch (error) {
       setErrors({
         submit: error.response?.data?.error || 'Error al iniciar sesión. Inténtalo de nuevo.',
       });
