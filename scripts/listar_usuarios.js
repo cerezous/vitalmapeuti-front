@@ -1,5 +1,5 @@
-const Usuario = require('./models/Usuario');
-const sequelize = require('./config/database');
+const Usuario = require('../backend/models/Usuario');
+const sequelize = require('../backend/config/database');
 
 async function listarUsuarios() {
   try {
@@ -10,8 +10,12 @@ async function listarUsuarios() {
       order: [['id', 'ASC']]
     });
     
+    console.log('\n📋 Usuarios en la base de datos:');
+    console.log('================================');
     usuarios.forEach(usuario => {
+      console.log(`ID: ${usuario.id} | Usuario: ${usuario.usuario} | Nombre: ${usuario.nombres} ${usuario.apellidos} | Estamento: ${usuario.estamento}`);
     });
+    console.log(`\nTotal usuarios: ${usuarios.length}`);
     
   } catch (error) {
     console.error('Error:', error.message);

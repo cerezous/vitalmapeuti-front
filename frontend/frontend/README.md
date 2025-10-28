@@ -1,128 +1,209 @@
-# VitalMape Frontend
+# 🏥 VitalMape UTI - Sistema de Gestión Hospitalaria
 
-Frontend React para el Sistema de Gestión de UTI VitalMape.
+Sistema completo de gestión para Unidad de Terapia Intensiva (UTI) desarrollado con React y Node.js.
 
-## Descripción
+## 📋 Características
 
-Este es el frontend del sistema VitalMape, una aplicación web moderna para la gestión de pacientes en Unidades de Terapia Intensiva (UTI). Proporciona una interfaz intuitiva y responsive para el manejo de pacientes, procedimientos médicos y estadísticas.
+- **Gestión de Pacientes**: Registro, seguimiento y egreso de pacientes
+- **Procedimientos Médicos**: Registro de procedimientos por especialidad
+- **Sistema de Usuarios**: Roles diferenciados (Administrador, Medicina, Enfermería, etc.)
+- **Estadísticas**: Reportes y métricas en tiempo real
+- **Cuestionarios**: Sistema de evaluación de burnout
+- **Interfaz Responsiva**: Optimizada para dispositivos móviles
+- **Base de Datos PostgreSQL**: Escalable y robusta para producción
 
-## Características
+## 🏗️ Arquitectura
 
+```
+vitalmape-uti/
+├── backend/          # API Node.js + Express + PostgreSQL
+├── frontend/         # React + TypeScript + Tailwind
+├── scripts/          # Scripts de utilidad y tests
+├── docs/            # Documentación
+├── data/            # Bases de datos y archivos de datos
+└── package.json     # Configuración principal
+```
+
+## 🚀 Instalación y Desarrollo
+
+### Prerrequisitos
+- Node.js >= 18.0.0
+- PostgreSQL >= 12
+- npm
+
+### Instalación Rápida
+```bash
+# 1. Configurar PostgreSQL
+./scripts/setup-postgresql.sh
+
+# 2. Instalar todas las dependencias
+npm run install-all
+
+# 3. Configurar base de datos
+cd backend
+npm run db:migrate
+npm run db:seed
+
+# 4. Desarrollo (backend + frontend)
+npm run dev
+```
+
+### Instalación Manual
+```bash
+# Instalar dependencias
+npm run install-all
+
+# Configurar PostgreSQL (ver docs/POSTGRESQL_SETUP.md)
+cd backend
+cp env.development .env
+# Ajustar variables en .env
+
+# Crear base de datos
+createdb vitalmape_dev
+
+# Ejecutar migraciones
+npm run db:migrate
+
+# Poblar datos iniciales
+npm run db:seed
+
+# Desarrollo
+npm run dev
+```
+
+## 🌐 Despliegue
+
+### Backend (Railway + PostgreSQL)
+1. Ve a https://railway.app
+2. Conecta tu repositorio
+3. Agrega servicio PostgreSQL
+4. Configura las variables de entorno desde `scripts/production.env`
+
+### Frontend (Vercel)
+1. Ve a https://vercel.com
+2. Conecta tu repositorio
+3. Configura el directorio como `frontend`
+
+### Script Automatizado
+```bash
+npm run deploy
+```
+
+## 📁 Estructura del Proyecto
+
+### Backend (`/backend`)
+- **API REST** con Express.js
+- **Base de datos** PostgreSQL
+- **Autenticación** JWT
+- **Envío de correos** con Nodemailer
+- **Modelos** Sequelize ORM
+- **Migraciones** automáticas
+
+### Frontend (`/frontend`)
 - **React 19** con TypeScript
-- **Tailwind CSS** para estilos modernos y responsive
-- **Axios** para comunicación con la API
+- **Tailwind CSS** para estilos
 - **React Router** para navegación
-- **Recharts** para gráficos y estadísticas
-- **Autenticación JWT** integrada
-- **Diseño responsive** para móviles y desktop
+- **Axios** para peticiones HTTP
+- **Context API** para estado global
 
-## Tecnologías
+### Scripts (`/scripts`)
+- Scripts de migración de base de datos
+- Tests y verificaciones
+- Utilidades de desarrollo
 
-- React 19.x
-- TypeScript 4.x
-- Tailwind CSS 3.x
-- Axios para HTTP requests
-- React Router DOM 7.x
-- Recharts para gráficos
+## 🔧 Variables de Entorno
 
-## Instalación
-
-1. Clona el repositorio:
-```bash
-git clone <url-del-repositorio>
-cd vitalmape-frontend
-```
-
-2. Instala las dependencias:
-```bash
-npm install
-```
-
-3. Configura las variables de entorno:
-```bash
-cp env.example .env
-```
-
-4. Edita el archivo `.env` con la URL de tu backend:
+### Backend (Desarrollo)
 ```env
-REACT_APP_API_URL=https://tu-backend.railway.app/api
+NODE_ENV=development
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=vitalmape_dev
+DB_USER=postgres
+DB_PASSWORD=password
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=mcerezopr@gmail.com
+SMTP_PASS=tu_password_de_aplicacion
+FRONTEND_URL=http://localhost:3000
+JWT_SECRET=tu_jwt_secret_seguro
 ```
 
-5. Inicia el servidor de desarrollo:
+### Backend (Producción)
+```env
+NODE_ENV=production
+DATABASE_URL=postgresql://usuario:password@host:puerto/database
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=mcerezopr@gmail.com
+SMTP_PASS=tu_password_de_aplicacion
+FRONTEND_URL=https://tu-frontend-url.vercel.app
+JWT_SECRET=vitalmape_jwt_secret_production_2024_secure_key
+```
+
+### Frontend
+```env
+REACT_APP_API_URL=https://tu-backend-url.railway.app/api
+```
+
+## 👥 Roles de Usuario
+
+- **Administrador**: Gestión completa del sistema
+- **Medicina**: Procedimientos médicos y estadísticas
+- **Enfermería**: Cuidados de enfermería y procedimientos
+- **Kinesiología**: Terapias y rehabilitación
+- **TENS**: Técnicos en enfermería
+- **Auxiliares**: Procedimientos auxiliares
+
+## 📊 Funcionalidades Principales
+
+### Gestión de Pacientes
+- Registro de ingreso
+- Seguimiento de evolución
+- Procedimientos por especialidad
+- Egreso y traslados
+
+### Procedimientos
+- Medicina: Cirugías, tratamientos
+- Enfermería: Cuidados, medicamentos
+- Kinesiología: Terapias físicas
+- TENS: Procedimientos técnicos
+- Auxiliares: Apoyo técnico
+
+### Estadísticas
+- Métricas por especialidad
+- Reportes de ocupación
+- Análisis de procedimientos
+- Evaluación de personal
+
+## 🐘 Base de Datos PostgreSQL
+
+### Ventajas
+- ✅ **Escalabilidad**: Mejor rendimiento con grandes volúmenes
+- ✅ **Concurrencia**: Múltiples usuarios simultáneos
+- ✅ **Integridad**: Mejor control de transacciones
+- ✅ **Funciones Avanzadas**: JSON, arrays, funciones personalizadas
+- ✅ **Producción**: Estándar en la industria
+
+### Comandos Útiles
 ```bash
-npm start
+# Configurar PostgreSQL
+./scripts/setup-postgresql.sh
+
+# Probar configuración
+./scripts/test-postgresql.sh
+
+# Ejecutar migraciones
+cd backend && npm run db:migrate
+
+# Poblar datos iniciales
+cd backend && npm run db:seed
 ```
 
-## Scripts disponibles
+## 🆘 Soporte
 
-- `npm start` - Inicia el servidor de desarrollo
-- `npm run build` - Construye la aplicación para producción
-- `npm test` - Ejecuta las pruebas
-- `npm run eject` - Expone la configuración de Create React App
+Para soporte técnico contacta a: mcerezopr@gmail.com
 
-## Estructura del proyecto
+## 📄 Licencia
 
-```
-frontend/
-├── public/           # Archivos públicos (HTML, imágenes, etc.)
-├── src/
-│   ├── components/  # Componentes React reutilizables
-│   ├── services/     # Servicios para comunicación con API
-│   ├── contexts/     # Contextos de React (Auth, etc.)
-│   ├── App.tsx       # Componente principal
-│   └── index.tsx     # Punto de entrada
-├── package.json      # Dependencias y scripts
-└── tailwind.config.js # Configuración de Tailwind
-```
-
-## Configuración del Backend
-
-El frontend necesita conectarse a un backend API. Asegúrate de que:
-
-1. El backend esté desplegado y funcionando
-2. La variable `REACT_APP_API_URL` apunte a la URL correcta del backend
-3. El backend tenga CORS configurado para permitir requests desde el frontend
-
-### URLs de ejemplo:
-- **Desarrollo local**: `http://localhost:3001/api`
-- **Producción Railway**: `https://tu-backend.railway.app/api`
-
-## Despliegue
-
-### Vercel (Recomendado para frontend)
-1. Conecta tu repositorio a Vercel
-2. Configura la variable de entorno `REACT_APP_API_URL`
-3. Vercel detectará automáticamente que es una aplicación React
-
-### Railway
-1. Conecta tu repositorio a Railway
-2. Configura la variable de entorno `REACT_APP_API_URL`
-3. Railway construirá y desplegará automáticamente
-
-### Variables de entorno requeridas:
-- `REACT_APP_API_URL` - URL del backend API
-
-## Características de la UI
-
-- **Diseño flat** sin gradientes ni bordes (según preferencias del usuario)
-- **Colores planos** para una apariencia moderna
-- **Responsive design** que funciona en móviles y desktop
-- **Navegación intuitiva** con menús organizados
-- **Formularios accesibles** con validación
-- **Gráficos interactivos** para estadísticas
-
-## Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-## Licencia
-
-ISC - Ver archivo LICENSE para más detalles.
-
-## Autor
-
-Matías Cerezo Prado - mcerezopr@gmail.com
+ISC License - Ver archivo LICENSE para más detalles.
