@@ -243,6 +243,17 @@ const registroProcedimientosAPI = {
       console.log('✅ Respuesta recibida:', response.status);
       console.log('📊 Datos:', response.data);
       
+      // Verificar que la respuesta tenga la estructura esperada
+      if (!response.data || !response.data.data) {
+        console.warn('⚠️ Respuesta sin datos, usando valores por defecto');
+        return {
+          totalProcedimientos: 0,
+          tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
+          totalCategorizaciones: 0,
+          pacientesAtendidos: 0
+        };
+      }
+      
       return response.data.data;
     } catch (error) {
       console.error('🚨 ERROR EN OBTENER MÉTRICAS USUARIO - VERSIÓN CORREGIDA:', error);
