@@ -377,7 +377,7 @@ const Register: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           <div className="grid grid-cols-2 h-auto">
             {/* Columna izquierda - Branding */}
-            <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-12 flex-col justify-between text-center">
+            <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-12 flex flex-col justify-between text-center">
               <div className="flex flex-col items-center">
                 <img 
                   src="/logodefinitivo4.png" 
@@ -611,6 +611,7 @@ const Register: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
