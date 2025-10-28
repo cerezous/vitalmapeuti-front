@@ -11,8 +11,6 @@ const authenticateToken = require('../middleware/auth');
 
 // Crear procedimientos de medicina
 router.post('/', authenticateToken, async (req, res) => {
-  const transaction = await sequelize.transaction();
-  
   try {
     const { turno, fecha, procedimientos } = req.body;
 
@@ -55,7 +53,6 @@ router.post('/', authenticateToken, async (req, res) => {
       // Validar que el procedimiento sea válido
       const procedimientosValidos = ProcedimientoMedicina.getProcedimientosValidos();
       if (!procedimientosValidos.includes(procedimiento.nombre)) {
-        await transaction.rollback();
         return res.status(400).json({
           error: 'Procedimiento inválido',
           message: `El procedimiento "${procedimiento.nombre}" no es válido para medicina`
@@ -64,7 +61,6 @@ router.post('/', authenticateToken, async (req, res) => {
 
       // Validar que si el procedimiento requiere paciente, esté presente
       if (ProcedimientoMedicina.requierePaciente(procedimiento.nombre) && !procedimiento.pacienteRut) {
-        await transaction.rollback();
         return res.status(400).json({
           error: 'Paciente requerido',
           message: `El procedimiento "${procedimiento.nombre}" requiere un paciente asignado`
@@ -75,54 +71,41 @@ router.post('/', authenticateToken, async (req, res) => {
       if (procedimiento.pacienteRut) {
         const paciente = await Paciente.findOne({ where: { rut: procedimiento.pacienteRut } });
         if (!paciente) {
-          await transaction.rollback();
           return res.status(404).json({
             error: 'Paciente no encontrado',
             message: `No existe un paciente con RUT ${procedimiento.pacienteRut}`
           });
         }
       }
-    }
 
-    // Crear cada procedimiento después de validar todo
-    for (const procedimiento of procedimientos) {
       // Validar formato de tiempo
       if (!procedimiento.tiempo || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(procedimiento.tiempo)) {
-        await transaction.rollback();
         return res.status(400).json({
           error: 'Formato de tiempo inválido',
           message: `El tiempo "${procedimiento.tiempo}" debe estar en formato HH:MM`
         });
       }
+    }
 
+    // Crear cada procedimiento después de validar todo
+    for (const procedimiento of procedimientos) {
       // Convertir tiempo a minutos para sumar
       const [horas, minutos] = procedimiento.tiempo.split(':').map(Number);
       tiempoTotal += horas * 60 + minutos;
 
       // Crear el procedimiento
-      try {
-        const nuevoProcedimiento = await ProcedimientoMedicina.create({
-          usuarioId: req.user.id,
-          turno,
-          fecha,
-          nombre: procedimiento.nombre,
-          tiempo: procedimiento.tiempo,
-          pacienteRut: procedimiento.pacienteRut || null,
-          observaciones: procedimiento.observaciones || null
-        }, { transaction });
+      const nuevoProcedimiento = await ProcedimientoMedicina.create({
+        usuarioId: req.user.id,
+        turno,
+        fecha,
+        nombre: procedimiento.nombre,
+        tiempo: procedimiento.tiempo,
+        pacienteRut: procedimiento.pacienteRut || null,
+        observaciones: procedimiento.observaciones || null
+      });
 
-        procedimientosCreados.push(nuevoProcedimiento);
-      } catch (createError) {
-        await transaction.rollback();
-        console.error('Error al crear procedimiento individual:', createError);
-        return res.status(400).json({
-          error: 'Error al crear procedimiento',
-          message: `Error al crear el procedimiento "${procedimiento.nombre}": ${createError.message}`
-        });
-      }
+      procedimientosCreados.push(nuevoProcedimiento);
     }
-
-    await transaction.commit();
 
     // Obtener procedimientos con relaciones para la respuesta
     const procedimientosConRelaciones = await ProcedimientoMedicina.findAll({
@@ -160,39 +143,25 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    await transaction.rollback();
     console.error('Error al crear procedimientos de medicina:', error);
-    console.error('Stack trace:', error.stack);
     
     if (error.name === 'SequelizeValidationError') {
-      console.error('Errores de validación:', error.errors);
       return res.status(400).json({
         error: 'Error de validación',
-        message: error.errors.map(e => `${e.path}: ${e.message}`).join(', '),
-        details: error.errors
+        message: error.errors.map(e => `${e.path}: ${e.message}`).join(', ')
       });
     }
 
     if (error.name === 'SequelizeForeignKeyConstraintError') {
-      console.error('Error de clave foránea:', error.message);
       return res.status(400).json({
         error: 'Error de referencia',
         message: 'El usuario o paciente referenciado no existe'
       });
     }
 
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      console.error('Error de unicidad:', error.message);
-      return res.status(400).json({
-        error: 'Error de duplicación',
-        message: 'Ya existe un registro con estos datos'
-      });
-    }
-
     res.status(500).json({
       error: 'Error interno del servidor',
-      message: 'Ocurrió un error al crear los procedimientos de medicina',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Ocurrió un error al crear los procedimientos de medicina'
     });
   }
 });
