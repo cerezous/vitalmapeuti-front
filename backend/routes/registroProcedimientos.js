@@ -158,20 +158,33 @@ router.get('/metricas/usuario', authenticateToken, async (req, res) => {
       where: { usuarioId }
     });
 
-    // 4. Número de Pacientes Atendidos (únicos)
+    // 4. Número de Pacientes Atendidos (únicos) - Usar consulta SQL segura
     let numeroPacientesAtendidos = 0;
     if (registrosIds.length > 0) {
-      // Usar Sequelize ORM para evitar problemas de nombres de columna
-      const pacientesUnicos = await ProcedimientoRegistro.findAll({
-        where: { 
-          registroId: { [Op.in]: registrosIds },
-          pacienteRut: { [Op.ne]: null }
-        },
-        attributes: ['pacienteRut'],
-        group: ['pacienteRut'],
-        raw: true
-      });
-      numeroPacientesAtendidos = pacientesUnicos.length;
+      try {
+        // Usar consulta SQL raw con nombres de columna explícitos
+        const pacientesRaw = await sequelize.query(
+          `SELECT DISTINCT "pacienteRut" FROM procedimientos_registro WHERE "registroId" = ANY($1) AND "pacienteRut" IS NOT NULL`,
+          {
+            replacements: [registrosIds],
+            type: sequelize.QueryTypes.SELECT
+          }
+        );
+        numeroPacientesAtendidos = pacientesRaw.length;
+      } catch (error) {
+        // Si falla la consulta SQL, usar Sequelize ORM
+        console.warn('Error en consulta SQL raw, usando Sequelize ORM:', error.message);
+        const pacientesUnicos = await ProcedimientoRegistro.findAll({
+          where: { 
+            registroId: { [Op.in]: registrosIds },
+            pacienteRut: { [Op.ne]: null }
+          },
+          attributes: ['pacienteRut'],
+          group: ['pacienteRut'],
+          raw: true
+        });
+        numeroPacientesAtendidos = pacientesUnicos.length;
+      }
     }
 
     res.json({
