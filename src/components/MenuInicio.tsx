@@ -28,8 +28,15 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
     try {
       const metricas = await registroProcedimientosAPI.obtenerMetricasUsuario();
       setMetricasUsuario(metricas);
-    } catch (err) {
-      console.error('Error al cargar métricas del usuario:', err);
+    } catch (error) {
+      console.error('Error al cargar métricas del usuario:', error);
+      // Mantener valores por defecto en caso de error
+      setMetricasUsuario({
+        totalProcedimientos: 0,
+        tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
+        totalCategorizaciones: 0,
+        pacientesAtendidos: 0
+      });
     }
   };
 
