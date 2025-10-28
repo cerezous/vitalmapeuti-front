@@ -6,6 +6,7 @@ const RegistroProcedimientos = require('../models/RegistroProcedimientos');
 const ProcedimientoRegistro = require('../models/ProcedimientoRegistro');
 const Usuario = require('../models/Usuario');
 const Paciente = require('../models/Paciente');
+const CategorizacionKinesiologia = require('../models/CategorizacionKinesiologia');
 
 // Middleware para validar token JWT
 const authenticateToken = require('../middleware/auth');
@@ -127,7 +128,6 @@ router.post('/', authenticateToken, async (req, res) => {
 // Obtener métricas del usuario actual
 router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   try {
-    const CategorizacionKinesiologia = require('../models/CategorizacionKinesiologia');
     const usuarioId = req.user.id;
     
     
@@ -191,10 +191,31 @@ router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Error al obtener métricas del usuario:', error);
     console.error('Stack trace:', error.stack);
-    res.status(500).json({
+    console.error('Usuario ID:', req.user?.id);
+    
+    // Determinar el tipo de error y proporcionar información más específica
+    let errorMessage = 'Ocurrió un error al obtener las métricas del usuario';
+    let statusCode = 500;
+    
+    if (error.name === 'SequelizeConnectionError') {
+      errorMessage = 'Error de conexión a la base de datos';
+      statusCode = 503;
+    } else if (error.name === 'SequelizeValidationError') {
+      errorMessage = 'Error de validación de datos';
+      statusCode = 400;
+    } else if (error.name === 'SequelizeForeignKeyConstraintError') {
+      errorMessage = 'Error de integridad referencial en la base de datos';
+      statusCode = 400;
+    } else if (error.message && error.message.includes('ENOTFOUND')) {
+      errorMessage = 'No se pudo conectar con el servidor de base de datos';
+      statusCode = 503;
+    }
+    
+    res.status(statusCode).json({
       error: 'Error interno del servidor',
-      message: 'Ocurrió un error al obtener las métricas del usuario',
-      details: error.message
+      message: errorMessage,
+      details: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });
@@ -202,7 +223,6 @@ router.get('/metricas/usuario', authenticateToken, async (req, res) => {
 // Obtener métricas para el dashboard
 router.get('/metricas/dashboard', authenticateToken, async (req, res) => {
   try {
-    const CategorizacionKinesiologia = require('../models/CategorizacionKinesiologia');
     
     // 1. Tiempo Total de Procedimientos (Mes actual)
     const inicioMes = new Date();

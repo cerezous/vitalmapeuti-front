@@ -234,10 +234,25 @@ const registroProcedimientosAPI = {
       );
       return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        throw new Error(error.response.data.message || 'Error al obtener las métricas del usuario');
+      console.error('Error detallado en obtenerMetricasUsuario:', error);
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          // Error del servidor con respuesta
+          const status = error.response.status;
+          const message = error.response.data?.message || error.response.data?.error || 'Error desconocido del servidor';
+          console.error(`Error del servidor (${status}):`, error.response.data);
+          throw new Error(`Error del servidor (${status}): ${message}`);
+        } else if (error.request) {
+          // Error de conexión - no se recibió respuesta
+          console.error('Error de conexión:', error.request);
+          throw new Error('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+        }
       }
-      throw error;
+      
+      // Error genérico
+      console.error('Error inesperado:', error);
+      throw new Error('Ocurrió un error inesperado al obtener las métricas del usuario');
     }
   },
 
