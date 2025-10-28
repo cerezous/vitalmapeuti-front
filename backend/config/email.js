@@ -65,17 +65,10 @@ async function enviarCorreoBienvenida(usuario, contraseña) {
                             <p style="margin: 8px 0; color: #34495e;"><strong>Estamento:</strong> ${usuario.estamento}</p>
                         </div>
                         
-                        <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-                            <h3 style="color: #27ae60; margin: 0 0 15px 0; font-size: 18px;">🔐 Importante - Seguridad</h3>
-                            <p style="margin: 8px 0; color: #2c3e50; font-size: 14px;">
-                                Por motivos de seguridad, te recomendamos cambiar tu contraseña después del primer inicio de sesión.
-                            </p>
-                        </div>
-                        
                         <div style="text-align: center; margin-top: 30px;">
-                            <a href="${process.env.FRONTEND_URL || 'https://vitalmapeuti-front.vercel.app'}" 
+                            <a href="${process.env.FRONTEND_URL || 'https://vitalmapeuti-front.vercel.app'}/login" 
                                style="background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                                Acceder al Sistema
+                                Iniciar Sesión
                             </a>
                         </div>
                         
@@ -199,17 +192,10 @@ async function enviarCorreoConGmail(usuario, contraseña) {
                             <p style="margin: 8px 0; color: #34495e;"><strong>Estamento:</strong> ${usuario.estamento}</p>
                         </div>
                         
-                        <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-                            <h3 style="color: #27ae60; margin: 0 0 15px 0; font-size: 18px;">🔐 Importante - Seguridad</h3>
-                            <p style="margin: 8px 0; color: #2c3e50; font-size: 14px;">
-                                Por motivos de seguridad, te recomendamos cambiar tu contraseña después del primer inicio de sesión.
-                            </p>
-                        </div>
-                        
                         <div style="text-align: center; margin-top: 30px;">
-                            <a href="${process.env.FRONTEND_URL || 'https://vitalmapeuti-front.vercel.app'}" 
+                            <a href="${process.env.FRONTEND_URL || 'https://vitalmapeuti-front.vercel.app'}/login" 
                                style="background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                                Acceder al Sistema
+                                Iniciar Sesión
                             </a>
                         </div>
                         
