@@ -228,10 +228,21 @@ const registroProcedimientosAPI = {
     pacientesAtendidos: number;
   }> => {
     try {
-      const response = await axios.get(
-        `${API_URL}/registro-procedimientos/metricas/usuario`,
-        { headers: getAuthHeader() }
-      );
+      console.log('🔍 Iniciando obtención de métricas del usuario...');
+      console.log('📍 API_URL:', API_URL);
+      console.log('🔑 Headers:', getAuthHeader());
+      
+      const url = `${API_URL}/registro-procedimientos/metricas/usuario`;
+      console.log('🌐 URL completa:', url);
+      
+      const response = await axios.get(url, { 
+        headers: getAuthHeader(),
+        timeout: 15000 // 15 segundos de timeout
+      });
+      
+      console.log('✅ Respuesta recibida:', response.status);
+      console.log('📊 Datos:', response.data);
+      
       return response.data.data;
     } catch (error) {
       console.error('Error detallado en obtenerMetricasUsuario:', error);
