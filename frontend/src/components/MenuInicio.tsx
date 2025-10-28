@@ -25,35 +25,8 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
   }, []);
 
   const cargarMetricasUsuario = async () => {
-    try {
-      console.log('🚀 VERSIÓN CORREGIDA - Iniciando carga de métricas...');
-      const metricas = await registroProcedimientosAPI.obtenerMetricasUsuario();
-      console.log('✅ VERSIÓN CORREGIDA - Métricas cargadas exitosamente:', metricas);
-      setMetricasUsuario(metricas);
-    } catch (err: any) {
-      console.error('🚨 VERSIÓN CORREGIDA - Error al cargar métricas del usuario:', err);
-      
-      // Establecer valores por defecto en caso de error
-      const metricasPorDefecto = {
-        totalProcedimientos: 0,
-        tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
-        totalCategorizaciones: 0,
-        pacientesAtendidos: 0
-      };
-      
-      console.log('🔄 VERSIÓN CORREGIDA - Estableciendo valores por defecto:', metricasPorDefecto);
-      setMetricasUsuario(metricasPorDefecto);
-      
-      // Mostrar mensaje de error más específico
-      const errorMessage = err?.message || 'Error desconocido';
-      console.warn(`🚨 VERSIÓN CORREGIDA - No se pudieron cargar las métricas del usuario: ${errorMessage}`);
-      
-      // Intentar recargar después de un delay
-      setTimeout(() => {
-        console.log('🔄 VERSIÓN CORREGIDA - Reintentando carga de métricas...');
-        cargarMetricasUsuario();
-      }, 5000);
-    }
+    const metricas = await registroProcedimientosAPI.obtenerMetricasUsuario();
+    setMetricasUsuario(metricas);
   };
 
   const verificarRespuestaExistente = async () => {

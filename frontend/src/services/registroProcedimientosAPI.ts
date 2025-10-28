@@ -228,53 +228,19 @@ const registroProcedimientosAPI = {
     pacientesAtendidos: number;
   }> => {
     try {
-      console.log('🔍 Iniciando obtención de métricas del usuario...');
-      console.log('📍 API_URL:', API_URL);
-      console.log('🔑 Headers:', getAuthHeader());
-      
-      const url = `${API_URL}/registro-procedimientos/metricas/usuario`;
-      console.log('🌐 URL completa:', url);
-      
-      const response = await axios.get(url, { 
-        headers: getAuthHeader(),
-        timeout: 15000 // 15 segundos de timeout
-      });
-      
-      console.log('✅ Respuesta recibida:', response.status);
-      console.log('📊 Datos:', response.data);
-      
-      // Verificar que la respuesta tenga la estructura esperada
-      if (!response.data || !response.data.data) {
-        console.warn('⚠️ Respuesta sin datos, usando valores por defecto');
-        return {
-          totalProcedimientos: 0,
-          tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
-          totalCategorizaciones: 0,
-          pacientesAtendidos: 0
-        };
-      }
-      
+      const response = await axios.get(
+        `${API_URL}/registro-procedimientos/metricas/usuario`,
+        { headers: getAuthHeader() }
+      );
       return response.data.data;
     } catch (error) {
-      console.error('🚨 ERROR EN OBTENER MÉTRICAS USUARIO - VERSIÓN CORREGIDA:', error);
-      
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          // Error del servidor con respuesta
-          const status = error.response.status;
-          const message = error.response.data?.message || error.response.data?.error || 'Error desconocido del servidor';
-          console.error(`🚨 Error del servidor (${status}):`, error.response.data);
-          throw new Error(`🚨 CORREGIDO - Error del servidor (${status}): ${message}`);
-        } else if (error.request) {
-          // Error de conexión - no se recibió respuesta
-          console.error('🚨 Error de conexión:', error.request);
-          throw new Error('🚨 CORREGIDO - No se pudo conectar con el servidor. Verifica tu conexión a internet.');
-        }
-      }
-      
-      // Error genérico
-      console.error('🚨 Error inesperado:', error);
-      throw new Error('🚨 CORREGIDO - Ocurrió un error inesperado al obtener las métricas del usuario');
+      // Retornar valores por defecto en lugar de lanzar error
+      return {
+        totalProcedimientos: 0,
+        tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
+        totalCategorizaciones: 0,
+        pacientesAtendidos: 0
+      };
     }
   },
 
