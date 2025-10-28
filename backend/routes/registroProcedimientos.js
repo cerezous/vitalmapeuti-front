@@ -128,40 +128,74 @@ router.post('/', authenticateToken, async (req, res) => {
 // Obtener métricas del usuario actual
 router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   try {
-    // Retornar valores por defecto para evitar cualquier problema de base de datos
+    const usuarioId = req.user.id;
+    
+    // 1. Total de Procedimientos del usuario
+    const registrosUsuario = await RegistroProcedimientos.findAll({
+      where: { usuarioId },
+      attributes: ['id']
+    });
+    
+    const registrosIds = registrosUsuario.map(r => r.id);
+    
+    let totalProcedimientos = 0;
+    if (registrosIds.length > 0) {
+      totalProcedimientos = await ProcedimientoRegistro.count({
+        where: { registroId: { [Op.in]: registrosIds } }
+      });
+    }
+
+    // 2. Tiempo Total de Procedimientos del usuario
+    const tiempoTotalResult = await RegistroProcedimientos.sum('tiempoTotal', {
+      where: { usuarioId }
+    });
+    const tiempoTotalMinutos = tiempoTotalResult || 0;
+    const tiempoTotalHoras = Math.floor(tiempoTotalMinutos / 60);
+    const tiempoTotalMins = tiempoTotalMinutos % 60;
+
+    // 3. Total de Categorizaciones del usuario
+    const totalCategorizaciones = await CategorizacionKinesiologia.count({
+      where: { usuarioId }
+    });
+
+    // 4. Número de Pacientes Atendidos (únicos)
+    let numeroPacientesAtendidos = 0;
+    if (registrosIds.length > 0) {
+      // Usar Sequelize ORM para evitar problemas de nombres de columna
+      const pacientesUnicos = await ProcedimientoRegistro.findAll({
+        where: { 
+          registroId: { [Op.in]: registrosIds },
+          pacienteRut: { [Op.ne]: null }
+        },
+        attributes: ['pacienteRut'],
+        group: ['pacienteRut'],
+        raw: true
+      });
+      numeroPacientesAtendidos = pacientesUnicos.length;
+    }
+
     res.json({
       message: 'Métricas del usuario obtenidas exitosamente',
       data: {
-        totalProcedimientos: 0,
+        totalProcedimientos,
         tiempoTotal: {
-          minutos: 0,
-          horas: 0,
-          minutosRestantes: 0,
-          texto: '0h 0m'
+          minutos: tiempoTotalMinutos,
+          horas: tiempoTotalHoras,
+          minutosRestantes: tiempoTotalMins,
+          texto: `${tiempoTotalHoras}h ${tiempoTotalMins}m`
         },
-        totalCategorizaciones: 0,
-        pacientesAtendidos: 0
+        totalCategorizaciones,
+        pacientesAtendidos: numeroPacientesAtendidos
       }
     });
 
   } catch (error) {
     console.error('Error al obtener métricas del usuario:', error);
     console.error('Stack trace:', error.stack);
-    
-    // En caso de error, retornar valores por defecto
-    res.json({
-      message: 'Métricas del usuario obtenidas exitosamente',
-      data: {
-        totalProcedimientos: 0,
-        tiempoTotal: {
-          minutos: 0,
-          horas: 0,
-          minutosRestantes: 0,
-          texto: '0h 0m'
-        },
-        totalCategorizaciones: 0,
-        pacientesAtendidos: 0
-      }
+    res.status(500).json({
+      error: 'Error interno del servidor',
+      message: 'Ocurrió un error al obtener las métricas del usuario',
+      details: error.message
     });
   }
 });

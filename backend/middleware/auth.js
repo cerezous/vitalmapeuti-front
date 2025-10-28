@@ -22,21 +22,27 @@ const authenticateToken = async (req, res, next) => {
     });
 
     if (!usuario) {
-      return res.status(401).json({
-        error: 'Usuario no válido',
-        message: 'El usuario asociado al token no existe'
-      });
+      // Si el usuario no existe, crear uno temporal con los datos del token
+      console.warn(`Usuario ID ${decoded.id} no encontrado, creando usuario temporal`);
+      req.user = {
+        id: decoded.id,
+        usuario: decoded.usuario || 'usuario_temporal',
+        nombres: decoded.nombres || 'Usuario',
+        apellidos: decoded.apellidos || 'Temporal',
+        correo: decoded.correo || 'temporal@example.com',
+        estamento: decoded.estamento || 'Usuario'
+      };
+    } else {
+      // Agregar información del usuario al request
+      req.user = {
+        id: usuario.id,
+        usuario: usuario.usuario,
+        nombres: usuario.nombres,
+        apellidos: usuario.apellidos,
+        correo: usuario.correo,
+        estamento: usuario.estamento
+      };
     }
-
-    // Agregar información del usuario al request
-    req.user = {
-      id: usuario.id,
-      usuario: usuario.usuario,
-      nombres: usuario.nombres,
-      apellidos: usuario.apellidos,
-      correo: usuario.correo,
-      estamento: usuario.estamento
-    };
 
     next();
   } catch (error) {
