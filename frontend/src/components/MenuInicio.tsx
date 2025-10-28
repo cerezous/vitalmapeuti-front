@@ -43,6 +43,7 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
   const verificarRespuestaExistente = async () => {
     try {
       const ultimaRespuesta = await burnoutAPI.obtenerUltimaRespuesta();
+      console.log('Respuesta obtenida del backend:', ultimaRespuesta);
       if (ultimaRespuesta) {
         setYaRespondioTest(true);
         setRespuestaAnterior(ultimaRespuesta);
@@ -177,9 +178,9 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
                 {respuestaAnterior && (
                   <div className="space-y-1">
                     <p>Fecha: {respuestaAnterior.fechaRespuesta ? new Date(respuestaAnterior.fechaRespuesta).toLocaleDateString('es-ES') : 'No disponible'}</p>
-                    <p>• Agotamiento: {respuestaAnterior.agotamientoEmocional || respuestaAnterior.nivelAgotamiento || 'No disponible'}</p>
-                    <p>• Despersonalización: {respuestaAnterior.despersonalizacion || respuestaAnterior.nivelDespersonalizacion || 'No disponible'}</p>
-                    <p>• Realización personal: {respuestaAnterior.realizacionPersonal || respuestaAnterior.nivelRealizacion || 'No disponible'}</p>
+                    <p>• Agotamiento: {respuestaAnterior.agotamientoEmocional !== undefined ? `${respuestaAnterior.agotamientoEmocional}/54 (${respuestaAnterior.nivelAgotamiento})` : 'No disponible'}</p>
+                    <p>• Despersonalización: {respuestaAnterior.despersonalizacion !== undefined ? `${respuestaAnterior.despersonalizacion}/30 (${respuestaAnterior.nivelDespersonalizacion})` : 'No disponible'}</p>
+                    <p>• Realización personal: {respuestaAnterior.realizacionPersonal !== undefined ? `${respuestaAnterior.realizacionPersonal}/48 (${respuestaAnterior.nivelRealizacion})` : 'No disponible'}</p>
                   </div>
                 )}
               </div>
