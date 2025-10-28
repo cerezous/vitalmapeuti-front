@@ -138,17 +138,37 @@ router.post('/', authenticateToken, async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     console.error('Error al crear procedimientos de medicina:', error);
+    console.error('Stack trace:', error.stack);
     
     if (error.name === 'SequelizeValidationError') {
+      console.error('Errores de validación:', error.errors);
       return res.status(400).json({
         error: 'Error de validación',
-        message: error.errors.map(e => e.message).join(', ')
+        message: error.errors.map(e => `${e.path}: ${e.message}`).join(', '),
+        details: error.errors
+      });
+    }
+
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      console.error('Error de clave foránea:', error.message);
+      return res.status(400).json({
+        error: 'Error de referencia',
+        message: 'El usuario o paciente referenciado no existe'
+      });
+    }
+
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      console.error('Error de unicidad:', error.message);
+      return res.status(400).json({
+        error: 'Error de duplicación',
+        message: 'Ya existe un registro con estos datos'
       });
     }
 
     res.status(500).json({
       error: 'Error interno del servidor',
-      message: 'Ocurrió un error al crear los procedimientos de medicina'
+      message: 'Ocurrió un error al crear los procedimientos de medicina',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
