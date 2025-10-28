@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
 
-const Register = () => {
+const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
@@ -11,7 +11,7 @@ const Register = () => {
     contraseña: '',
     confirmarContraseña: '',
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -20,7 +20,7 @@ const Register = () => {
   // Solo estamentos permitidos para registro público (excluye Administrador por seguridad)
   const estamentos = ['Kinesiología', 'Enfermería', 'Medicina', 'Auxiliares', 'TENS'];
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -36,7 +36,7 @@ const Register = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.nombres.trim()) {
       newErrors.nombres = 'Los nombres son requeridos';
@@ -76,7 +76,7 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -101,11 +101,11 @@ const Register = () => {
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response?.data?.errors) {
         // Errores de validación del backend
-        const backendErrors = {};
-        error.response.data.errors.forEach((err) => {
+        const backendErrors: { [key: string]: string } = {};
+        error.response.data.errors.forEach((err: any) => {
           if (err.path) {
             backendErrors[err.path] = err.message;
           }

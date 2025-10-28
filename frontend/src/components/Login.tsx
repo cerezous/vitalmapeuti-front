@@ -3,12 +3,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ModalForgotPassword from './ModalForgotPassword';
 
-const Login: React.FC = () => {
+const Login = () => {
   const [formData, setFormData] = useState({
     usuario: '',
     contraseña: '',
   });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
@@ -25,7 +25,7 @@ const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     
     // Convertir a minúsculas solo para el campo usuario
@@ -45,7 +45,7 @@ const Login: React.FC = () => {
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+    const newErrors: any = {};
 
     if (!formData.usuario.trim()) {
       newErrors.usuario = 'El nombre de usuario es requerido';
@@ -59,7 +59,7 @@ const Login: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -71,7 +71,7 @@ const Login: React.FC = () => {
     try {
       await login(formData.usuario, formData.contraseña);
       navigate(from, { replace: true });
-    } catch (error) {
+    } catch (error: any) {
       setErrors({
         submit: error.response?.data?.error || 'Error al iniciar sesión. Inténtalo de nuevo.',
       });
