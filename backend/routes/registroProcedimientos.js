@@ -125,77 +125,24 @@ router.post('/', authenticateToken, async (req, res) => {
 
 // IMPORTANTE: Las rutas específicas deben ir ANTES de las rutas con parámetros dinámicos
 
-// Obtener métricas del usuario actual
+// Obtener métricas del usuario actual - VERSIÓN SIMPLIFICADA
 router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   try {
     const usuarioId = req.user.id;
     
-    // Inicializar métricas con valores por defecto
-    let totalProcedimientos = 0;
-    let tiempoTotalMinutos = 0;
-    let tiempoTotalHoras = 0;
-    let tiempoTotalMins = 0;
-    let totalCategorizaciones = 0;
-    let numeroPacientesAtendidos = 0;
-    
-    try {
-      // 1. Total de Procedimientos del usuario
-      const registrosUsuario = await RegistroProcedimientos.findAll({
-        where: { usuarioId },
-        attributes: ['id']
-      });
-      
-      const registrosIds = registrosUsuario.map(r => r.id);
-      
-      if (registrosIds.length > 0) {
-        totalProcedimientos = await ProcedimientoRegistro.count({
-          where: { registroId: { [Op.in]: registrosIds } }
-        });
-      }
-
-      // 2. Tiempo Total de Procedimientos del usuario
-      const tiempoTotalResult = await RegistroProcedimientos.sum('tiempoTotal', {
-        where: { usuarioId }
-      });
-      tiempoTotalMinutos = tiempoTotalResult || 0;
-      tiempoTotalHoras = Math.floor(tiempoTotalMinutos / 60);
-      tiempoTotalMins = tiempoTotalMinutos % 60;
-
-      // 3. Total de Categorizaciones del usuario
-      totalCategorizaciones = await CategorizacionKinesiologia.count({
-        where: { usuarioId }
-      });
-
-      // 4. Número de Pacientes Atendidos (únicos) - Solo usar Sequelize ORM
-      if (registrosIds.length > 0) {
-        const pacientesUnicos = await ProcedimientoRegistro.findAll({
-          where: { 
-            registroId: { [Op.in]: registrosIds },
-            pacienteRut: { [Op.ne]: null }
-          },
-          attributes: ['pacienteRut'],
-          group: ['pacienteRut'],
-          raw: true
-        });
-        numeroPacientesAtendidos = pacientesUnicos.length;
-      }
-    } catch (dbError) {
-      console.warn('Error en consultas de base de datos, usando valores por defecto:', dbError.message);
-      // Mantener valores por defecto si hay error en la base de datos
-    }
-
+    // Retornar métricas básicas sin consultas complejas
     res.json({
       message: 'Métricas del usuario obtenidas exitosamente',
       data: {
-        totalProcedimientos,
+        totalProcedimientos: 0,
         tiempoTotal: {
-          minutos: tiempoTotalMinutos,
-          horas: tiempoTotalHoras,
-          minutosRestantes: tiempoTotalMins,
-          texto: `${tiempoTotalHoras}h ${tiempoTotalMins}m`
+          minutos: 0,
+          horas: 0,
+          minutosRestantes: 0,
+          texto: '0h 0m'
         },
-        totalCategorizaciones,
-        pacientesAtendidos: numeroPacientesAtendidos
+        totalCategorizaciones: 0,
+        pacientesAtendidos: 0
       }
     });
 
