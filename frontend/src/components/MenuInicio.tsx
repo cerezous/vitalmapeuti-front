@@ -371,26 +371,8 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
                       });
 
 
-                      // Mostrar resultados
-                      let mensaje = `Resultados del Cuestionario de Burnout:\n\n`;
-                      mensaje += `• Agotamiento Emocional: ${resultado.agotamientoEmocional}/54 (${resultado.nivelAgotamiento})\n`;
-                      mensaje += `• Despersonalización: ${resultado.despersonalizacion}/30 (${resultado.nivelDespersonalizacion})\n`;
-                      mensaje += `• Realización Personal: ${resultado.realizacionPersonal}/48 (${resultado.nivelRealizacion})\n\n`;
-                      
-                      // Interpretación de resultados
-                      if (resultado.nivelAgotamiento === 'alto') mensaje += `⚠️ Nivel alto de agotamiento emocional\n`;
-                      else if (resultado.nivelAgotamiento === 'medio') mensaje += `⚡ Nivel medio de agotamiento emocional\n`;
-                      else mensaje += `✅ Nivel bajo de agotamiento emocional\n`;
-
-                      if (resultado.nivelDespersonalizacion === 'alto') mensaje += `⚠️ Nivel alto de despersonalización\n`;
-                      else if (resultado.nivelDespersonalizacion === 'medio') mensaje += `⚡ Nivel medio de despersonalización\n`;
-                      else mensaje += `✅ Nivel bajo de despersonalización\n`;
-
-                      if (resultado.nivelRealizacion === 'bajo') mensaje += `⚠️ Nivel bajo de realización personal\n`;
-                      else if (resultado.nivelRealizacion === 'medio') mensaje += `⚡ Nivel medio de realización personal\n`;
-                      else mensaje += `✅ Nivel alto de realización personal\n`;
-
-                      alert(mensaje);
+                      // Mostrar mensaje de agradecimiento
+                      alert('¡Gracias por completar el test de burnout!');
                       
                       // Actualizar estado para reflejar que ya respondió
                       setYaRespondioTest(true);
