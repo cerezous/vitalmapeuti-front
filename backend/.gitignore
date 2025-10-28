@@ -10,17 +10,11 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
-env.development
-env.production
-
-# Database files
-*.sqlite
-*.db
-data/
 
 # Logs
 logs
 *.log
+backend.log
 
 # Runtime data
 pids
@@ -34,19 +28,8 @@ coverage/
 # nyc test coverage
 .nyc_output
 
-# Grunt intermediate storage
-.grunt
-
-# Bower dependency directory
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons
-build/Release
-
 # Dependency directories
+node_modules/
 jspm_packages/
 
 # Optional npm cache directory
@@ -64,34 +47,6 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
-# parcel-bundler cache
-.cache
-.parcel-cache
-
-# next.js build output
-.next
-
-# nuxt.js build output
-.nuxt
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
 # IDE files
 .vscode/
 .idea/
@@ -108,9 +63,14 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
-# Build directories
-build/
+# Database files (if using SQLite locally)
+*.sqlite
+*.sqlite3
+*.db
+
+# Build outputs
 dist/
+build/
 
 # Temporary files
 tmp/
