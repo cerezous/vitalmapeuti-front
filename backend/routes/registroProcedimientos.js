@@ -125,12 +125,10 @@ router.post('/', authenticateToken, async (req, res) => {
 
 // IMPORTANTE: Las rutas específicas deben ir ANTES de las rutas con parámetros dinámicos
 
-// Obtener métricas del usuario actual - VERSIÓN SIMPLIFICADA
+// Obtener métricas del usuario actual - VERSIÓN COMPLETAMENTE NUEVA
 router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   try {
-    const usuarioId = req.user.id;
-    
-    // Retornar métricas básicas sin consultas complejas
+    // Retornar métricas básicas sin ninguna consulta a BD
     res.json({
       message: 'Métricas del usuario obtenidas exitosamente',
       data: {
