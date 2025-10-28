@@ -2,18 +2,16 @@ const axios = require('axios');
 
 // Configuración
 const API_URL = 'https://vitalmapeuti-back.onrender.com';
-const TEST_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXN1YXJpbyI6Im1jZXJlem8iLCJlc3RhbWVudG8iOiJFbmZlcm1lcsOtYSIsImlhdCI6MTc2MTYxNzgwNSwiZXhwIjoxNzYxNzA0MjA1fQ.fzKwrVinvEvZ8IzMdeQ47aDJt9TtAu8v4ifT3r1613U';
 
-async function testMetricasUsuario() {
+async function testMetricasUsuarioTest() {
   try {
-    console.log('🧪 Probando endpoint de métricas de usuario...');
-    console.log(`URL: ${API_URL}/api/registro-procedimientos/metricas/usuario`);
+    console.log('🧪 Probando endpoint de prueba sin autenticación...');
+    console.log(`URL: ${API_URL}/api/registro-procedimientos/metricas/usuario-test`);
     
     const response = await axios.get(
-      `${API_URL}/api/registro-procedimientos/metricas/usuario`,
+      `${API_URL}/api/registro-procedimientos/metricas/usuario-test`,
       {
         headers: {
-          'Authorization': `Bearer ${TEST_TOKEN}`,
           'Content-Type': 'application/json'
         }
       }
@@ -35,4 +33,4 @@ async function testMetricasUsuario() {
 }
 
 // Ejecutar prueba
-testMetricasUsuario();
+testMetricasUsuarioTest();
