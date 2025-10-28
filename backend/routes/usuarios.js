@@ -205,15 +205,84 @@ router.delete('/:id', auth, requireAdmin, async (req, res) => {
       });
     }
 
-    // Eliminar el usuario - los registros relacionados se eliminarán automáticamente por CASCADE
-    await usuario.destroy();
-
-    res.json({
-      message: 'Usuario eliminado exitosamente'
-    });
+    // Intentar eliminación directa primero
+    try {
+      await usuario.destroy();
+      
+      res.json({
+        message: 'Usuario eliminado exitosamente'
+      });
+      
+    } catch (destroyError) {
+      // Si falla por restricción de clave foránea, intentar eliminación manual
+      if (destroyError.name === 'SequelizeForeignKeyConstraintError') {
+        console.log('Eliminación directa falló, intentando eliminación manual...');
+        
+        const transaction = await sequelize.transaction();
+        
+        try {
+          // Obtener todas las tablas que referencian a usuarios
+          const [tablasConFK] = await sequelize.query(`
+            SELECT 
+              tc.table_name,
+              kcu.column_name
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+              ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.constraint_type = 'FOREIGN KEY'
+              AND kcu.referenced_table_name = 'usuarios'
+              AND kcu.referenced_column_name = 'id'
+          `, { transaction });
+          
+          console.log('Tablas con referencias encontradas:', tablasConFK);
+          
+          // Eliminar registros relacionados
+          for (const tabla of tablasConFK) {
+            try {
+              const [resultado] = await sequelize.query(`
+                DELETE FROM "${tabla.table_name}" 
+                WHERE "${tabla.column_name}" = ${id}
+              `, { transaction });
+              
+              if (resultado > 0) {
+                console.log(`Eliminados ${resultado} registros de ${tabla.table_name} para usuario ${id}`);
+              }
+            } catch (error) {
+              console.log(`Error eliminando de ${tabla.table_name}:`, error.message);
+              // Continuar con otras tablas
+            }
+          }
+          
+          // Ahora eliminar el usuario
+          await usuario.destroy({ transaction });
+          
+          // Confirmar transacción
+          await transaction.commit();
+          
+          res.json({
+            message: 'Usuario eliminado exitosamente'
+          });
+          
+        } catch (manualError) {
+          await transaction.rollback();
+          throw manualError;
+        }
+      } else {
+        throw destroyError;
+      }
+    }
 
   } catch (error) {
     console.error('Error al eliminar usuario:', error);
+    
+    // Manejar errores específicos
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({
+        message: 'No se puede eliminar el usuario porque tiene registros relacionados. Contacte al administrador.',
+        error: 'Restricción de clave foránea'
+      });
+    }
+    
     res.status(500).json({
       message: 'Error interno del servidor',
       error: error.message
