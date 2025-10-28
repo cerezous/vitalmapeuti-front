@@ -50,11 +50,12 @@ router.post('/', authenticateToken, async (req, res) => {
     const procedimientosCreados = [];
     let tiempoTotal = 0;
 
-    // Crear cada procedimiento
+    // Validar todos los procedimientos antes de crear
     for (const procedimiento of procedimientos) {
       // Validar que el procedimiento sea válido
       const procedimientosValidos = ProcedimientoMedicina.getProcedimientosValidos();
       if (!procedimientosValidos.includes(procedimiento.nombre)) {
+        await transaction.rollback();
         return res.status(400).json({
           error: 'Procedimiento inválido',
           message: `El procedimiento "${procedimiento.nombre}" no es válido para medicina`
@@ -63,6 +64,7 @@ router.post('/', authenticateToken, async (req, res) => {
 
       // Validar que si el procedimiento requiere paciente, esté presente
       if (ProcedimientoMedicina.requierePaciente(procedimiento.nombre) && !procedimiento.pacienteRut) {
+        await transaction.rollback();
         return res.status(400).json({
           error: 'Paciente requerido',
           message: `El procedimiento "${procedimiento.nombre}" requiere un paciente asignado`
@@ -73,11 +75,24 @@ router.post('/', authenticateToken, async (req, res) => {
       if (procedimiento.pacienteRut) {
         const paciente = await Paciente.findOne({ where: { rut: procedimiento.pacienteRut } });
         if (!paciente) {
+          await transaction.rollback();
           return res.status(404).json({
             error: 'Paciente no encontrado',
             message: `No existe un paciente con RUT ${procedimiento.pacienteRut}`
           });
         }
+      }
+    }
+
+    // Crear cada procedimiento después de validar todo
+    for (const procedimiento of procedimientos) {
+      // Validar formato de tiempo
+      if (!procedimiento.tiempo || !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(procedimiento.tiempo)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          error: 'Formato de tiempo inválido',
+          message: `El tiempo "${procedimiento.tiempo}" debe estar en formato HH:MM`
+        });
       }
 
       // Convertir tiempo a minutos para sumar
@@ -85,17 +100,26 @@ router.post('/', authenticateToken, async (req, res) => {
       tiempoTotal += horas * 60 + minutos;
 
       // Crear el procedimiento
-      const nuevoProcedimiento = await ProcedimientoMedicina.create({
-        usuarioId: req.user.id,
-        turno,
-        fecha,
-        nombre: procedimiento.nombre,
-        tiempo: procedimiento.tiempo,
-        pacienteRut: procedimiento.pacienteRut || null,
-        observaciones: procedimiento.observaciones || null
-      }, { transaction });
+      try {
+        const nuevoProcedimiento = await ProcedimientoMedicina.create({
+          usuarioId: req.user.id,
+          turno,
+          fecha,
+          nombre: procedimiento.nombre,
+          tiempo: procedimiento.tiempo,
+          pacienteRut: procedimiento.pacienteRut || null,
+          observaciones: procedimiento.observaciones || null
+        }, { transaction });
 
-      procedimientosCreados.push(nuevoProcedimiento);
+        procedimientosCreados.push(nuevoProcedimiento);
+      } catch (createError) {
+        await transaction.rollback();
+        console.error('Error al crear procedimiento individual:', createError);
+        return res.status(400).json({
+          error: 'Error al crear procedimiento',
+          message: `Error al crear el procedimiento "${procedimiento.nombre}": ${createError.message}`
+        });
+      }
     }
 
     await transaction.commit();
