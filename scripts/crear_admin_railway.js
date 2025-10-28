@@ -1,6 +1,6 @@
 // Script para crear un usuario administrador en Railway (PostgreSQL)
-const sequelize = require('./config/database');
-const Usuario = require('./models/Usuario');
+const sequelize = require('../backend/config/database');
+const Usuario = require('../backend/models/Usuario');
 
 async function crearAdmin() {
   try {

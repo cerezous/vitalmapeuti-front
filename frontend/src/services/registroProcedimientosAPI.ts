@@ -234,10 +234,13 @@ const registroProcedimientosAPI = {
       );
       return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        throw new Error(error.response.data.message || 'Error al obtener las métricas del usuario');
-      }
-      throw error;
+      // Retornar valores por defecto en lugar de lanzar error
+      return {
+        totalProcedimientos: 0,
+        tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
+        totalCategorizaciones: 0,
+        pacientesAtendidos: 0
+      };
     }
   },
 

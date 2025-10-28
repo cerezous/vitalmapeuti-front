@@ -109,6 +109,7 @@ const burnoutAPI = {
       return response.data;
     } catch (error: any) {
       console.error('Error al obtener última respuesta:', error);
+      // No mostrar error en consola para errores de red
       return null;
     }
   },

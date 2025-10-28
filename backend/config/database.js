@@ -19,6 +19,11 @@ if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
       min: 0,
       acquire: 30000,
       idle: 10000
+    },
+    define: {
+      timestamps: true,
+      underscored: false,
+      freezeTableName: true
     }
   });
 } else {
