@@ -17,12 +17,18 @@ const authenticateToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'vitalmape-secret-key-2024');
     
     // Verificar que el usuario aún existe
-    const usuario = await Usuario.findByPk(decoded.id, {
-      attributes: ['id', 'usuario', 'nombres', 'apellidos', 'correo', 'estamento']
-    });
+    let usuario;
+    try {
+      usuario = await Usuario.findByPk(decoded.id, {
+        attributes: ['id', 'usuario', 'nombres', 'apellidos', 'correo', 'estamento']
+      });
+    } catch (dbError) {
+      console.warn('Error al buscar usuario en BD, usando datos del token:', dbError.message);
+      usuario = null;
+    }
 
     if (!usuario) {
-      // Si el usuario no existe, crear uno temporal con los datos del token
+      // Si el usuario no existe o hay error en BD, crear uno temporal con los datos del token
       console.warn(`Usuario ID ${decoded.id} no encontrado, creando usuario temporal`);
       req.user = {
         id: decoded.id,
