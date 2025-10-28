@@ -98,6 +98,19 @@ const burnoutAPI = {
       return response.data;
     } catch (error: any) {
       console.error('Error al obtener estadísticas:', error);
+      console.error('Error response:', error.response);
+      console.error('Error status:', error.response?.status);
+      console.error('Error data:', error.response?.data);
+      
+      // Si no hay datos, retornar estructura vacía en lugar de error
+      if (error.response?.status === 500 && error.response?.data?.message?.includes('Error interno del servidor')) {
+        console.log('Retornando estadísticas vacías debido a error del servidor');
+        return {
+          totalCuestionarios: 0,
+          porEstamento: {}
+        };
+      }
+      
       throw new Error(error.response?.data?.message || 'Error al obtener las estadísticas');
     }
   },
