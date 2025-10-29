@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import categorizacionKinesiologiaAPI, { CategorizacionRequest } from '../services/categorizacionKinesiologiaAPI';
 import procedimientosKinesiologiaAPI, { ProcedimientoRequest, ProcedimientoKinesiologia } from '../services/procedimientosKinesiologiaAPI';
 import { authService } from '../services/api';
+import TimePicker from './TimePicker';
 
 interface ModalKinesiologiaProps {
   isOpen: boolean;
@@ -928,11 +929,11 @@ const ModalKinesiologia: React.FC<ModalKinesiologiaProps> = ({ isOpen, onClose, 
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Tiempo (HH:MM) <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="time"
-                        value={nuevoProcedimiento.tiempo}
-                        onChange={(e) => setNuevoProcedimiento(prev => ({ ...prev, tiempo: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      <TimePicker
+                        value={nuevoProcedimiento.tiempo || '00:00'}
+                        onChange={(value) => setNuevoProcedimiento(prev => ({ ...prev, tiempo: value }))}
+                        className="justify-start"
+                        required
                       />
                     </div>
 
