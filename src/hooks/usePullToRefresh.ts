@@ -54,7 +54,6 @@ export const usePullToRefresh = ({
 
       touchStartY.current = e.touches[0].clientY;
       isPulling.current = true;
-      console.log('🔽 Pull-to-refresh iniciado', { isStandalone, scrollTop, containerScroll });
     };
 
     const handleTouchMove = (e: TouchEvent) => {
