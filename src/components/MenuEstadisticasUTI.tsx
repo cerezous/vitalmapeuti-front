@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import estadisticasAPI, { EstadisticasUTI } from '../services/estadisticasAPI';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 
 // Usar la interfaz importada
 type KPIData = EstadisticasUTI;
@@ -12,13 +13,10 @@ const MenuEstadisticasUTI: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'tiempo' | 'severidad' | 'tendencias'>('overview');
 
-  useEffect(() => {
-    cargarDatosEstadisticas();
-  }, []);
-
-  const cargarDatosEstadisticas = async () => {
+  const cargarDatosEstadisticas = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const datos = await estadisticasAPI.obtenerEstadisticasUTI();
       setKpiData(datos);
     } catch (error) {
@@ -27,7 +25,18 @@ const MenuEstadisticasUTI: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    cargarDatosEstadisticas();
+  }, [cargarDatosEstadisticas]);
+
+  // Implementar pull-to-refresh
+  usePullToRefresh({
+    onRefresh: cargarDatosEstadisticas,
+    enabled: true,
+    threshold: 80
+  });
 
   const getOcupacionColor = (tasa: number) => {
     if (tasa < 70) return 'text-green-600';
