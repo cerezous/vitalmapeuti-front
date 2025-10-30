@@ -17,38 +17,26 @@ const authenticateToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'vitalmape-secret-key-2024');
     
     // Verificar que el usuario aún existe
-    let usuario;
-    try {
-      usuario = await Usuario.findByPk(decoded.id, {
-        attributes: ['id', 'usuario', 'nombres', 'apellidos', 'correo', 'estamento']
-      });
-    } catch (dbError) {
-      console.warn('Error al buscar usuario en BD, usando datos del token:', dbError.message);
-      usuario = null;
-    }
+    const usuario = await Usuario.findByPk(decoded.id, {
+      attributes: ['id', 'usuario', 'nombres', 'apellidos', 'correo', 'estamento']
+    });
 
     if (!usuario) {
-      // Si el usuario no existe o hay error en BD, crear uno temporal con los datos del token
-      console.warn(`Usuario ID ${decoded.id} no encontrado, creando usuario temporal`);
-      req.user = {
-        id: decoded.id,
-        usuario: decoded.usuario || 'usuario_temporal',
-        nombres: decoded.nombres || 'Usuario',
-        apellidos: decoded.apellidos || 'Temporal',
-        correo: decoded.correo || 'temporal@example.com',
-        estamento: decoded.estamento || 'Usuario'
-      };
-    } else {
-      // Agregar información del usuario al request
-      req.user = {
-        id: usuario.id,
-        usuario: usuario.usuario,
-        nombres: usuario.nombres,
-        apellidos: usuario.apellidos,
-        correo: usuario.correo,
-        estamento: usuario.estamento
-      };
+      return res.status(401).json({
+        error: 'Usuario no válido',
+        message: 'El usuario asociado al token no existe'
+      });
     }
+
+    // Agregar información del usuario al request
+    req.user = {
+      id: usuario.id,
+      usuario: usuario.usuario,
+      nombres: usuario.nombres,
+      apellidos: usuario.apellidos,
+      correo: usuario.correo,
+      estamento: usuario.estamento
+    };
 
     next();
   } catch (error) {

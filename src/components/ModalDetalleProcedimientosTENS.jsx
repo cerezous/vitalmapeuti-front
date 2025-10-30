@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TimePicker from './TimePicker';
 import procedimientosTENSAPI from '../services/procedimientosTENSAPI';
 import { useAuth } from '../contexts/AuthContext';
 import { pacienteService } from '../services/api';
@@ -478,12 +479,12 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
                     Tiempo (HH:MM) <span className="text-red-500">*</span>
                   </label>
                   <div className="flex gap-2">
-                    <input
-                      type="time"
-                      value={nuevoProcedimiento.tiempo}
-                      onChange={(e) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: e.target.value })}
-                      className="flex-1 px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm md:text-base"
-                    />
+                    <div className="flex-1">
+                      <TimePicker
+                        value={nuevoProcedimiento.tiempo || '00:00'}
+                        onChange={(value) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: value })}
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={agregarNuevoProcedimiento}

@@ -205,97 +205,15 @@ router.delete('/:id', auth, requireAdmin, async (req, res) => {
       });
     }
 
-    console.log(`🗑️ ELIMINANDO COMPLETAMENTE usuario ID: ${id} - ${usuario.nombres} ${usuario.apellidos}`);
-
-    // LISTA COMPLETA DE TODAS LAS TABLAS QUE PUEDEN TENER REFERENCIAS A USUARIOS
-    const todasLasTablas = [
-      // Procedimientos
-      'procedimientos_kinesiologia',
-      'procedimientos_enfermeria', 
-      'procedimientos_medicina',
-      'procedimientos_tens',
-      'procedimientos_auxiliares',
-      
-      // Evaluaciones
-      'evaluaciones_apache2',
-      'evaluaciones_nas',
-      
-      // Otros registros
-      'registros_burnout',
-      'categorizacion_kinesiologia',
-      'turnos_medicina',
-      'egresos',
-      'CuestionarioBurnout',
-      
-      // Tablas adicionales
-      'registro_procedimientos',
-      'procedimiento_registro',
-      'registro_procedimientos_tens',
-      'procedimiento_tens',
-      'apache2',
-      'nas'
-    ];
-
-    let totalEliminados = 0;
-
-    // ELIMINAR TODOS LOS REGISTROS DEL USUARIO PRIMERO
-    for (const tabla of todasLasTablas) {
-      try {
-        // Verificar si la tabla existe
-        const [tablaExiste] = await sequelize.query(`
-          SELECT EXISTS (
-            SELECT FROM information_schema.tables 
-            WHERE table_name = '${tabla}'
-          );
-        `);
-        
-        if (!tablaExiste[0].exists) {
-          continue;
-        }
-        
-        // Verificar si la tabla tiene columna usuarioId
-        const [columnaExiste] = await sequelize.query(`
-          SELECT EXISTS (
-            SELECT FROM information_schema.columns 
-            WHERE table_name = '${tabla}' AND column_name = 'usuarioId'
-          );
-        `);
-        
-        if (!columnaExiste[0].exists) {
-          continue;
-        }
-        
-        // Eliminar registros
-        const [resultado] = await sequelize.query(`
-          DELETE FROM "${tabla}" 
-          WHERE "usuarioId" = ${id}
-        `);
-        
-        if (resultado > 0) {
-          console.log(`✅ ${tabla}: ${resultado} registro(s) eliminado(s)`);
-          totalEliminados += resultado;
-        }
-        
-      } catch (error) {
-        console.log(`⚠️ ${tabla}: ${error.message}`);
-      }
-    }
-
-    console.log(`📊 Total de registros eliminados: ${totalEliminados}`);
-
-    // AHORA ELIMINAR EL USUARIO
+    // Eliminar el usuario - los registros relacionados se eliminarán automáticamente por CASCADE
     await usuario.destroy();
 
-    console.log(`✅ Usuario ${usuario.nombres} ${usuario.apellidos} eliminado completamente`);
-
     res.json({
-      message: 'Usuario eliminado exitosamente',
-      registrosEliminados: totalEliminados
+      message: 'Usuario eliminado exitosamente'
     });
 
   } catch (error) {
     console.error('Error al eliminar usuario:', error);
-    
     res.status(500).json({
       message: 'Error interno del servidor',
       error: error.message

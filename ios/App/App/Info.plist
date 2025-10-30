@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>com.vitalmape.vitalmapeuti</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -45,5 +45,36 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UISupportsDocumentBrowser</key>
+	<false/>
+	<!-- Configuración para iPhone 14 Pro Max y dispositivos modernos -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<!-- Configuración para App Store -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<!-- Configuración de privacidad -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<!-- Soporte para pantallas notched (Safe Area) -->
+	<key>UIRequiresFullScreen</key>
+	<false/>
+	<!-- Configuración para Face ID/Touch ID -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>Usamos Face ID para proteger el acceso a su información de salud.</string>
+	<!-- Configuración de privacidad para biometría -->
+	<key>NSBiometricUsageDescription</key>
+	<string>Usamos biometría para proteger el acceso a su información de salud.</string>
 </dict>
 </plist>

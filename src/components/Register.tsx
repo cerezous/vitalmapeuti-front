@@ -142,7 +142,7 @@ const Register: React.FC = () => {
               </p>
               <Link 
                 to="/login" 
-                className="text-blue-600 hover:text-blue-500 font-medium"
+                className="text-primary-600 hover:text-primary-500 font-medium"
               >
                 Ir al login ahora
               </Link>
@@ -346,28 +346,27 @@ const Register: React.FC = () => {
                   'Crear cuenta'
                 )}
               </button>
-            </form>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  ¿Ya tienes una cuenta?
+                </span>
+              </div>
+            </div>
 
             <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
-                    ¿Ya tienes una cuenta?
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <Link
-                  to="/login"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-50 border-blue-600"
-                >
-                  Iniciar sesión
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-600 bg-white hover:bg-gray-50 border-primary-600"
+              >
+                Iniciar sesión
+              </Link>
             </div>
           </div>
         </div>
@@ -417,7 +416,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`appearance-none block w-full px-3 py-2 border ${
                           errors.nombres ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base`}
+                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base`}
                         placeholder="Ingresa tus nombres"
                       />
                       {errors.nombres && (
@@ -443,7 +442,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`appearance-none block w-full px-3 py-2 border ${
                           errors.apellidos ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base`}
+                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base`}
                         placeholder="Ingresa tus apellidos"
                       />
                       {errors.apellidos && (
@@ -465,7 +464,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`appearance-none block w-full px-3 py-2 border ${
                           errors.estamento ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base`}
+                        } rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base`}
                       >
                         <option value="">Selecciona tu estamento</option>
                         {estamentos.map(est => (
@@ -493,7 +492,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`appearance-none block w-full px-3 py-2 border ${
                           errors.correo ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base`}
+                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base`}
                         placeholder="Ingresa tu correo electrónico"
                       />
                       {errors.correo && (
@@ -517,7 +516,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`appearance-none block w-full px-3 py-2 border ${
                           errors.contraseña ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base`}
+                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base`}
                         placeholder="Crea una contraseña"
                       />
                       {errors.contraseña && (
@@ -541,7 +540,7 @@ const Register: React.FC = () => {
                         onChange={handleChange}
                         className={`appearance-none block w-full px-3 py-2 border ${
                           errors.confirmarContraseña ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base`}
+                        } rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-base`}
                         placeholder="Confirma tu contraseña"
                       />
                       {errors.confirmarContraseña && (
@@ -569,7 +568,7 @@ const Register: React.FC = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? (
                         <>
@@ -601,7 +600,7 @@ const Register: React.FC = () => {
                   <div className="mt-6">
                     <Link
                       to="/login"
-                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-50 border-blue-600"
+                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-600 bg-white hover:bg-gray-50 border-primary-600"
                     >
                       Iniciar sesión
                     </Link>
@@ -612,6 +611,7 @@ const Register: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

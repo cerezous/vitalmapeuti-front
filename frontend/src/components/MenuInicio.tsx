@@ -28,22 +28,14 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
     try {
       const metricas = await registroProcedimientosAPI.obtenerMetricasUsuario();
       setMetricasUsuario(metricas);
-    } catch (error) {
-      console.error('Error al cargar métricas del usuario:', error);
-      // Mantener valores por defecto en caso de error
-      setMetricasUsuario({
-        totalProcedimientos: 0,
-        tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
-        totalCategorizaciones: 0,
-        pacientesAtendidos: 0
-      });
+    } catch (err) {
+      console.error('Error al cargar métricas del usuario:', err);
     }
   };
 
   const verificarRespuestaExistente = async () => {
     try {
       const ultimaRespuesta = await burnoutAPI.obtenerUltimaRespuesta();
-      console.log('Respuesta obtenida del backend:', ultimaRespuesta);
       if (ultimaRespuesta) {
         setYaRespondioTest(true);
         setRespuestaAnterior(ultimaRespuesta);
@@ -178,9 +170,9 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
                 {respuestaAnterior && (
                   <div className="space-y-1">
                     <p>Fecha: {respuestaAnterior.fechaRespuesta ? new Date(respuestaAnterior.fechaRespuesta).toLocaleDateString('es-ES') : 'No disponible'}</p>
-                    <p>• Agotamiento: {respuestaAnterior.agotamientoEmocional !== undefined ? `${respuestaAnterior.agotamientoEmocional}/54 (${respuestaAnterior.nivelAgotamiento})` : 'No disponible'}</p>
-                    <p>• Despersonalización: {respuestaAnterior.despersonalizacion !== undefined ? `${respuestaAnterior.despersonalizacion}/30 (${respuestaAnterior.nivelDespersonalizacion})` : 'No disponible'}</p>
-                    <p>• Realización personal: {respuestaAnterior.realizacionPersonal !== undefined ? `${respuestaAnterior.realizacionPersonal}/48 (${respuestaAnterior.nivelRealizacion})` : 'No disponible'}</p>
+                    <p>• Agotamiento: {respuestaAnterior.agotamientoEmocional || respuestaAnterior.nivelAgotamiento || 'No disponible'}</p>
+                    <p>• Despersonalización: {respuestaAnterior.despersonalizacion || respuestaAnterior.nivelDespersonalizacion || 'No disponible'}</p>
+                    <p>• Realización personal: {respuestaAnterior.realizacionPersonal || respuestaAnterior.nivelRealizacion || 'No disponible'}</p>
                   </div>
                 )}
               </div>
@@ -372,8 +364,26 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
                       });
 
 
-                      // Mostrar mensaje de agradecimiento
-                      alert('¡Gracias por completar el test de burnout!');
+                      // Mostrar resultados
+                      let mensaje = `Resultados del Cuestionario de Burnout:\n\n`;
+                      mensaje += `• Agotamiento Emocional: ${resultado.agotamientoEmocional}/54 (${resultado.nivelAgotamiento})\n`;
+                      mensaje += `• Despersonalización: ${resultado.despersonalizacion}/30 (${resultado.nivelDespersonalizacion})\n`;
+                      mensaje += `• Realización Personal: ${resultado.realizacionPersonal}/48 (${resultado.nivelRealizacion})\n\n`;
+                      
+                      // Interpretación de resultados
+                      if (resultado.nivelAgotamiento === 'alto') mensaje += `⚠️ Nivel alto de agotamiento emocional\n`;
+                      else if (resultado.nivelAgotamiento === 'medio') mensaje += `⚡ Nivel medio de agotamiento emocional\n`;
+                      else mensaje += `✅ Nivel bajo de agotamiento emocional\n`;
+
+                      if (resultado.nivelDespersonalizacion === 'alto') mensaje += `⚠️ Nivel alto de despersonalización\n`;
+                      else if (resultado.nivelDespersonalizacion === 'medio') mensaje += `⚡ Nivel medio de despersonalización\n`;
+                      else mensaje += `✅ Nivel bajo de despersonalización\n`;
+
+                      if (resultado.nivelRealizacion === 'bajo') mensaje += `⚠️ Nivel bajo de realización personal\n`;
+                      else if (resultado.nivelRealizacion === 'medio') mensaje += `⚡ Nivel medio de realización personal\n`;
+                      else mensaje += `✅ Nivel alto de realización personal\n`;
+
+                      alert(mensaje);
                       
                       // Actualizar estado para reflejar que ya respondió
                       setYaRespondioTest(true);

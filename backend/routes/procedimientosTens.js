@@ -10,19 +10,13 @@ const router = express.Router();
 // Middleware para validar token JWT
 const authenticateToken = require('../middleware/auth');
 
-// Middleware para verificar que el usuario sea TENS o Administrador (solo para escritura)
+// Middleware para verificar que el usuario sea TENS o Administrador
 const requireTensOrAdmin = (req, res, next) => {
   if (req.user.estamento !== 'TENS' && req.user.estamento !== 'Administrador') {
     return res.status(403).json({
       message: 'No tienes permisos para acceder a esta sección. Solo usuarios TENS y Administradores pueden realizar registros en este módulo.'
     });
   }
-  next();
-};
-
-// Middleware para permitir lectura a todos los usuarios autenticados
-const allowReadAccess = (req, res, next) => {
-  // Todos los usuarios autenticados pueden leer
   next();
 };
 
@@ -75,7 +69,7 @@ const convertirTiempoAMinutos = (tiempo) => {
 };
 
 // GET /api/procedimientos-tens - Obtener todos los registros TENS
-router.get('/', authenticateToken, allowReadAccess, async (req, res) => {
+router.get('/', authenticateToken, requireTensOrAdmin, async (req, res) => {
   try {
     const {
       page = 1,
@@ -164,7 +158,7 @@ router.get('/', authenticateToken, allowReadAccess, async (req, res) => {
 });
 
 // GET /api/procedimientos-tens/:id - Obtener registro específico
-router.get('/:id', authenticateToken, allowReadAccess, async (req, res) => {
+router.get('/:id', authenticateToken, requireTensOrAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -468,7 +462,7 @@ router.delete('/:id/procedimientos/:procId', authenticateToken, requireTensOrAdm
 });
 
 // GET /api/procedimientos-tens/metricas/dashboard - Métricas para el dashboard
-router.get('/metricas/dashboard', authenticateToken, allowReadAccess, async (req, res) => {
+router.get('/metricas/dashboard', authenticateToken, async (req, res) => {
   try {
     const fechaActual = new Date();
     const inicioMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
@@ -564,7 +558,7 @@ router.get('/metricas/dashboard', authenticateToken, allowReadAccess, async (req
 });
 
 // GET /api/procedimientos-tens/metricas/usuario - Métricas del usuario actual
-router.get('/metricas/usuario', authenticateToken, allowReadAccess, async (req, res) => {
+router.get('/metricas/usuario', authenticateToken, async (req, res) => {
   try {
     const usuarioId = req.user.id;
     const fechaActual = new Date();

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TimePicker from './TimePicker';
 import auxiliaresAPI, { ProcedimientoAuxiliarData } from '../services/auxiliaresAPI';
 
 interface ModalAuxiliarProps {
@@ -260,12 +261,9 @@ const ModalAuxiliar: React.FC<ModalAuxiliarProps> = ({ isOpen, onClose, onSucces
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tiempo (HH:MM)
                 </label>
-                <input
-                  type="time"
-                  value={nuevoProcedimiento.tiempo}
-                  onChange={(e) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: e.target.value })}
-                  className="w-full px-3 md:px-4 py-2 bg-white text-gray-900 text-sm md:text-base rounded-lg focus:ring-2 focus:ring-gray-700 transition-all"
-                  placeholder="Tiempo"
+                <TimePicker
+                  value={nuevoProcedimiento.tiempo || '00:00'}
+                  onChange={(value) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: value })}
                   disabled={loading}
                 />
               </div>
