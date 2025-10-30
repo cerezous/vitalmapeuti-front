@@ -28,14 +28,22 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
     try {
       const metricas = await registroProcedimientosAPI.obtenerMetricasUsuario();
       setMetricasUsuario(metricas);
-    } catch (err) {
-      console.error('Error al cargar métricas del usuario:', err);
+    } catch (error) {
+      console.error('Error al cargar métricas del usuario:', error);
+      // Mantener valores por defecto en caso de error
+      setMetricasUsuario({
+        totalProcedimientos: 0,
+        tiempoTotal: { texto: '0 hrs', horas: 0, minutos: 0, minutosRestantes: 0 },
+        totalCategorizaciones: 0,
+        pacientesAtendidos: 0
+      });
     }
   };
 
   const verificarRespuestaExistente = async () => {
     try {
       const ultimaRespuesta = await burnoutAPI.obtenerUltimaRespuesta();
+      console.log('Respuesta obtenida del backend:', ultimaRespuesta);
       if (ultimaRespuesta) {
         setYaRespondioTest(true);
         setRespuestaAnterior(ultimaRespuesta);
@@ -170,9 +178,9 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
                 {respuestaAnterior && (
                   <div className="space-y-1">
                     <p>Fecha: {respuestaAnterior.fechaRespuesta ? new Date(respuestaAnterior.fechaRespuesta).toLocaleDateString('es-ES') : 'No disponible'}</p>
-                    <p>• Agotamiento: {respuestaAnterior.agotamientoEmocional || respuestaAnterior.nivelAgotamiento || 'No disponible'}</p>
-                    <p>• Despersonalización: {respuestaAnterior.despersonalizacion || respuestaAnterior.nivelDespersonalizacion || 'No disponible'}</p>
-                    <p>• Realización personal: {respuestaAnterior.realizacionPersonal || respuestaAnterior.nivelRealizacion || 'No disponible'}</p>
+                    <p>• Agotamiento: {respuestaAnterior.agotamientoEmocional !== undefined ? `${respuestaAnterior.agotamientoEmocional}/54 (${respuestaAnterior.nivelAgotamiento})` : 'No disponible'}</p>
+                    <p>• Despersonalización: {respuestaAnterior.despersonalizacion !== undefined ? `${respuestaAnterior.despersonalizacion}/30 (${respuestaAnterior.nivelDespersonalizacion})` : 'No disponible'}</p>
+                    <p>• Realización personal: {respuestaAnterior.realizacionPersonal !== undefined ? `${respuestaAnterior.realizacionPersonal}/48 (${respuestaAnterior.nivelRealizacion})` : 'No disponible'}</p>
                   </div>
                 )}
               </div>
@@ -197,22 +205,6 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Manual de usuario */}
-      <div className="bg-white rounded-lg shadow p-6 mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Manual de usuario</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Consulta el manual para aprender a usar el sistema paso a paso y resolver dudas frecuentes.
-        </p>
-        <a
-          href="/manual.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Abrir manual en nueva pestaña
-        </a>
       </div>
 
       {/* Modal Encuesta de Burnout */}
@@ -380,26 +372,8 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
                       });
 
 
-                      // Mostrar resultados
-                      let mensaje = `Resultados del Cuestionario de Burnout:\n\n`;
-                      mensaje += `• Agotamiento Emocional: ${resultado.agotamientoEmocional}/54 (${resultado.nivelAgotamiento})\n`;
-                      mensaje += `• Despersonalización: ${resultado.despersonalizacion}/30 (${resultado.nivelDespersonalizacion})\n`;
-                      mensaje += `• Realización Personal: ${resultado.realizacionPersonal}/48 (${resultado.nivelRealizacion})\n\n`;
-                      
-                      // Interpretación de resultados
-                      if (resultado.nivelAgotamiento === 'alto') mensaje += `⚠️ Nivel alto de agotamiento emocional\n`;
-                      else if (resultado.nivelAgotamiento === 'medio') mensaje += `⚡ Nivel medio de agotamiento emocional\n`;
-                      else mensaje += `✅ Nivel bajo de agotamiento emocional\n`;
-
-                      if (resultado.nivelDespersonalizacion === 'alto') mensaje += `⚠️ Nivel alto de despersonalización\n`;
-                      else if (resultado.nivelDespersonalizacion === 'medio') mensaje += `⚡ Nivel medio de despersonalización\n`;
-                      else mensaje += `✅ Nivel bajo de despersonalización\n`;
-
-                      if (resultado.nivelRealizacion === 'bajo') mensaje += `⚠️ Nivel bajo de realización personal\n`;
-                      else if (resultado.nivelRealizacion === 'medio') mensaje += `⚡ Nivel medio de realización personal\n`;
-                      else mensaje += `✅ Nivel alto de realización personal\n`;
-
-                      alert(mensaje);
+                      // Mostrar mensaje de agradecimiento
+                      alert('¡Gracias por completar el test de burnout!');
                       
                       // Actualizar estado para reflejar que ya respondió
                       setYaRespondioTest(true);
