@@ -169,13 +169,14 @@ const ModalRegistroProcedimientosEnfermeria: React.FC<ModalRegistroProcedimiento
 
   // Tareas habituales de Enfermería
   const tareasHabituales = [
-    'Administrativo (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
+    'Entrega de turno',
+    'Recepción de turno',
+    'Tareas Administrativas (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
     'Curación avanzada',
     'Diálisis',
-    'Entrega de turno (solo cuando se recibe turno)',
     'Atención de enfermería (evaluación, curación simple, administración de medicamentos, etc)',
     'Hemocultivos (incluye registro administrativo)',
-    'Ingreso (Incluye tarea administrativa)',
+    'Ingreso (recepción de paciente)',
     'Instalación LA',
     'Instalación SNG',
     'Instalación de Sonda Foley',
@@ -211,7 +212,7 @@ const ModalRegistroProcedimientosEnfermeria: React.FC<ModalRegistroProcedimiento
     'Instalación de SNY',
     'Mielograma',
     'Paracentesís',
-    'PCR',
+    'PCR (incluye IOT por PCR)',
     'Premeditación QMT',
     'Punción lumbar',
     'Radiografía',
@@ -223,10 +224,12 @@ const ModalRegistroProcedimientosEnfermeria: React.FC<ModalRegistroProcedimiento
 
   // Procedimientos que no requieren paciente
   const procedimientosSinPaciente = [
-    'Administrativo (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
-    'Entrega de turno (solo cuando se recibe turno)',
+    'Tareas Administrativas (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
+    'Entrega de turno',
+    'Recepción de turno',
     'Preparación de medicamentos',
-    'Toma de exámenes (incluye registro administrativo)'
+    'Toma de exámenes (incluye registro administrativo)',
+    'Atención de enfermería (evaluación, curación simple, administración de medicamentos, etc)'
   ];
 
   // Cargar pacientes cuando se abre el modal
