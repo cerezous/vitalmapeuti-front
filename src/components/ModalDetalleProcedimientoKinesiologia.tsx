@@ -97,24 +97,34 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     procedimientos.some(proc => proc.usuarioId === user.id)
   );
 
-  // Procedimientos de kinesiología disponibles
-  const procedimientosDisponibles = [
-    'Kinesiterapia respiratoria (Ev, KTR, EMR, etc)',
+  // Catálogo alineado con ModalRegistroProcedimientos
+  const procedimientosKinesiologia = [
+    'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
+    'Recepción de turno',
+    'Entrega de turno',
+    'Kinesiterapia respiratoria (Ev, KTR, EMR, instalación de oxigenoterapia, etc)',
     'Kinesiterapia motora',
     'Kinesiterapia integral (respiratorio + motor)',
+    'Ingreso (recepción y evaluación del paciente)',
+    'Traslado a otra unidad',
     'Cultivo de secreción bronquial',
     'Film array respiratorio',
     'Baciloscopía',
     'Instalación de VMNI',
     'Instalación de CNAF',
     'IOT',
-    'PCR',
+    'PCR (incluye IOT por PCR)',
     'Instalación de TQT',
     'Cambio de TQT',
     'Decanulación',
-    'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)',
-    // Otros procedimientos
+    'TAC simple',
+    'TAC con contraste',
+    'RMN',
+    'RMN con traslado a BUPA',
+  ];
+
+  const otrosProcedimientos = [
+    'Asistencia en aseos (general o parcial)',
     'Instalación VVP',
     'Instalación CVC',
     'Instalación CHD',
@@ -129,14 +139,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     'Instalación de SNY',
     'Toma de exámenes',
     'Hemocultivos',
-    'TAC simple',
-    'TAC con contraste',
-    'RMN',
-    'RMN con traslado a BUPA',
     'Electrocardiograma',
     'MAKI',
-    'Premeditación QMT',
-    'Cateterismo vesical',
     'Endoscopía',
     'Colonoscopía',
     'Endoscopía + Colonoscopía',
@@ -148,8 +152,6 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     'Punción lumbar',
     'Mielograma',
     'Traslado a pabellón',
-    'Traslado a otra unidad',
-    'Ingreso',
     'Curación simple',
     'Diálisis',
     'Curación avanzada'
@@ -157,8 +159,9 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
 
   // Procedimientos que no requieren paciente
   const procedimientosSinPaciente = [
-    'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)'
+    'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
+    'Entrega de turno',
+    'Recepción de turno'
   ];
 
   const formatearFecha = (fechaStr: string) => {
@@ -419,16 +422,16 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
                     disabled={loading}
                   >
                     <option value="">Seleccionar procedimiento...</option>
-                    <optgroup label="Procedimientos de Kinesiología">
-                      {procedimientosDisponibles.slice(0, 15).map((proc, index) => (
-                        <option key={`kine-${index}`} value={proc}>{proc}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Otros procedimientos">
-                      {procedimientosDisponibles.slice(15).map((proc, index) => (
-                        <option key={`otros-${index}`} value={proc}>{proc}</option>
-                      ))}
-                    </optgroup>
+                  <optgroup label="Procedimientos de Kinesiología">
+                    {procedimientosKinesiologia.map((proc, index) => (
+                      <option key={`kine-${index}`} value={proc}>{proc}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Otros procedimientos">
+                    {otrosProcedimientos.map((proc, index) => (
+                      <option key={`otros-${index}`} value={proc}>{proc}</option>
+                    ))}
+                  </optgroup>
                   </select>
                 </div>
 

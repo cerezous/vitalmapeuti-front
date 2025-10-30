@@ -82,10 +82,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
             const registros = await nasAPI.obtenerRegistrosPorPaciente(paciente.rut, { limit: 1 });
             if (registros && registros.length > 0) {
               const ultimoNAS = registros[0];
-              // Asegurar que puntuacionTotal sea un número válido
-              const puntuacion = typeof ultimoNAS.puntuacionTotal === 'number' 
-                ? ultimoNAS.puntuacionTotal 
-                : parseFloat(ultimoNAS.puntuacionTotal) || 0;
+              const puntuacion = ultimoNAS.puntuacionTotal;
               
               let color = 'bg-blue-200'; // Por defecto
               let categoria = 'Normal';
@@ -270,18 +267,12 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
     if (nasInfo) {
       // Buscar el paciente por cama
       const paciente = pacientes.find(p => p.camaAsignada === numeroCama);
-      
-      // Asegurar que puntuacion sea un número válido
-      const puntuacionNumerica = typeof nasInfo.puntuacion === 'number' 
-        ? nasInfo.puntuacion 
-        : parseFloat(nasInfo.puntuacion) || 0;
-      
       return {
         color: nasInfo.color,
-        puntuacion: puntuacionNumerica.toFixed(1),
+        puntuacion: nasInfo.puntuacion.toFixed(1),
         fecha: nasInfo.fecha,
         fechaFormateada: formatearFecha(nasInfo.fecha),
-        titulo: `Cama ${numeroCama} - ${nasInfo.pacienteNombre} - NAS: ${puntuacionNumerica.toFixed(1)}%`,
+        titulo: `Cama ${numeroCama} - ${nasInfo.pacienteNombre} - NAS: ${nasInfo.puntuacion.toFixed(1)}%`,
         pacienteRut: paciente?.rut || null,
         pacienteNombre: nasInfo.pacienteNombre
       };
@@ -439,7 +430,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
   ] : [
     {
       titulo: 'NAS Promedio',
-      valor: `${(metricas.nasPromedio || 0).toFixed(1)}%`,
+      valor: `${metricas.nasPromedio.toFixed(1)}%`,
       icono: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -459,7 +450,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
       ),
       color: metricas.pacientesAltaCarga.porcentaje > 30 ? 'bg-red-500' : 
              metricas.pacientesAltaCarga.porcentaje > 15 ? 'bg-orange-500' : 'bg-green-500',
-      subtitulo: `${(metricas.pacientesAltaCarga.porcentaje || 0).toFixed(0)}% con NAS >80%`
+      subtitulo: `${metricas.pacientesAltaCarga.porcentaje.toFixed(0)}% con NAS >80%`
     },
     {
       titulo: 'Total Procedimientos',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TimePicker from './TimePicker';
 import { useAuth } from '../contexts/AuthContext';
 import { pacienteService } from '../services/api';
 import procedimientosTENSAPI from '../services/procedimientosTENSAPI';
@@ -154,26 +155,36 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
   const procedimientosHabituales = [
     'Esterilización (conteo de materiales, recolección y traslados)',
     'Tareas administrativas (registros, evoluciones, etc)',
-    'Entrega de turno (solo cuando se recibe)',
-    'Toma de signos vitales',
-    'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, etc)',
-    'Administración de medicamentos oral/SNG/SNY/Gastrostomía',
+    'Entrega de turno',
+    'Recepción de turno',
+    'Toma de signos vitales (registro por paciente)',
+    'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, medición de deposiciones, etc)',
+    'Administración de medicamentos oral/SNG/SNY/Gastrostomía/Broncodilatadores',
+    'Preparación de medicamentos',
+    'Cambio de posición',
     'Medición de diuresis',
-    'Administración de broncodilatadores o nebulización'
+    'Toma de exámenes (CD, muestra de orina, etc)',
+    'Traslado a endoscopia',
+    'Traslado a TAC sin contraste',
+    'Traslado a TAC con contraste',
+    'Traslado a RMN',
+    'Traslado de paciente',
   ];
 
   // Otras tareas de TENS
   const otrasTareas = [
     'Control de glicemia',
-    'Curación simple (asistencia)',
-    'Curación avanzada (asistencia)',
-    'Cambio de posición',
+    'Instalación de CVC (asistencia)',
+    'Instalación de CHD (asistencia)',
+    'Asistencia en procedimientos de enfermería (instalación de LA, curaciones, toma de exámenes, etc)',
+    'Asistencia en procedimientos de kinesiología (Kine motora o respiratoria, etc)',
+    'IOT (asistencia)',
+    'PCR (asistencia)',
     'Alimentación asistida',
     'Traslado interno',
-    'Traslado a TAC sin contraste',
-    'Traslado a TAC con contraste',
     'Control de drenajes (vaciado y registro)',
-    'Educación familiar'
+    'Educación familiar',
+    'Acompañamiento familiar'
   ];
 
   // Todos los procedimientos TENS combinados
@@ -183,7 +194,9 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
   const procedimientosSinPaciente = [
     'Esterilización (conteo de materiales, recolección y traslados)',
     'Tareas administrativas (registros, evoluciones, etc)',
-    'Entrega de turno (solo cuando se recibe)'
+    'Preparación de medicamentos',
+    'Entrega de turno',
+    'Recepción de turno'
   ];
 
   // Cargar pacientes cuando se abre el modal
@@ -525,12 +538,9 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tiempo (HH:MM)
                 </label>
-                <input
-                  type="time"
-                  value={nuevoProcedimiento.tiempo}
-                  onChange={(e) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: e.target.value })}
-                  className="w-full px-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-900 transition-all"
-                  placeholder="Tiempo"
+                <TimePicker
+                  value={nuevoProcedimiento.tiempo || '00:00'}
+                  onChange={(value) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: value })}
                   disabled={loading}
                 />
               </div>

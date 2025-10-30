@@ -173,39 +173,45 @@ const ModalRegistroProcedimientosMedicina: React.FC<ModalRegistroProcedimientosM
   
   // Separar en procedimientos habituales y otros procedimientos
   const procedimientosMedicina = [
-    'Administrativo (evoluciones, revisión de HC, indicaciones, etc)',
+    'Tareas administrativas (evoluciones, revisión de HC, indicaciones, recetas, etc)',
+    'Logística (solicitud de insumos o situación similar por la cual se debe retrasar un procedimiento)',
+    'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)',
+    'Informe médico (redacción para traslados)',
     'Egreso (redacción de egreso, indicaciones, etc)',
-    'Entrega de turno (solo cuando se recibe turno)',
+    'Entrega de turno',
+    'Recepción de turno',
+    'Discusión con especialidades',
+    'Visita clínica',
+    'Redacción de licencia médica',
+    'Desfibrilación o cardioversión',
     'Ingreso (redacción de ingreso, evaluación y procedimientos correspondientes)',
     'Instalación CHD',
     'Instalación CVC',
     'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)',
     'IOT',
-    'PCR'
+    'PCR (incluye IOT por PCR)'
   ];
 
   // Otros procedimientos (requieren paciente específico) - ordenados alfabéticamente
   const otrosProcedimientos = [
     'Cambio de TQT',
-    'Colonoscopía',
+    'Colonoscopía (indicación de sedación y/o supervisión)',
     'Decanulación',
     'Ecografía',
-    'Endoscopía',
-    'Endoscopía + Colonoscopía',
-    'Fibrobroncoscopía',
-    'Instalación de Cistotomia',
-    'Instalación de gastrotomía',
-    'Instalación de SNY',
+    'Endoscopía (indicación de sedación y/o supervisión)',
+    'Endoscopía + Colonoscopía (indicación de sedación y/o supervisión)',
+    'Fibrobroncoscopía (indicación de sedación, supervisión o realización del procedimiento)',
+    'Instalación de Cistotomia (indicación de sedación/analgesia o supervisión)',
+    'Instalación de gastrotomía (indicación de sedación y/o supervisión)',
+    'Instalación de SNY (indicación de sedación y/o supervisión)',
     'Instalación de TQT',
-    'Instalación de tunelizado',
+    'Instalación de tunelizado (indicación de sedación y/o supervisión)',
     'Instalación LA',
     'Instalación PICCLINE',
-    'Mielograma',
-    'Paracentesís',
-    'Punción lumbar',
-    'Radiografía',
-    'RMN con traslado a BUPA',
-    'Toracocentesís'
+    'Mielograma (indicación de analgesia, supervisión o realización del procedimiento)',
+    'Paracentesís (supervisión o realización del procedimiento)',
+    'Punción lumbar (indicación de sedación, supervisión o realización del procedimiento)',
+    'Toracocentesís (indicación de sedación/analgesia, supervisión o realización del procedimiento)'
   ];
 
   // Verificar si un procedimiento requiere paciente

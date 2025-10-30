@@ -7,8 +7,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Configurar para soportar Safe Area en dispositivos modernos (iPhone 14 Pro Max, etc.)
+        if let window = self.window {
+            window.backgroundColor = UIColor.white
+        }
+        
+        // Inicializar el gestor de biometría
+        _ = BiometricManager.shared
+        
+        // Mejorar el comportamiento del teclado
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+        
         return true
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        // Ayuda a manejar el teclado en iOS
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+            // El plugin de Capacitor Keyboard manejará esto automáticamente
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        // Limpiar cualquier ajuste del teclado
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

@@ -70,22 +70,7 @@ const MenuCuestionariosBurnout: React.FC = () => {
       setEstadisticas(estadisticasData);
     } catch (err: any) {
       console.error('Error al cargar datos:', err);
-      
-      // Si es un error de estadísticas pero hay cuestionarios, mostrar solo los cuestionarios
-      if (err.message?.includes('estadísticas') && cuestionarios.length === 0) {
-        try {
-          const soloCuestionarios = await burnoutAPI.obtenerTodosCuestionarios();
-          setCuestionarios(soloCuestionarios);
-          setEstadisticas({
-            totalCuestionarios: soloCuestionarios.length,
-            porEstamento: {}
-          });
-        } catch (cuestionariosError) {
-          setError('Error al cargar los cuestionarios. Por favor, inténtalo de nuevo.');
-        }
-      } else {
-        setError('Error al cargar los cuestionarios. Por favor, inténtalo de nuevo.');
-      }
+      setError('Error al cargar los cuestionarios. Por favor, inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
     }

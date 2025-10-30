@@ -3,12 +3,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ModalForgotPassword from './ModalForgotPassword';
 
-const Login = () => {
+const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     usuario: '',
     contraseña: '',
   });
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
@@ -25,7 +25,7 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
     // Convertir a minúsculas solo para el campo usuario
@@ -45,7 +45,7 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    const newErrors: any = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.usuario.trim()) {
       newErrors.usuario = 'El nombre de usuario es requerido';
@@ -59,7 +59,7 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {

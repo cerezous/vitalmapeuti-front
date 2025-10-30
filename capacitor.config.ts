@@ -1,18 +1,13 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.vitalmape.uti',
+  appId: 'com.vitalmape.vitalmapeuti',
   appName: 'VitalMape UTI',
   webDir: 'build',
-  // En desarrollo, puedes usar la URL local del backend
-  // En producción, deja esto comentado o usa tu URL de producción
-  // server: {
-  //   url: 'http://192.168.1.117:3001',
-  //   cleartext: true
-  // },
+  // Cargar desde servidor de producción para actualizaciones en vivo
   server: {
-    androidScheme: 'https',
-    iosScheme: 'https'
+    url: 'https://vitalmapeuti.onrender.com',
+    cleartext: false
   },
   ios: {
     contentInset: 'automatic',

@@ -466,52 +466,31 @@ app.post('/api/auth/register', async (req, res) => {
     }
     
     // Generar nombre de usuario automáticamente desde nombres y apellidos
-    // Primera letra del nombre + primer apellido completo
+    // Primera letra del nombre + primer apellido
     const nombreLimpio = nombres.trim().toLowerCase();
     const apellidosLimpio = apellidos.trim().toLowerCase();
     const apellidosSeparados = apellidosLimpio.split(/\s+/);
     
     const primeraLetraNombre = nombreLimpio.charAt(0);
     const primerApellido = apellidosSeparados[0] || '';
-    let usuarioBase = primeraLetraNombre + primerApellido;
+    let usuario = primeraLetraNombre + primerApellido;
     
-    // Verificar si el usuario base existe
-    let usuarioFinal = usuarioBase;
-    const usuarioExiste = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+    // Si el usuario ya existe y hay segundo apellido, agregar primera letra del segundo apellido
+    let usuarioExiste = await Usuario.findOne({ where: { usuario } });
+    if (usuarioExiste && apellidosSeparados.length > 1) {
+      const segundoApellido = apellidosSeparados[1];
+      usuario = usuario + segundoApellido.charAt(0);
+    }
     
-    if (usuarioExiste) {
-      // Si existe, agregar primera letra del segundo apellido
-      if (apellidosSeparados.length > 1) {
-        const segundoApellido = apellidosSeparados[1];
-        usuarioFinal = usuarioBase + segundoApellido.charAt(0);
-        const existe = await Usuario.findOne({ where: { usuario: usuarioFinal } });
-        
-        if (existe) {
-          // Si aún existe, agregar 2 letras más del segundo apellido
-          if (segundoApellido.length >= 2) {
-            usuarioFinal = usuarioBase + segundoApellido.substring(0, 2);
-            const existe2 = await Usuario.findOne({ where: { usuario: usuarioFinal } });
-            if (existe2) {
-              // Si aún existe, agregar más letras del segundo apellido
-              for (let i = 2; i < segundoApellido.length; i++) {
-                usuarioFinal = usuarioBase + segundoApellido.substring(0, i + 1);
-                const existe3 = await Usuario.findOne({ where: { usuario: usuarioFinal } });
-                if (!existe3) break;
-              }
-            }
-          }
-        }
-      }
-      
-      // Si aún existe, agregar más letras del primer apellido
-      if (usuarioFinal === usuarioBase || await Usuario.findOne({ where: { usuario: usuarioFinal } })) {
-        const primerApellidoCompleto = apellidosSeparados[0];
-        for (let i = 1; i < primerApellidoCompleto.length; i++) {
-          usuarioFinal = primeraLetraNombre + primerApellidoCompleto.substring(0, i + 1);
-          const existe = await Usuario.findOne({ where: { usuario: usuarioFinal } });
-          if (!existe) break;
-        }
-      }
+    // Si aún existe, agregar un número al final
+    let contador = 2;
+    let usuarioFinal = usuario;
+    usuarioExiste = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+    
+    while (usuarioExiste) {
+      usuarioFinal = usuario + contador;
+      usuarioExiste = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+      contador++;
     }
     
     console.log('👤 Usuario generado:', usuarioFinal);
@@ -525,18 +504,25 @@ app.post('/api/auth/register', async (req, res) => {
       contraseña
     });
     
-    // Enviar correo de bienvenida (en segundo plano, no bloquear registro)
+    // Enviar correo de bienvenida
     try {
       const resultadoCorreo = await enviarCorreoBienvenida(nuevoUsuario, contraseña);
       if (resultadoCorreo.success) {
         console.log(`✅ Correo de bienvenida enviado a ${correo}`);
       } else {
-        console.warn('⚠️ No se pudo enviar correo de bienvenida:', resultadoCorreo.error);
-        // No fallar el registro si el correo falla, solo registrar el warning
+        console.error('❌ Error enviando correo de bienvenida:', resultadoCorreo.error);
+        // Si el correo falla, fallar el registro
+        return res.status(500).json({ 
+          error: 'Error al enviar correo de bienvenida', 
+          message: 'No se pudo completar el registro. Inténtalo más tarde.' 
+        });
       }
     } catch (emailError) {
-      console.warn('⚠️ Error en envío de correo (no crítico):', emailError.message);
-      // No fallar el registro si el correo falla
+      console.error('❌ Error en envío de correo:', emailError);
+      return res.status(500).json({ 
+        error: 'Error en el servicio de correo', 
+        message: 'No se pudo completar el registro. Inténtalo más tarde.' 
+      });
     }
     
     // Excluir contraseña de la respuesta
@@ -553,11 +539,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     console.log('✅ Usuario registrado exitosamente:', usuarioFinal);
     
-    res.status(201).json({
-      success: true,
-      message: 'Usuario registrado exitosamente',
-      usuario: usuarioResponse
-    });
+    res.status(201).json(usuarioResponse);
   } catch (error) {
     console.error('❌ Error al crear usuario:', error);
     
@@ -570,7 +552,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     if (error.name === 'SequelizeValidationError') {
       const errors = error.errors.map(err => ({
-        path: err.path,
+        field: err.path,
         message: err.message
       }));
       return res.status(400).json({ 

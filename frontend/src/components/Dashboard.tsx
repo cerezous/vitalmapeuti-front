@@ -176,8 +176,7 @@ const Dashboard: React.FC = () => {
       setPacientes(pacientesData);
     } catch (err) {
       console.error('Error al cargar pacientes:', err);
-      setError('Error de conexión al cargar los pacientes');
-      setPacientes([]); // Establecer array vacío en caso de error
+      setError('Error al cargar los pacientes');
     } finally {
       setIsLoading(false);
     }

@@ -1,23 +1,27 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
+# Dependencies
+node_modules/
+jspm_packages/
 /.pnp
 .pnp.js
 
-# testing
-/coverage
+# Testing
+coverage/
+.nyc_output
 
-# production
-/build
+# Production
+build/
+dist/
 
-# misc
-.DS_Store
+# Environment variables
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -41,3 +45,38 @@ xcuserdata/
 !ios/App/App.xcodeproj/project.pbxproj
 !ios/App/App/Info.plist
 !ios/App/Podfile
+
+# Optional npm cache
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# React specific
+.eslintcache

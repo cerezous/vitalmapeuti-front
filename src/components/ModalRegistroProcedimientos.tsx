@@ -59,25 +59,34 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
 
   // Procedimientos de Kinesiología
   const procedimientosKinesiologia = [
-    'Kinesiterapia respiratoria (Ev, KTR, EMR, etc)',
+    'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
+    'Recepción de turno',
+    'Entrega de turno',
+    'Kinesiterapia respiratoria (Ev, KTR, EMR, instalación de oxigenoterapia, etc)',
     'Kinesiterapia motora',
     'Kinesiterapia integral (respiratorio + motor)',
+    'Ingreso (recepción y evaluación del paciente)',
+    'Traslado a otra unidad',
     'Cultivo de secreción bronquial',
     'Film array respiratorio',
     'Baciloscopía',
     'Instalación de VMNI',
     'Instalación de CNAF',
     'IOT',
-    'PCR',
+    'PCR (incluye IOT por PCR)',
     'Instalación de TQT',
     'Cambio de TQT',
     'Decanulación',
-    'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)'
+    'TAC simple',
+    'TAC con contraste',
+    'RMN',
+    'RMN con traslado a BUPA',
+
   ];
 
   // Otros procedimientos
   const otrosProcedimientos = [
+    'Asistencia en aseos (general o parcial)',
     'Instalación VVP',
     'Instalación CVC',
     'Instalación CHD',
@@ -92,14 +101,8 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
     'Instalación de SNY',
     'Toma de exámenes',
     'Hemocultivos',
-    'TAC simple',
-    'TAC con contraste',
-    'RMN',
-    'RMN con traslado a BUPA',
     'Electrocardiograma',
     'MAKI',
-    'Premeditación QMT',
-    'Cateterismo vesical',
     'Endoscopía',
     'Colonoscopía',
     'Endoscopía + Colonoscopía',
@@ -111,8 +114,6 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
     'Punción lumbar',
     'Mielograma',
     'Traslado a pabellón',
-    'Traslado a otra unidad',
-    'Ingreso',
     'Curación simple',
     'Diálisis',
     'Curación avanzada'
@@ -120,8 +121,9 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
 
   // Procedimientos que no requieren paciente
   const procedimientosSinPaciente = [
-    'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)'
+    'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
+    'Entrega de turno',
+    'Recepción de turno'
   ];
 
   // Cargar pacientes cuando se abre el modal

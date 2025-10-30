@@ -341,7 +341,7 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
                     Tiempo (HH:MM)
                   </label>
                   <TimePicker
-                    value={nuevoProcedimiento.tiempo}
+                    value={nuevoProcedimiento.tiempo || '00:00'}
                     onChange={(value) => setNuevoProcedimiento(prev => ({ ...prev, tiempo: value }))}
                     disabled={loading}
                   />

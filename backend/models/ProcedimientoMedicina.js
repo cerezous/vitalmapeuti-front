@@ -52,8 +52,7 @@ const ProcedimientoMedicina = sequelize.define('ProcedimientoMedicina', {
     type: DataTypes.STRING(15),
     allowNull: true, // Algunos procedimientos médicos no requieren paciente específico
     validate: {
-      is: /^[0-9]{1,2}\.?[0-9]{3}\.?[0-9]{3}-[0-9kK]$/i,
-      len: [8, 15] // Longitud mínima y máxima para RUT chileno
+      is: /^[0-9]{1,2}\.?[0-9]{3}\.?[0-9]{3}-[0-9kK]$/i
     },
     references: {
       model: 'pacientes',
