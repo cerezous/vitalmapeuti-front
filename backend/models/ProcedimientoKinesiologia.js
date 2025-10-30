@@ -31,16 +31,32 @@ const ProcedimientoKinesiologia = sequelize.define('ProcedimientoKinesiologia', 
     validate: {
       notEmpty: true,
       isIn: [[
-        // Procedimientos de Kinesiología
+        // Kinesiología principales (ambas variantes donde aplica)
+        'Tareas administrativas (evoluciones, estadísticas, etc)',
+        'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
+        'Recepción de turno',
+        'Entrega de turno',
+        'Entrega de turno (solo cuando se recibe turno)',
         'Kinesiterapia respiratoria (Ev, KTR, EMR, etc)',
+        'Kinesiterapia respiratoria (Ev, KTR, EMR, instalación de oxigenoterapia, etc)',
         'Kinesiterapia motora',
         'Kinesiterapia integral (respiratorio + motor)',
+        'Ingreso (recepción y evaluación del paciente)',
+        'Traslado a otra unidad',
         'Cultivo de secreción bronquial',
         'Film array respiratorio',
         'Baciloscopía',
         'Instalación de VMNI',
         'Instalación de CNAF',
-        // Procedimientos de Enfermería
+        'IOT',
+        'PCR',
+        'PCR (incluye IOT por PCR)',
+        'Instalación de TQT',
+        'Cambio de TQT',
+        'Decanulación',
+
+        // Otros procedimientos (compartidos)
+        'Asistencia en aseos (general o parcial)',
         'Instalación VVP',
         'Instalación CVC',
         'Instalación CHD',
@@ -73,20 +89,11 @@ const ProcedimientoKinesiologia = sequelize.define('ProcedimientoKinesiologia', 
         'Paracentesís',
         'Punción lumbar',
         'Mielograma',
-        'IOT',
-        'PCR',
-        'Instalación de TQT',
-        'Cambio de TQT',
-        'Decanulación',
         'Traslado a pabellón',
-        'Traslado a otra unidad',
-        'Ingreso',
         'Curación simple',
         'Diálisis',
         'Curación avanzada',
-        'Evaluación de enfermería',
-        'Tareas administrativas (evoluciones, estadísticas, etc)',
-        'Entrega de turno (solo cuando se recibe turno)'
+        'Evaluación de enfermería'
       ]]
     }
   },

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { pacienteService, Paciente } from '../services/api';
 import medicinaAPI, { ProcedimientoMedicinaData } from '../services/medicinaAPI';
+import TimePicker from './TimePicker';
 
 interface ModalRegistroProcedimientosMedicinaProps {
   isOpen: boolean;
@@ -639,11 +640,10 @@ const ModalRegistroProcedimientosMedicina: React.FC<ModalRegistroProcedimientosM
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tiempo (HH:MM) <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="time"
-                  value={nuevoProcedimiento.tiempo}
-                  onChange={(e) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: e.target.value })}
-                  className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                <TimePicker
+                  value={nuevoProcedimiento.tiempo || '00:00'}
+                  onChange={(value) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: value })}
+                  required
                 />
               </div>
             </div>

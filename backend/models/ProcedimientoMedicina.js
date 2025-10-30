@@ -94,48 +94,61 @@ const ProcedimientoMedicina = sequelize.define('ProcedimientoMedicina', {
 
 // Método estático para validar si un procedimiento requiere paciente
 ProcedimientoMedicina.requierePaciente = function(nombreProcedimiento) {
+  // Debe estar alineado con el frontend (medicinaAPI.requierePaciente)
   const procedimientosSinPaciente = [
-    'Administrativo (evoluciones, revisión de HC, indicaciones, etc)',
-    'Entrega de turno (solo cuando se recibe turno)',
-    'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)'
+    'Tareas administrativas (evoluciones, revisión de HC, indicaciones, recetas, etc)',
+    'Logística (solicitud de insumos o situación similar por la cual se debe retrasar un procedimiento)',
+    'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)',
+    'Entrega de turno',
+    'Recepción de turno',
+    'Discusión con especialidades',
+    'Visita clínica',
+    'Redacción de licencia médica'
   ];
   return !procedimientosSinPaciente.includes(nombreProcedimiento);
 };
 
 // Método estático para obtener procedimientos válidos
 ProcedimientoMedicina.getProcedimientosValidos = function() {
+  // Debe coincidir con frontend/src/services/medicinaAPI.ts (getProcedimientosValidos)
   return [
     // Procedimientos habituales de medicina
-    'Administrativo (evoluciones, revisión de HC, indicaciones, etc)',
+    'Tareas administrativas (evoluciones, revisión de HC, indicaciones, recetas, etc)',
+    'Logística (solicitud de insumos o situación similar por la cual se debe retrasar un procedimiento)',
+    'Informe médico (redacción para traslados)',
     'Egreso (redacción de egreso, indicaciones, etc)',
-    'Entrega de turno (solo cuando se recibe turno)',
+    'Entrega de turno',
+    'Recepción de turno',
+    'Discusión con especialidades',
+    'Visita clínica',
+    'Redacción de licencia médica',
+    'Desfibrilación o cardioversión',
     'Ingreso (redacción de ingreso, evaluación y procedimientos correspondientes)',
-    'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)',
-    // Otros procedimientos
-    'Cambio de TQT',
-    'Colonoscopía',
-    'Decanulación',
-    'Ecografía',
-    'Endoscopía',
-    'Endoscopía + Colonoscopía',
-    'Fibrobroncoscopía',
     'Instalación CHD',
     'Instalación CVC',
-    'Instalación de Cistotomia',
-    'Instalación de gastrotomía',
-    'Instalación de SNY',
+    'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)',
+    'IOT',
+    'PCR (incluye IOT por PCR)',
+
+    // Otros procedimientos (requieren paciente)
+    'Cambio de TQT',
+    'Colonoscopía (indicación de sedación y/o supervisión)',
+    'Decanulación',
+    'Ecografía',
+    'Endoscopía (indicación de sedación y/o supervisión)',
+    'Endoscopía + Colonoscopía (indicación de sedación y/o supervisión)',
+    'Fibrobroncoscopía (indicación de sedación, supervisión o realización del procedimiento)',
+    'Instalación de Cistotomia (indicación de sedación/analgesia o supervisión)',
+    'Instalación de gastrotomía (indicación de sedación y/o supervisión)',
+    'Instalación de SNY (indicación de sedación y/o supervisión)',
     'Instalación de TQT',
-    'Instalación de tunelizado',
+    'Instalación de tunelizado (indicación de sedación y/o supervisión)',
     'Instalación LA',
     'Instalación PICCLINE',
-    'IOT',
-    'Mielograma',
-    'Paracentesís',
-    'PCR',
-    'Punción lumbar',
-    'Radiografía',
-    'RMN con traslado a BUPA',
-    'Toracocentesís'
+    'Mielograma (indicación de analgesia, supervisión o realización del procedimiento)',
+    'Paracentesís (supervisión o realización del procedimiento)',
+    'Punción lumbar (indicación de sedación, supervisión o realización del procedimiento)',
+    'Toracocentesís (indicación de sedación/analgesia, supervisión o realización del procedimiento)'
   ];
 };
 

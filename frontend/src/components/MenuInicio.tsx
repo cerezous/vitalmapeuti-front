@@ -207,6 +207,22 @@ const MenuInicio: React.FC<MenuInicioProps> = () => {
         </div>
       </div>
 
+      {/* Manual de usuario */}
+      <div className="bg-white rounded-lg shadow p-6 mt-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Manual de usuario</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Consulta el manual para aprender a usar el sistema paso a paso y resolver dudas frecuentes.
+        </p>
+        <a
+          href="/manual.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Abrir manual en nueva pestaña
+        </a>
+      </div>
+
       {/* Modal Encuesta de Burnout */}
       {showModalBurnout && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1 sm:p-2 md:p-4">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { pacienteService, Paciente } from '../services/api';
 import registroProcedimientosAPI, { ProcedimientoRegistroData } from '../services/registroProcedimientosAPI';
 import procedimientosKinesiologiaAPI from '../services/procedimientosKinesiologiaAPI';
+import TimePicker from './TimePicker';
 
 type TipoProcedimiento = 'enfermeria' | 'kinesiologia' | 'medicina';
 
@@ -440,12 +441,9 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tiempo (HH:MM)
                 </label>
-                <input
-                  type="time"
-                  value={nuevoProcedimiento.tiempo}
-                  onChange={(e) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: e.target.value })}
-                  className={`w-full px-3 md:px-4 py-2 bg-white text-gray-900 text-sm md:text-base rounded-lg focus:ring-2 ${tipo === 'kinesiologia' ? 'focus:ring-gray-800' : 'focus:ring-blue-900'} transition-all`}
-                  placeholder="Tiempo"
+                <TimePicker
+                  value={nuevoProcedimiento.tiempo || '00:00'}
+                  onChange={(value) => setNuevoProcedimiento({ ...nuevoProcedimiento, tiempo: value })}
                   disabled={loading}
                 />
               </div>

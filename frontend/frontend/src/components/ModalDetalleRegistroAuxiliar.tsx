@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TimePicker from './TimePicker';
 import { GrupoProcedimientosAuxiliares, ProcedimientoAuxiliar } from '../services/auxiliaresAPI';
 import { useAuth } from '../contexts/AuthContext';
 import auxiliaresAPI from '../services/auxiliaresAPI';
@@ -339,11 +340,9 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tiempo (HH:MM)
                   </label>
-                  <input
-                    type="time"
-                    value={nuevoProcedimiento.tiempo}
-                    onChange={(e) => setNuevoProcedimiento(prev => ({ ...prev, tiempo: e.target.value }))}
-                    className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-sm md:text-base"
+                  <TimePicker
+                    value={nuevoProcedimiento.tiempo || '00:00'}
+                    onChange={(value) => setNuevoProcedimiento(prev => ({ ...prev, tiempo: value }))}
                     disabled={loading}
                   />
                 </div>

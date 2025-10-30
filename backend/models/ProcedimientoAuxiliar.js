@@ -33,16 +33,8 @@ const ProcedimientoAuxiliar = sequelize.define('ProcedimientoAuxiliar', {
     type: DataTypes.STRING(255),
     allowNull: false,
     validate: {
-      notEmpty: true,
-      isIn: [[
-        'Entrega de turno',
-        'Aseo terminal',
-        'Entrega de interconsulta',
-        'Entrega de exámenes',
-        'Entrega de recetas / recepción de fármacos (trayecto hacia y desde farmacia)',
-        'Aseo regular',
-        'Recepción / entrega de ropa'
-      ]]
+      notEmpty: true
+      // La validación de lista permitida se hace con getProcedimientosValidos() en rutas si aplica
     }
   },
   tiempo: {
@@ -104,14 +96,22 @@ ProcedimientoAuxiliar.requierePaciente = function(nombreProcedimiento) {
 
 // Método estático para obtener lista de procedimientos válidos
 ProcedimientoAuxiliar.getProcedimientosValidos = function() {
+  // Debe coincidir con frontend/src/services/auxiliaresAPI.ts (getProcedimientosValidos)
   return [
     'Entrega de turno',
-    'Aseo terminal',
-    'Entrega de interconsulta',
-    'Entrega de exámenes',
-    'Entrega de recetas / recepción de fármacos (trayecto hacia y desde farmacia)',
-    'Aseo regular',
-    'Recepción / entrega de ropa'
+    'Recepción de turno',
+    'Aseo terminal (se debe registrar 1 por 1)',
+    'Entrega de interconsulta (se debe registrar 1 por 1)',
+    'Entrega de exámenes (se debe registrar 1 por 1)',
+    'Entrega de recetas / recepción de fármacos (trayecto hacia y desde farmacia - (se debe registrar 1 por 1))',
+    'Aseo diurno (registrar tiempo total)',
+    'Aseo nocturno (registrar tiempo total)',
+    'Aseo de equipos',
+    'Preparación de material',
+    'Traslados de paciente (se debe registrar 1 por 1)',
+    'Traslados a procedimientos (se debe registrar 1 por 1)',
+    'Recepción / entrega de ropa (se debe registrar 1 por 1)',
+    'Reposición de insumos (para diurnos incluye traslados a bodega'
   ];
 };
 

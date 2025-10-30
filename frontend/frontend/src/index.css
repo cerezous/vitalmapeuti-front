@@ -2,13 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Soporte para Safe Area en iOS (iPhone X y posteriores, incluyendo iPhone 14 Pro Max) */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-right: env(safe-area-inset-right);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --safe-area-inset-left: env(safe-area-inset-left);
+}
+
 body {
   margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Permite overscroll en iOS para pull-to-refresh */
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Mejora el rendering en iOS */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  /* Altura completa considerando Safe Area para iOS */
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Para iOS Safari */
+}
+
+/* Mejoras para pull-to-refresh en iOS PWA y soporte Safe Area */
+#root {
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Para iOS Safari */
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Asegura que el contenido no quede oculto detrás de las barras del sistema */
+  /* Usamos env() directamente para mejor compatibilidad con iOS */
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 code {

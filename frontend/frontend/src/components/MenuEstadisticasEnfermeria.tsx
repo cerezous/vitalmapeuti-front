@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import estadisticasAPI, { EstadisticasEstamento } from '../services/estadisticasAPI';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 
 const MenuEstadisticasEnfermeria: React.FC = () => {
   const { user } = useAuth();
@@ -8,13 +9,10 @@ const MenuEstadisticasEnfermeria: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    cargarEstadisticas();
-  }, []);
-
-  const cargarEstadisticas = async () => {
+  const cargarEstadisticas = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const datos = await estadisticasAPI.obtenerEstadisticasEstamento('enfermeria');
       setEstadisticas(datos);
     } catch (error) {
@@ -23,7 +21,18 @@ const MenuEstadisticasEnfermeria: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    cargarEstadisticas();
+  }, [cargarEstadisticas]);
+
+  // Implementar pull-to-refresh
+  usePullToRefresh({
+    onRefresh: cargarEstadisticas,
+    enabled: true,
+    threshold: 80
+  });
 
   if (loading) {
     return (
