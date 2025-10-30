@@ -112,7 +112,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     'Cambio de TQT',
     'Decanulación',
     'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)',
+    'Entrega de turno',
+    'Recepción de turno',
     // Otros procedimientos
     'Instalación VVP',
     'Instalación CVC',
@@ -157,7 +158,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
   // Procedimientos que no requieren paciente
   const procedimientosSinPaciente = [
     'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)'
+    'Entrega de turno',
+    'Recepción de turno'
   ];
 
   const formatearFecha = (fechaStr: string) => {

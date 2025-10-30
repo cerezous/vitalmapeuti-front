@@ -121,8 +121,9 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
 
   // Procedimientos que no requieren paciente
   const procedimientosSinPaciente = [
-    'Tareas administrativas (evoluciones, estadísticas, etc)',
-    'Entrega de turno (solo cuando se recibe turno)'
+    'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
+    'Entrega de turno',
+    'Recepción de turno'
   ];
 
   // Cargar pacientes cuando se abre el modal
