@@ -466,7 +466,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
     
     // Generar nombre de usuario automáticamente desde nombres y apellidos
-    // Primera letra del nombre + primer apellido
+    // Primera letra del nombre + primer apellido completo
     const nombreLimpio = nombres.trim().toLowerCase();
     const apellidosLimpio = apellidos.trim().toLowerCase();
     const apellidosSeparados = apellidosLimpio.split(/\s+/);
@@ -475,22 +475,43 @@ app.post('/api/auth/register', async (req, res) => {
     const primerApellido = apellidosSeparados[0] || '';
     let usuarioBase = primeraLetraNombre + primerApellido;
     
-    // Si hay segundo apellido, agregar primera letra del segundo apellido
-    if (apellidosSeparados.length > 1) {
-      const segundoApellido = apellidosSeparados[1];
-      usuarioBase = usuarioBase + segundoApellido.charAt(0);
-    }
-    
-    // Generar usuario único usando timestamp para evitar múltiples consultas
-    const timestamp = Date.now().toString().slice(-4); // Últimos 4 dígitos del timestamp
-    let usuarioFinal = usuarioBase + timestamp;
-    
-    // Verificar una sola vez si existe y ajustar si es necesario
+    // Verificar si el usuario base existe
+    let usuarioFinal = usuarioBase;
     const usuarioExiste = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+    
     if (usuarioExiste) {
-      // Si existe, agregar un número aleatorio
-      const numeroAleatorio = Math.floor(Math.random() * 999) + 1;
-      usuarioFinal = usuarioBase + numeroAleatorio;
+      // Si existe, agregar primera letra del segundo apellido
+      if (apellidosSeparados.length > 1) {
+        const segundoApellido = apellidosSeparados[1];
+        usuarioFinal = usuarioBase + segundoApellido.charAt(0);
+        const existe = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+        
+        if (existe) {
+          // Si aún existe, agregar 2 letras más del segundo apellido
+          if (segundoApellido.length >= 2) {
+            usuarioFinal = usuarioBase + segundoApellido.substring(0, 2);
+            const existe2 = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+            if (existe2) {
+              // Si aún existe, agregar más letras del segundo apellido
+              for (let i = 2; i < segundoApellido.length; i++) {
+                usuarioFinal = usuarioBase + segundoApellido.substring(0, i + 1);
+                const existe3 = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+                if (!existe3) break;
+              }
+            }
+          }
+        }
+      }
+      
+      // Si aún existe, agregar más letras del primer apellido
+      if (usuarioFinal === usuarioBase || await Usuario.findOne({ where: { usuario: usuarioFinal } })) {
+        const primerApellidoCompleto = apellidosSeparados[0];
+        for (let i = 1; i < primerApellidoCompleto.length; i++) {
+          usuarioFinal = primeraLetraNombre + primerApellidoCompleto.substring(0, i + 1);
+          const existe = await Usuario.findOne({ where: { usuario: usuarioFinal } });
+          if (!existe) break;
+        }
+      }
     }
     
     console.log('👤 Usuario generado:', usuarioFinal);

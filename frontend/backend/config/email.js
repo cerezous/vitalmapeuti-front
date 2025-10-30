@@ -1,303 +1,227 @@
 const nodemailer = require('nodemailer');
 
-// Cargar variables de entorno
-require('dotenv').config();
-
-// Validación de configuración de correo
-function validarConfiguracionCorreo() {
-    const configuracionRequerida = {
-        SMTP_USER: process.env.SMTP_USER,
-        SMTP_PASS: process.env.SMTP_PASS
-    };
-
-    const faltantes = Object.keys(configuracionRequerida).filter(
-        key => !configuracionRequerida[key]
-    );
-
-    if (faltantes.length > 0) {
-        console.warn('⚠️ Variables de entorno faltantes para correo:', faltantes);
-        return false;
-    }
-
-    return true;
-}
-
-// Configuración del transporter de correo
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // Usar servicio Gmail directamente
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT || 587,
-    secure: false, // true para 465, false para otros puertos
-    auth: {
-        user: process.env.SMTP_USER || 'mcerezopr@gmail.com',
-        pass: process.env.SMTP_PASS // Contraseña de aplicación de Gmail
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    connectionTimeout: 10000, // 10 segundos para conectar
-    greetingTimeout: 5000,    // 5 segundos para saludo
-    socketTimeout: 10000       // 10 segundos para operaciones
-});
-
-// Verificar configuración del transporter
-async function verificarConexionCorreo() {
-    try {
-        if (!validarConfiguracionCorreo()) {
-            console.warn('⚠️ Configuración de correo incompleta - Correo deshabilitado');
-            return false;
-        }
-
-        // Verificar si la contraseña es un placeholder
-        if (process.env.SMTP_PASS === 'tu-contraseña-app-gmail' || 
-            process.env.SMTP_PASS === 'tu_password_de_aplicacion' ||
-            process.env.SMTP_PASS === 'disabled') {
-            console.warn('⚠️ Contraseña de correo no configurada - Correo deshabilitado');
-            return false;
-        }
-
-        await transporter.verify();
-        console.log('✅ Servicio de correo configurado correctamente');
-        return true;
-    } catch (error) {
-        console.warn('⚠️ Error en configuración de correo:', error.message);
-        console.warn('📧 Para habilitar correo, configura SMTP_PASS con contraseña de aplicación de Gmail');
-        return false;
-    }
-}
-
-// Inicializar verificación
-verificarConexionCorreo();
-
 // Función para validar email
 function validarEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
 }
 
-// Función para reintentar envío de correo
-async function enviarConReintentos(mailOptions, maxReintentos = 2) {
-    for (let intento = 1; intento <= maxReintentos; intento++) {
+// Función para enviar correo de bienvenida - SOLUCIÓN DIRECTA CON SENDGRID API
+async function enviarCorreoBienvenida(usuario, contraseña) {
+    console.log('📧 Iniciando envío de correo de bienvenida...');
+    console.log('👤 Usuario:', usuario.nombres, usuario.apellidos);
+    console.log('📮 Correo:', usuario.correo || usuario.email);
+    
+    // DEBUG: Mostrar todas las variables de entorno relacionadas con correo
+    console.log('🔍 DEBUG Variables de entorno:');
+    console.log('SENDGRID_API_KEY:', process.env.SENDGRID_API_KEY ? 'CONFIGURADO' : 'NO CONFIGURADO');
+    console.log('SMTP_HOST:', process.env.SMTP_HOST || 'NO CONFIGURADO');
+    console.log('SMTP_USER:', process.env.SMTP_USER || 'NO CONFIGURADO');
+    console.log('NODE_ENV:', process.env.NODE_ENV || 'NO CONFIGURADO');
+    
+    // Verificación rápida
+    if (!process.env.SENDGRID_API_KEY) {
+        console.log('❌ SendGrid no configurado - Intentando con Gmail SMTP como fallback');
+        
+        // FALLBACK: Intentar con Gmail SMTP
         try {
-            const info = await transporter.sendMail(mailOptions);
-            return { success: true, messageId: info.messageId, intentos: intento };
+            return await enviarCorreoConGmail(usuario, contraseña);
         } catch (error) {
-            console.warn(`⚠️ Intento ${intento} de ${maxReintentos} fallido:`, error.message);
-            
-            if (intento === maxReintentos) {
-                console.error('❌ Todos los intentos de envío fallaron');
-                return { success: false, error: error.message, intentos: intento };
-            }
-            
-            // Esperar antes del siguiente intento (tiempo fijo más corto)
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.error('❌ Fallback Gmail también falló:', error.message);
+            return { success: false, error: 'No se pudo enviar correo con ningún método' };
         }
     }
-}
 
-// Función para enviar correo de bienvenida
-async function enviarCorreoBienvenida(usuario, contraseña) {
-    // Verificar si el correo está habilitado
-    const correoHabilitado = await verificarConexionCorreo();
-    if (!correoHabilitado) {
-        console.log('📧 Correo deshabilitado - Saltando envío de bienvenida');
-        return { success: true, message: 'Correo deshabilitado - Usuario creado sin notificación' };
-    }
-
-    // Validar email del destinatario
     const emailDestinatario = usuario.correo || usuario.email;
     if (!emailDestinatario || !validarEmail(emailDestinatario)) {
+        console.error('❌ Dirección de correo inválida:', emailDestinatario);
         return { success: false, error: `Dirección de correo inválida: ${emailDestinatario}` };
     }
 
-    const mailOptions = {
-        from: `"VitalMape UTI" <${process.env.SMTP_USER || 'mcerezopr@gmail.com'}>`,
-        to: emailDestinatario,
-        subject: 'Bienvenido a VitalMape - Sistema de Gestión UTI',
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #4f46e5; color: white; padding: 30px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 2rem;">
-                        <i style="margin-right: 10px;">🏥</i>
-                        VitalMape
-                    </h1>
-                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Sistema de Gestión UTI</p>
-                </div>
-                
-                <div style="padding: 30px; background: #f8f9fa;">
-                    <h2 style="color: #333; margin-bottom: 20px;">¡Bienvenido/a ${usuario.nombres}!</h2>
-                    
-                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-                        Tu cuenta ha sido creada exitosamente en VitalMape. A continuación encontrarás 
-                        tus credenciales de acceso:
-                    </p>
-                    
-                    <div style="background: white; padding: 20px; margin: 20px 0;">
-                        <h3 style="color: #333; margin-bottom: 15px;">Credenciales de Acceso</h3>
-                        <p style="margin: 5px 0;"><strong>Usuario:</strong> ${usuario.usuario}</p>
-                        <p style="margin: 5px 0;"><strong>Contraseña:</strong> ${contraseña}</p>
-                        <p style="margin: 5px 0;"><strong>Estamento:</strong> ${usuario.estamento}</p>
-                    </div>
-                    
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}" 
-                           style="background: #4f46e5; 
-                                  color: white; 
-                                  padding: 12px 30px; 
-                                  text-decoration: none; 
-                                  display: inline-block;
-                                  font-weight: bold;">
-                            Acceder al Sistema
-                        </a>
-                    </div>
-                </div>
-                
-                <div style="background: #374151; color: white; padding: 20px; text-align: center; font-size: 0.9rem;">
-                    <p style="margin: 0;">
-                        Este es un correo automático del sistema VitalMape. 
-                        Por favor, no respondas a este mensaje.
-                    </p>
-                </div>
-            </div>
-        `
-    };
+    console.log('📤 Enviando correo de bienvenida con SendGrid API...');
+    
+    // Usar SendGrid API directamente
+    try {
+        const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-    return await enviarConReintentos(mailOptions);
+        const msg = {
+            to: emailDestinatario,
+            from: 'mcerezopr@gmail.com', // Email verificado en SendGrid
+            subject: '¡Bienvenido a VitalMape UTI!',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+                    <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="color: #2c3e50; margin: 0; font-size: 28px;">¡Bienvenido a VitalMape UTI!</h1>
+                            <p style="color: #7f8c8d; margin: 10px 0 0 0; font-size: 16px;">Sistema de Gestión de Unidad de Terapia Intensiva</p>
+                        </div>
+                        
+                        <div style="background-color: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                            <h2 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 20px;">Información de tu cuenta</h2>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Nombre:</strong> ${usuario.nombres} ${usuario.apellidos}</p>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Usuario:</strong> ${usuario.usuario}</p>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Contraseña:</strong> ${contraseña}</p>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Estamento:</strong> ${usuario.estamento}</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="${process.env.FRONTEND_URL || 'https://vitalmapeuti-front.vercel.app'}/login" 
+                               style="background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                Iniciar Sesión
+                            </a>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center;">
+                            <p style="color: #7f8c8d; font-size: 12px; margin: 0;">
+                                Este es un correo automático del sistema VitalMape UTI.<br>
+                                Si no solicitaste esta cuenta, puedes ignorar este mensaje.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const resultado = await sgMail.send(msg);
+        console.log('✅ Correo de bienvenida enviado exitosamente con SendGrid API');
+        console.log('📧 Status Code:', resultado[0].statusCode);
+        return { success: true, messageId: resultado[0].headers['x-message-id'] };
+        
+    } catch (error) {
+        console.error('❌ Error al enviar correo con SendGrid API:', error.message);
+        console.error('❌ Error details:', error.response?.body);
+        return { success: false, error: error.message };
+    }
 }
 
 // Función para enviar correo de recuperación de contraseña
 async function enviarCorreoRecuperacion(usuario, token) {
-    // Verificar si el correo está habilitado
-    const correoHabilitado = await verificarConexionCorreo();
-    if (!correoHabilitado) {
-        console.log('📧 Correo deshabilitado - Saltando envío de recuperación');
-        return { success: true, message: 'Correo deshabilitado - Token generado sin notificación' };
+    console.log('📧 Enviando correo de recuperación...');
+    
+    if (!process.env.SENDGRID_API_KEY) {
+        console.log('❌ SendGrid no configurado - Saltando envío de recuperación');
+        return { success: true, message: 'SendGrid no configurado - Usuario creado sin notificación' };
     }
 
-    // Validar email del destinatario
     const emailDestinatario = usuario.correo || usuario.email;
     if (!emailDestinatario || !validarEmail(emailDestinatario)) {
+        console.error('❌ Dirección de correo inválida:', emailDestinatario);
         return { success: false, error: `Dirección de correo inválida: ${emailDestinatario}` };
     }
 
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
-    
-    const mailOptions = {
-        from: `"VitalMape UTI" <${process.env.SMTP_USER || 'mcerezopr@gmail.com'}>`,
-        to: emailDestinatario,
-        subject: 'Recuperación de Contraseña - VitalMape',
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #4f46e5; color: white; padding: 30px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 2rem;">
-                        <i style="margin-right: 10px;">🔐</i>
-                        Recuperación de Contraseña
-                    </h1>
-                </div>
-                
-                <div style="padding: 30px; background: #f8f9fa;">
-                    <h2 style="color: #333; margin-bottom: 20px;">Hola ${usuario.nombres},</h2>
-                    
-                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-                        Has solicitado recuperar tu contraseña en VitalMape. 
-                        Haz clic en el botón de abajo para restablecer tu contraseña:
-                    </p>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${resetUrl}" 
-                           style="background: #4f46e5; 
-                                  color: white; 
-                                  padding: 12px 30px; 
-                                  text-decoration: none; 
-                                  display: inline-block;
-                                  font-weight: bold;">
-                            Restablecer Contraseña
-                        </a>
-                    </div>
-                    
-                    <div style="background: #fef3c7; padding: 15px; margin: 20px 0;">
-                        <p style="color: #92400e; margin: 0;">
-                            <strong>⏰ Importante:</strong> Este enlace expirará en 1 hora por seguridad.
-                        </p>
-                    </div>
-                    
-                    <p style="color: #666; font-size: 0.9rem;">
-                        Si no solicitaste este cambio, puedes ignorar este correo de forma segura.
-                    </p>
-                </div>
-                
-                <div style="background: #374151; color: white; padding: 20px; text-align: center; font-size: 0.9rem;">
-                    <p style="margin: 0;">
-                        Este es un correo automático del sistema VitalMape. 
-                        Por favor, no respondas a este mensaje.
-                    </p>
-                </div>
-            </div>
-        `
-    };
+    try {
+        const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-    return await enviarConReintentos(mailOptions);
+        const msg = {
+            to: emailDestinatario,
+            from: 'mcerezopr@gmail.com',
+            subject: 'Recuperación de Contraseña - VitalMape UTI',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h1 style="color: #2c3e50;">Recuperación de Contraseña</h1>
+                    <p>Hola ${usuario.nombres},</p>
+                    <p>Has solicitado recuperar tu contraseña. Haz clic en el siguiente enlace:</p>
+                    <a href="${process.env.FRONTEND_URL}/recuperar-contraseña?token=${token}" 
+                       style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                        Recuperar Contraseña
+                    </a>
+                    <p>Este enlace expirará en 1 hora.</p>
+                </div>
+            `
+        };
+
+        const resultado = await sgMail.send(msg);
+        console.log('✅ Correo de recuperación enviado exitosamente');
+        return { success: true, messageId: resultado[0].headers['x-message-id'] };
+        
+    } catch (error) {
+        console.error('❌ Error al enviar correo de recuperación:', error.message);
+        return { success: false, error: error.message };
+    }
 }
 
-// Función para enviar notificaciones generales
-async function enviarNotificacion(destinatarios, asunto, mensaje) {
-    // Verificar si el correo está habilitado
-    const correoHabilitado = await verificarConexionCorreo();
-    if (!correoHabilitado) {
-        console.log('📧 Correo deshabilitado - Saltando envío de notificación');
-        return { success: true, message: 'Correo deshabilitado - Notificación no enviada' };
+// Función de fallback con Gmail SMTP
+async function enviarCorreoConGmail(usuario, contraseña) {
+    console.log('📧 Intentando envío con Gmail SMTP como fallback...');
+    
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        console.error('❌ Configuración SMTP incompleta');
+        return { success: false, error: 'Configuración SMTP incompleta' };
     }
-
-    // Validar que hay destinatarios
-    if (!destinatarios || !Array.isArray(destinatarios) || destinatarios.length === 0) {
-        return { success: false, error: 'No se han proporcionado destinatarios válidos' };
-    }
-
-    // Validar emails de destinatarios
-    const destinatariosValidos = destinatarios.filter(email => validarEmail(email));
-    if (destinatariosValidos.length === 0) {
-        return { success: false, error: 'No se encontraron direcciones de correo válidas' };
-    }
-
-    if (destinatariosValidos.length < destinatarios.length) {
-        console.warn(`⚠️ Algunos destinatarios tienen emails inválidos. Válidos: ${destinatariosValidos.length}/${destinatarios.length}`);
-    }
-
-    const mailOptions = {
-        from: `"VitalMape UTI" <${process.env.SMTP_USER || 'mcerezopr@gmail.com'}>`,
-        to: destinatariosValidos.join(', '),
-        subject: asunto,
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #4f46e5; color: white; padding: 30px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 2rem;">
-                        <i style="margin-right: 10px;">📢</i>
-                        ${asunto}
-                    </h1>
-                </div>
-                
-                <div style="padding: 30px; background: #f8f9fa;">
-                    <div style="background: white; padding: 20px;">
-                        ${mensaje}
+    
+    try {
+        const nodemailer = require('nodemailer');
+        
+        const transporter = nodemailer.createTransporter({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT || 587,
+            secure: false,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            },
+            tls: {
+                rejectUnauthorized: false
+            },
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 30000
+        });
+        
+        const emailDestinatario = usuario.correo || usuario.email;
+        
+        const mailOptions = {
+            from: process.env.SMTP_USER,
+            to: emailDestinatario,
+            subject: '¡Bienvenido a VitalMape UTI!',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+                    <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="color: #2c3e50; margin: 0; font-size: 28px;">¡Bienvenido a VitalMape UTI!</h1>
+                            <p style="color: #7f8c8d; margin: 10px 0 0 0; font-size: 16px;">Sistema de Gestión de Unidad de Terapia Intensiva</p>
+                        </div>
+                        
+                        <div style="background-color: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                            <h2 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 20px;">Información de tu cuenta</h2>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Nombre:</strong> ${usuario.nombres} ${usuario.apellidos}</p>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Usuario:</strong> ${usuario.usuario}</p>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Contraseña:</strong> ${contraseña}</p>
+                            <p style="margin: 8px 0; color: #34495e;"><strong>Estamento:</strong> ${usuario.estamento}</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="${process.env.FRONTEND_URL || 'https://vitalmapeuti-front.vercel.app'}/login" 
+                               style="background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                Iniciar Sesión
+                            </a>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center;">
+                            <p style="color: #7f8c8d; font-size: 12px; margin: 0;">
+                                Este es un correo automático del sistema VitalMape UTI.<br>
+                                Si no solicitaste esta cuenta, puedes ignorar este mensaje.
+                            </p>
+                        </div>
                     </div>
                 </div>
-                
-                <div style="background: #374151; color: white; padding: 20px; text-align: center; font-size: 0.9rem;">
-                    <p style="margin: 0;">
-                        Sistema VitalMape - Gestión UTI
-                    </p>
-                </div>
-            </div>
-        `
-    };
-
-    return await enviarConReintentos(mailOptions);
+            `
+        };
+        
+        const resultado = await transporter.sendMail(mailOptions);
+        console.log('✅ Correo de bienvenida enviado exitosamente con Gmail SMTP');
+        console.log('📧 Message ID:', resultado.messageId);
+        return { success: true, messageId: resultado.messageId };
+        
+    } catch (error) {
+        console.error('❌ Error al enviar correo con Gmail SMTP:', error.message);
+        return { success: false, error: error.message };
+    }
 }
 
 module.exports = {
     enviarCorreoBienvenida,
-    enviarCorreoRecuperacion,
-    enviarNotificacion,
-    verificarConexionCorreo
+    enviarCorreoRecuperacion
 };
