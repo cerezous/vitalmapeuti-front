@@ -194,7 +194,9 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
   const procedimientosSinPaciente = [
     'Esterilización (conteo de materiales, recolección y traslados)',
     'Tareas administrativas (registros, evoluciones, etc)',
-    'Entrega de turno (solo cuando se recibe)'
+    'Preparación de medicamentos',
+    'Entrega de turno',
+    'Recepción de turno'
   ];
 
   // Cargar pacientes cuando se abre el modal
