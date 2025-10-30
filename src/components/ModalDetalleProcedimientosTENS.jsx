@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TimePicker from './TimePicker';
 import procedimientosTENSAPI from '../services/procedimientosTENSAPI';
 import { useAuth } from '../contexts/AuthContext';
@@ -27,6 +27,7 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
   const [procedimientosEditables, setProcedimientosEditables] = useState([]);
+  const procedimientosOriginalesRef = useRef([]);
 
   // Verificar si el usuario actual puede editar (es el propietario del registro o es administrador)
   const puedeEditar = user && registro && (registro.usuarioId === user.id || user.estamento === 'Administrador');
@@ -41,7 +42,9 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
   const procedimientosHabituales = [
     'Esterilización (conteo de materiales, recolección y traslados)',
     'Tareas administrativas (registros, evoluciones, etc)',
-    'Entrega de turno (solo cuando se recibe)',
+    'Entrega de turno',
+    'Recepción de turno',
+    'Preparación de medicamentos',
     'Toma de signos vitales',
     'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, etc)',
     'Administración de medicamentos oral/SNG/SNY/Gastrostomía',
@@ -67,7 +70,9 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
   const procedimientosSinPaciente = [
     'Esterilización (conteo de materiales, recolección y traslados)',
     'Tareas administrativas (registros, evoluciones, etc)',
-    'Entrega de turno (solo cuando se recibe)'
+    'Entrega de turno',
+    'Recepción de turno',
+    'Preparación de medicamentos'
   ];
 
   // Verificar si el procedimiento seleccionado requiere paciente
@@ -99,9 +104,12 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
   // Inicializar procedimientos editables cuando se entra al modo edición
   useEffect(() => {
     if (modoEdicion && registro && registro.procedimientos) {
-      setProcedimientosEditables([...registro.procedimientos]);
+      const copia = (registro.procedimientos || []).map(p => ({ ...p }));
+      setProcedimientosEditables(copia);
+      procedimientosOriginalesRef.current = (registro.procedimientos || []).map(p => ({ ...p }));
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
+      procedimientosOriginalesRef.current = [];
     }
   }, [modoEdicion, registro]);
 
@@ -202,6 +210,27 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     setMensaje({ tipo: '', texto: '' });
   };
 
+  const actualizarCampoProcedimiento = (id, campo, valor) => {
+    setProcedimientosEditables(prev => prev.map(p => p.id === id ? { ...p, [campo]: valor, ...(campo === 'pacienteRut' ? { paciente: undefined } : {}) } : p));
+  };
+
+  const seleccionarPacientePara = (id, rut) => {
+    const pacienteSeleccionado = [...pacientes, ...pacientesEgresados].find(p => p.rut === rut);
+    setProcedimientosEditables(prev => prev.map(p => {
+      if (p.id !== id) return p;
+      return {
+        ...p,
+        pacienteRut: rut || undefined,
+        paciente: pacienteSeleccionado ? {
+          nombreCompleto: pacienteSeleccionado.nombreCompleto,
+          rut: pacienteSeleccionado.rut,
+          numeroFicha: pacienteSeleccionado.numeroFicha,
+          camaAsignada: pacienteSeleccionado.camaAsignada
+        } : undefined
+      };
+    }));
+  };
+
   const eliminarProcedimiento = async (id) => {
     // Si es un procedimiento existente (ID positivo), eliminarlo directamente del servidor
     if (id > 0 && registro) {
@@ -249,15 +278,34 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
       // Obtener solo los procedimientos nuevos (ID negativo)
       const procedimientosNuevos = procedimientosEditables.filter(proc => proc.id < 0);
 
-      // Si hay procedimientos nuevos, agregarlos al registro existente
-      if (procedimientosNuevos.length > 0) {
+      // Detectar procedimientos existentes modificados (comparando con snapshot original)
+      const originalesPorId = new Map((procedimientosOriginalesRef.current || []).map(p => [p.id, p]));
+      const modificados = procedimientosEditables.filter(proc => proc.id > 0).filter(proc => {
+        const orig = originalesPorId.get(proc.id);
+        if (!orig) return false;
+        return (orig.nombre !== proc.nombre) || (orig.tiempo !== proc.tiempo) || ((orig.pacienteRut || null) !== (proc.pacienteRut || null));
+      });
+
+      // Primero, eliminar los modificados para reemplazarlos
+      for (const proc of modificados) {
+        await procedimientosTENSAPI.eliminarProcedimiento(registro.id, proc.id);
+      }
+
+      // Construir lista a agregar: nuevos + reemplazos de modificados
+      const aAgregar = [
+        ...procedimientosNuevos.map(proc => ({ nombre: proc.nombre, tiempo: proc.tiempo, pacienteRut: proc.pacienteRut })),
+        ...modificados.map(proc => ({ nombre: proc.nombre, tiempo: proc.tiempo, pacienteRut: proc.pacienteRut }))
+      ];
+
+      // Si hay procedimientos a agregar, agregarlos al registro existente
+      if (aAgregar.length > 0) {
         const procedimientosData = procedimientosNuevos.map(proc => ({
           nombre: proc.nombre,
           tiempo: proc.tiempo,
           pacienteRut: proc.pacienteRut
         }));
 
-        const respuesta = await procedimientosTENSAPI.agregarProcedimientos(registro.id, procedimientosData);
+        const respuesta = await procedimientosTENSAPI.agregarProcedimientos(registro.id, aAgregar);
         
         // Actualizar inmediatamente el registro con los nuevos procedimientos
         const nuevosProcedimientosDelBackend = Array.isArray(respuesta) ? respuesta : [];
@@ -276,7 +324,7 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
         }, registro.tiempoTotal || 0);
         registro.tiempoTotal = tiempoTotalNuevo;
         
-        setMensaje({ tipo: 'success', texto: 'Procedimientos agregados exitosamente' });
+        setMensaje({ tipo: 'success', texto: 'Cambios guardados exitosamente' });
       } else {
         setMensaje({ tipo: 'success', texto: 'Cambios guardados exitosamente' });
       }
