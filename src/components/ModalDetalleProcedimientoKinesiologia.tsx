@@ -119,7 +119,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     'TAC simple',
     'TAC con contraste',
     'RMN',
-    'RMN con traslado a BUPA'
+    'RMN con traslado a BUPA',
   ];
 
   const otrosProcedimientos = [
@@ -421,16 +421,16 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
                     disabled={loading}
                   >
                     <option value="">Seleccionar procedimiento...</option>
-                    <optgroup label="Procedimientos de Kinesiología">
-                      {procedimientosKinesiologia.map((proc, index) => (
-                        <option key={`kine-${index}`} value={proc}>{proc}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Otros procedimientos">
-                      {otrosProcedimientos.map((proc, index) => (
-                        <option key={`otros-${index}`} value={proc}>{proc}</option>
-                      ))}
-                    </optgroup>
+                  <optgroup label="Procedimientos de Kinesiología">
+                    {procedimientosKinesiologia.map((proc, index) => (
+                      <option key={`kine-${index}`} value={proc}>{proc}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Otros procedimientos">
+                    {otrosProcedimientos.map((proc, index) => (
+                      <option key={`otros-${index}`} value={proc}>{proc}</option>
+                    ))}
+                  </optgroup>
                   </select>
                 </div>
 
