@@ -32,7 +32,6 @@
   "scripts": {
     "start": "cd frontendprod && HOST=0.0.0.0 react-scripts start",
     "build": "cd frontendprod && DISABLE_ESLINT_PLUGIN=true react-scripts build && cd .. && cp -r frontendprod/build ./build",
-    "postinstall": "cd frontendprod && npm install && echo 'Dependencies installed successfully'",
     "test": "cd frontendprod && react-scripts test",
     "eject": "cd frontendprod && react-scripts eject",
     "cap:sync": "cd frontendprod && npx cap sync",
