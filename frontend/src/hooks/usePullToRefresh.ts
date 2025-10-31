@@ -167,20 +167,24 @@ export const usePullToRefresh = ({
     };
 
     // Agregar event listeners
-    element.addEventListener('touchstart', handleTouchStart, { passive: false });
-    element.addEventListener('touchmove', handleTouchMove, { passive: false });
-    element.addEventListener('touchend', handleTouchEnd);
+    const handleTouchStartWrapper = handleTouchStart as any;
+    const handleTouchMoveWrapper = handleTouchMove as any;
+    const handleTouchEndWrapper = handleTouchEnd as any;
+    
+    element.addEventListener('touchstart', handleTouchStartWrapper, { passive: false });
+    element.addEventListener('touchmove', handleTouchMoveWrapper, { passive: false });
+    element.addEventListener('touchend', handleTouchEndWrapper);
 
     // Cleanup
     return () => {
       if (element === window) {
-        window.removeEventListener('touchstart', handleTouchStart);
-        window.removeEventListener('touchmove', handleTouchMove);
-        window.removeEventListener('touchend', handleTouchEnd);
+        window.removeEventListener('touchstart', handleTouchStartWrapper);
+        window.removeEventListener('touchmove', handleTouchMoveWrapper);
+        window.removeEventListener('touchend', handleTouchEndWrapper);
       } else {
-        element.removeEventListener('touchstart', handleTouchStart);
-        element.removeEventListener('touchmove', handleTouchMove);
-        element.removeEventListener('touchend', handleTouchEnd);
+        element.removeEventListener('touchstart', handleTouchStartWrapper);
+        element.removeEventListener('touchmove', handleTouchMoveWrapper);
+        element.removeEventListener('touchend', handleTouchEndWrapper);
       }
       // Limpiar indicador visual
       const indicator = document.getElementById('pull-to-refresh-indicator');
