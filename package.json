@@ -31,7 +31,7 @@
   },
   "scripts": {
     "start": "cd frontend && HOST=0.0.0.0 react-scripts start",
-    "build": "cd frontend && DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build": "cd frontend && DISABLE_ESLINT_PLUGIN=true react-scripts build && cd .. && cp -r frontend/build ./build",
     "postinstall": "cd frontend && npm install && echo 'Dependencies installed successfully'",
     "test": "cd frontend && react-scripts test",
     "eject": "cd frontend && react-scripts eject",
