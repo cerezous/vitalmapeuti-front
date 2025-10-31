@@ -22,13 +22,13 @@ const Register: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value,
     }));
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev: { [key: string]: string }) => ({
         ...prev,
         [name]: '',
       }));

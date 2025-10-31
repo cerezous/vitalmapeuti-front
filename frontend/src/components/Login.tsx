@@ -31,13 +31,13 @@ const Login = () => {
     // Convertir a minúsculas solo para el campo usuario
     const processedValue = name === 'usuario' ? value.toLowerCase() : value;
     
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: processedValue,
     }));
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev: any) => ({
         ...prev,
         [name]: '',
       }));
