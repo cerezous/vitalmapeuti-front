@@ -228,7 +228,6 @@ const auxiliaresAPI = {
       'Entrega de interconsulta (se debe registrar 1 por 1)',
       'Entrega de exámenes (se debe registrar 1 por 1)',
       'Entrega de recetas / recepción de fármacos (trayecto hacia y desde farmacia - (se debe registrar 1 por 1))',
-      'Aseo nocturno (registrar tiempo total)',
       'Aseo de equipos',
       'Preparación de material',
       'Traslados de paciente (se debe registrar 1 por 1)',
