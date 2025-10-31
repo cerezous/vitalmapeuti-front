@@ -30,17 +30,17 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "HOST=0.0.0.0 react-scripts start",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "postinstall": "echo 'Dependencies installed successfully'",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "cap:sync": "npx cap sync",
-    "cap:copy": "npx cap copy",
-    "cap:update": "npx cap update",
-    "ios:open": "npx cap open ios",
-    "ios:sync": "npm run build && npx cap sync ios",
-    "ios:build": "npm run build && npx cap sync ios && npx cap open ios"
+    "start": "cd frontend && HOST=0.0.0.0 react-scripts start",
+    "build": "cd frontend && DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "postinstall": "cd frontend && npm install && echo 'Dependencies installed successfully'",
+    "test": "cd frontend && react-scripts test",
+    "eject": "cd frontend && react-scripts eject",
+    "cap:sync": "cd frontend && npx cap sync",
+    "cap:copy": "cd frontend && npx cap copy",
+    "cap:update": "cd frontend && npx cap update",
+    "ios:open": "cd frontend && npx cap open ios",
+    "ios:sync": "cd frontend && npm run build && npx cap sync ios",
+    "ios:build": "cd frontend && npm run build && npx cap sync ios && npx cap open ios"
   },
   "eslintConfig": {
     "extends": [
