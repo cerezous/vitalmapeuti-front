@@ -3,7 +3,7 @@ services:
     name: vitalmape-frontend
     env: node
     buildCommand: npm run build
-    staticPublishPath: ./frontend/build
+    staticPublishPath: frontend/build
     envVars:
       - key: NODE_ENV
         value: production
