@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: vitalmape-frontend
+    rootDir: frontendprod
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
