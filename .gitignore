@@ -13,6 +13,9 @@
 /backendprod
 /frontendprod
 # Excepciones: archivos específicos que necesitan estar en producción
+!frontendprod/
+!frontendprod/src/
+!frontendprod/src/services/
 !frontendprod/src/services/auxiliaresAPI.ts
 
 # misc
