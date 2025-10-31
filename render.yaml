@@ -1,10 +1,6 @@
 services:
-  - type: web
+  - type: static
     name: vitalmape-frontend
-    env: node
     buildCommand: ./render-build.sh
     staticPublishPath: build
-    envVars:
-      - key: NODE_ENV
-        value: production
 
