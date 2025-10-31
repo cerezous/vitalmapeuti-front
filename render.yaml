@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: vitalmape-frontend
+    rootDir: frontendprod
+    buildCommand: npm install && DISABLE_ESLINT_PLUGIN=true react-scripts build
+    staticPublishPath: build
