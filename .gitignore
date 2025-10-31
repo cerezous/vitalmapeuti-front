@@ -13,10 +13,16 @@
 /backendprod
 /frontendprod
 # Excepciones: archivos específicos que necesitan estar en producción
-!frontendprod/
+!frontendprod/package.json
+!frontendprod/package-lock.json
+!frontendprod/tsconfig.json
+!frontendprod/tailwind.config.js
+!frontendprod/postcss.config.js
+!frontendprod/public/
 !frontendprod/src/
 !frontendprod/src/services/
 !frontendprod/src/services/auxiliaresAPI.ts
+!frontendprod/render.yaml
 
 # misc
 .DS_Store
