@@ -12,6 +12,8 @@
 /build
 /backendprod
 /frontendprod
+# Excepciones: archivos específicos que necesitan estar en producción
+!frontendprod/src/services/auxiliaresAPI.ts
 
 # misc
 .DS_Store
