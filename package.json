@@ -30,17 +30,17 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "cd frontend && HOST=0.0.0.0 react-scripts start",
-    "build": "cd frontend && DISABLE_ESLINT_PLUGIN=true react-scripts build && cd .. && cp -r frontend/build ./build",
-    "postinstall": "cd frontend && npm install && echo 'Dependencies installed successfully'",
-    "test": "cd frontend && react-scripts test",
-    "eject": "cd frontend && react-scripts eject",
-    "cap:sync": "cd frontend && npx cap sync",
-    "cap:copy": "cd frontend && npx cap copy",
-    "cap:update": "cd frontend && npx cap update",
-    "ios:open": "cd frontend && npx cap open ios",
-    "ios:sync": "cd frontend && npm run build && npx cap sync ios",
-    "ios:build": "cd frontend && npm run build && npx cap sync ios && npx cap open ios"
+    "start": "cd frontendprod && HOST=0.0.0.0 react-scripts start",
+    "build": "cd frontendprod && DISABLE_ESLINT_PLUGIN=true react-scripts build && cd .. && cp -r frontendprod/build ./build",
+    "postinstall": "cd frontendprod && npm install && echo 'Dependencies installed successfully'",
+    "test": "cd frontendprod && react-scripts test",
+    "eject": "cd frontendprod && react-scripts eject",
+    "cap:sync": "cd frontendprod && npx cap sync",
+    "cap:copy": "cd frontendprod && npx cap copy",
+    "cap:update": "cd frontendprod && npx cap update",
+    "ios:open": "cd frontendprod && npx cap open ios",
+    "ios:sync": "cd frontendprod && npm run build && npx cap sync ios",
+    "ios:build": "cd frontendprod && npm run build && npx cap sync ios && npx cap open ios"
   },
   "eslintConfig": {
     "extends": [
