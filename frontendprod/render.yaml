@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: vitalmape-frontend
+    buildCommand: ./render-build.sh
+    staticPublishPath: build
+
