@@ -2,7 +2,7 @@ services:
   - type: web
     name: vitalmape-frontend
     env: node
-    buildCommand: npm run build && cp -r frontend/build ./build
+    buildCommand: ./render-build.sh
     staticPublishPath: build
     envVars:
       - key: NODE_ENV
