@@ -436,6 +436,9 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
                     Ya tiene un registro de procedimientos para el turno {turno} del {formatearFechaParaMostrar(fecha)}. 
                     No puede realizar múltiples registros en el mismo turno y fecha.
                   </p>
+                  <p className="text-sm text-orange-700 mt-2 font-medium">
+                    Para continuar registrando actividades de su turno, diríjase al botón "Ver detalle" de su registro y presione el botón "Editar".
+                  </p>
                 </div>
               </div>
             </div>
