@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { pacienteService, Paciente } from '../services/api';
 import registroProcedimientosAPI, { ProcedimientoRegistroData } from '../services/registroProcedimientosAPI';
 import procedimientosKinesiologiaAPI from '../services/procedimientosKinesiologiaAPI';
+import { useAuth } from '../contexts/AuthContext';
 import TimePicker from './TimePicker';
 
 type TipoProcedimiento = 'enfermeria' | 'kinesiologia' | 'medicina';
@@ -22,6 +23,7 @@ interface ProcedimientoItem {
 }
 
 const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = ({ isOpen, onClose, onSuccess, tipo = 'enfermeria' as TipoProcedimiento }) => {
+  const { user } = useAuth();
   const [turno, setTurno] = useState<'Día' | 'Noche'>('Día');
   const [fecha, setFecha] = useState<string>(() => {
     const today = new Date();
@@ -49,6 +51,7 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
   const [tipoAlerta, setTipoAlerta] = useState<'success' | 'error'>('success');
   const [textoAlerta, setTextoAlerta] = useState('');
+  const [yaExisteRegistroFecha, setYaExisteRegistroFecha] = useState(false);
 
   // Función para mostrar alerta emergente
   const mostrarAlertaEmergente = (tipo: 'success' | 'error', texto: string) => {
@@ -60,6 +63,34 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
     setTimeout(() => {
       setMostrarAlerta(false);
     }, 3000);
+  };
+
+  // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
+  const formatearFechaParaMostrar = (fecha: string): string => {
+    if (!fecha) return '';
+    const [year, month, day] = fecha.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  // Función para verificar si ya existe un registro para la fecha actual (solo Kinesiología)
+  const verificarRegistroExistente = async (fechaSeleccionada: string, turnoSeleccionado: 'Día' | 'Noche') => {
+    if (!user || tipo !== 'kinesiologia') return false;
+    
+    try {
+      const { procedimientos } = await procedimientosKinesiologiaAPI.obtenerTodos({
+        fechaDesde: fechaSeleccionada,
+        fechaHasta: fechaSeleccionada,
+        turno: turnoSeleccionado,
+        limit: 1 // Solo necesitamos saber si existe al menos uno
+      });
+      
+      // Filtrar por usuario actual
+      const registroUsuario = procedimientos.find(p => p.usuarioId === user.id);
+      return !!registroUsuario;
+    } catch (error) {
+      console.warn('No se pudo verificar registro existente:', error);
+      return false; // En caso de error, permitir continuar
+    }
   };
 
   // Procedimientos de Kinesiología
@@ -166,8 +197,26 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
       setProcedimientos([]);
       setNuevoProcedimiento({ nombre: '', tiempo: '00:00', pacienteRut: '' });
       setMensaje({ tipo: '', texto: '' });
+      setYaExisteRegistroFecha(false);
     }
   }, [isOpen]);
+
+  // Verificar si ya existe un registro para la fecha y turno seleccionados (solo Kinesiología)
+  useEffect(() => {
+    const checkearRegistroExistente = async () => {
+      if (isOpen && user && fecha && turno && tipo === 'kinesiologia') {
+        try {
+          const existeRegistro = await verificarRegistroExistente(fecha, turno);
+          setYaExisteRegistroFecha(existeRegistro);
+        } catch (error) {
+          console.warn('No se pudo verificar registro existente:', error);
+          setYaExisteRegistroFecha(false);
+        }
+      }
+    };
+
+    checkearRegistroExistente();
+  }, [isOpen, fecha, turno, user, tipo]);
 
   // Verificar si el procedimiento seleccionado requiere paciente
   const requierePaciente = (nombreProcedimiento: string): boolean => {
@@ -220,6 +269,15 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
   const handleGuardar = async () => {
     if (procedimientos.length === 0) {
       setMensaje({ tipo: 'error', texto: 'Debes agregar al menos un procedimiento' });
+      return;
+    }
+
+    // Verificar si ya existe un registro para esta fecha y turno (solo Kinesiología)
+    if (yaExisteRegistroFecha && tipo === 'kinesiologia') {
+      setMensaje({ 
+        tipo: 'error', 
+        texto: `Ya tiene un registro de procedimientos para el turno ${turno} del ${formatearFechaParaMostrar(fecha)}. No puede realizar múltiples registros en el mismo turno y fecha.` 
+      });
       return;
     }
 
@@ -360,6 +418,26 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
               mensaje.tipo === 'success' ? (tipo === 'kinesiologia' ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700') : 'bg-red-100 text-red-700'
             }`}>
               {mensaje.texto}
+            </div>
+          )}
+
+          {/* Aviso de registro existente (solo Kinesiología) */}
+          {yaExisteRegistroFecha && tipo === 'kinesiologia' && (
+            <div className="mb-4 p-4 rounded-lg bg-orange-50 border border-orange-200">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 text-orange-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-orange-800">
+                    Registro existente para esta fecha y turno
+                  </p>
+                  <p className="text-sm text-orange-700 mt-1">
+                    Ya tiene un registro de procedimientos para el turno {turno} del {formatearFechaParaMostrar(fecha)}. 
+                    No puede realizar múltiples registros en el mismo turno y fecha.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -561,9 +639,9 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
           <button
             onClick={handleGuardar}
             className={`w-full md:w-auto px-4 md:px-6 py-2.5 md:py-2 ${tipo === 'kinesiologia' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-900 hover:bg-blue-800'} text-white text-sm md:text-base font-medium rounded-lg transition-colors disabled:bg-gray-400 order-1 md:order-2`}
-            disabled={loading || procedimientos.length === 0}
+            disabled={loading || procedimientos.length === 0 || (yaExisteRegistroFecha && tipo === 'kinesiologia')}
           >
-            {loading ? 'Guardando...' : 'Guardar Registro'}
+            {loading ? 'Guardando...' : (yaExisteRegistroFecha && tipo === 'kinesiologia') ? 'Registro existente' : 'Guardar Registro'}
           </button>
         </div>
         </div>

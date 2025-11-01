@@ -65,6 +65,7 @@ export interface PaginationParams {
   limit?: number;
   fechaDesde?: string;
   fechaHasta?: string;
+  turno?: string;
 }
 
 class ProcedimientosKinesiologiaAPI {
@@ -105,6 +106,7 @@ class ProcedimientosKinesiologiaAPI {
       if (params.limit) queryParams.append('limit', params.limit.toString());
       if (params.fechaDesde) queryParams.append('fechaDesde', params.fechaDesde);
       if (params.fechaHasta) queryParams.append('fechaHasta', params.fechaHasta);
+      if (params.turno) queryParams.append('turno', params.turno);
       
       const url = `${this.baseURL}/todos${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       const response = await api.get<{ message: string; data: { procedimientos: ProcedimientoKinesiologia[]; pagination: any } }>(url);
