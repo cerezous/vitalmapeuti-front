@@ -1015,7 +1015,7 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
               {agruparProcedimientos().map((grupo, index) => (
                 <div key={index} className={`${
                   grupo.registradoPorUsuario 
-                    ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' 
+                    ? 'bg-green-50 border-green-200 hover:bg-green-100' 
                     : 'bg-gray-50 hover:bg-gray-100'
                 } rounded-lg p-4 flex items-center justify-between transition-colors border`}>
                   {/* Vista móvil */}
@@ -1069,11 +1069,7 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
                   </div>
                   
                   {/* Vista desktop */}
-                  <div className="flex-1 hidden md:grid grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Turno</p>
-                      <p className="font-semibold text-gray-800">{grupo.turno}</p>
-                    </div>
+                  <div className="flex-1 hidden md:grid grid-cols-5 gap-4">
                     <div>
                       <p className="text-sm text-gray-500">Fecha</p>
                       <p className="font-semibold text-gray-800">
@@ -1083,6 +1079,14 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
                           return `${day}/${month}/${year}`;
                         })()}
                       </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Turno</p>
+                      <p className="font-semibold text-gray-800">{grupo.turno}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Usuario</p>
+                      <p className="font-semibold text-gray-800">{grupo.usuarioNombre}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Tiempo Total</p>

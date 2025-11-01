@@ -321,7 +321,7 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
                 const registradoPorUsuario = user && grupo.usuarioId === user.id;
                 
                 return (
-                <div key={index} className={`${registradoPorUsuario ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'} rounded-lg p-4 flex items-center justify-between ${registradoPorUsuario ? 'hover:bg-blue-100' : 'hover:bg-gray-100'} transition-colors border`}>
+                <div key={index} className={`${registradoPorUsuario ? 'bg-green-50 border border-green-200' : 'bg-gray-50'} rounded-lg p-4 flex items-center justify-between ${registradoPorUsuario ? 'hover:bg-green-100' : 'hover:bg-gray-100'} transition-colors`}>
                   {/* Vista móvil */}
                   <div className="flex-1 md:hidden">
                     <div className="space-y-1">
@@ -378,11 +378,7 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
                   </div>
                   
                   {/* Vista desktop */}
-                  <div className="flex-1 hidden md:grid grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Turno</p>
-                      <p className="font-semibold text-gray-800">{grupo.turno}</p>
-                    </div>
+                  <div className="flex-1 hidden md:grid grid-cols-5 gap-4">
                     <div>
                       <p className="text-sm text-gray-500">Fecha</p>
                       <p className="font-semibold text-gray-800">
@@ -391,6 +387,19 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
                           const [year, month, day] = grupo.fecha.split('-');
                           return `${day}/${month}/${year}`;
                         })()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Turno</p>
+                      <p className="font-semibold text-gray-800">{grupo.turno}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Usuario</p>
+                      <p className="font-semibold text-gray-800">
+                        {grupo.procedimientos && grupo.procedimientos.length > 0 && grupo.procedimientos[0].usuario 
+                          ? `${grupo.procedimientos[0].usuario.nombres} ${grupo.procedimientos[0].usuario.apellidos}`
+                          : 'Usuario desconocido'
+                        }
                       </p>
                     </div>
                     <div>

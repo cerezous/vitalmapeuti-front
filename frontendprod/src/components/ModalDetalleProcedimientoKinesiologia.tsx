@@ -98,6 +98,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     user.estamento === 'Administrador' || 
     procedimientos.some(proc => proc.usuarioId === user.id)
   );
+  // Solo el usuario que creó el registro puede agregar procedimientos
+  const puedeAgregar = user && procedimientos.some(proc => proc.usuarioId === user.id);
 
   // Catálogo alineado con ModalRegistroProcedimientos
   const procedimientosKinesiologia = [
@@ -288,8 +290,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
         }
       }
 
-      // 1. Agregar procedimientos nuevos
-      if (procedimientosNuevos.length > 0) {
+      // 1. Agregar procedimientos nuevos (solo si el usuario es el propietario)
+      if (procedimientosNuevos.length > 0 && puedeAgregar) {
         const respuesta = await procedimientosKinesiologiaAPI.agregarProcedimientos({
           fecha: fechaGrupo || primerProcedimiento.fecha,
           turno: primerProcedimiento.turno || 'Día',
@@ -452,8 +454,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
             </div>
           )}
 
-          {/* Formulario para agregar procedimiento - Solo en modo edición */}
-          {modoEdicion && puedeEditar && (
+          {/* Formulario para agregar procedimiento - Solo en modo edición y si es el propietario */}
+          {modoEdicion && puedeEditar && puedeAgregar && (
             <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
               <h3 className="text-base md:text-lg font-semibold text-blue-800 mb-3 md:mb-4">Agregar Nuevo Procedimiento</h3>
               
