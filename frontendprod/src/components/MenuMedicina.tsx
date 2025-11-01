@@ -159,7 +159,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
       
       // Agregar resultados válidos al objeto apache2Data
       resultados.forEach(resultado => {
-        if (resultado) {
+        if (resultado && resultado.cama) {
           apache2Data[resultado.cama] = resultado.data;
         }
       });
