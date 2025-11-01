@@ -161,7 +161,6 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
     'Entrega de turno',
     'Recepción de turno',
     'Preparación de medicamentos',
-    'Toma de exámenes (incluye registro administrativo)',
   ];
 
   const formatearTiempo = (tiempo: string): string => {
