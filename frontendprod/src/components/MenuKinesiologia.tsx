@@ -116,7 +116,7 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
       
       // Agregar resultados válidos al objeto categorizaciones
       resultados.forEach(resultado => {
-        if (resultado) {
+        if (resultado && resultado.cama) {
           categorizaciones[resultado.cama] = resultado.data;
         }
       });

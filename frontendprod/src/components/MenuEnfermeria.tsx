@@ -129,7 +129,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
       
       // Agregar resultados válidos al objeto nasData
       resultados.forEach(resultado => {
-        if (resultado) {
+        if (resultado && resultado.cama) {
           nasData[resultado.cama] = resultado.data;
         }
       });
