@@ -25,9 +25,14 @@ const ModalRegistroProcedimientos: React.FC<ModalRegistroProcedimientosProps> = 
   const [turno, setTurno] = useState<'Día' | 'Noche'>('Día');
   const [fecha, setFecha] = useState<string>(() => {
     const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const hora = today.getHours();
+    
+    // Si es antes de las 08:00, usar el día anterior
+    const fechaAUsar = hora < 8 ? new Date(today.getTime() - 24 * 60 * 60 * 1000) : today;
+    
+    const year = fechaAUsar.getFullYear();
+    const month = String(fechaAUsar.getMonth() + 1).padStart(2, '0');
+    const day = String(fechaAUsar.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
   const [procedimientos, setProcedimientos] = useState<ProcedimientoItem[]>([]);
