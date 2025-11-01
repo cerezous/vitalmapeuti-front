@@ -228,8 +228,7 @@ const ModalRegistroProcedimientosEnfermeria: React.FC<ModalRegistroProcedimiento
     'Entrega de turno',
     'Recepción de turno',
     'Preparación de medicamentos',
-    'Toma de exámenes (incluye registro administrativo)',
-    'Atención de enfermería (evaluación, curación simple, administración de medicamentos, etc)'
+    'Toma de exámenes (incluye registro administrativo)'
   ];
 
   // Cargar pacientes cuando se abre el modal
