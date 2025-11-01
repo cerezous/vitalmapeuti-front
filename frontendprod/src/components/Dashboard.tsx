@@ -204,7 +204,12 @@ const Dashboard: React.FC = () => {
 
   // Seleccionar paciente basado en parámetro rut de URL (buscar en pacientes activos y egresos)
   useEffect(() => {
-    if (rut && !selectedPatient) {
+    if (rut) {
+      // Verificar si ya tenemos el paciente correcto seleccionado
+      if (selectedPatient && selectedPatient.rut === rut) {
+        return; // Ya está seleccionado el paciente correcto
+      }
+      
       // Primero buscar en pacientes activos
       if (pacientes.length > 0) {
         const pacienteActivo = pacientes.find(p => p.rut === rut);
