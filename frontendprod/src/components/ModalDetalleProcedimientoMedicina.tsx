@@ -137,6 +137,7 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
     'Interconsulta (lectura de HC, evaluación/reevaluación, evolución)',
     'Informe médico (redacción para traslados)',
     'Egreso (redacción de egreso, indicaciones, etc)',
+    'Entrega de información a familiar',
     'Entrega de turno',
     'Recepción de turno',
     'Discusión con especialidades',
