@@ -1383,7 +1383,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button style={{ display: 'none' }}>close</button>
         </form>
       </dialog>
     </>
