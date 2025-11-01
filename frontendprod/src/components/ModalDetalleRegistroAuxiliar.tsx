@@ -166,7 +166,12 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
         const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id && proc.id > 0);
         for (const proc of procedimientosExistentes) {
           if (proc.id) {
-            await auxiliaresAPI.actualizar(proc.id, { fecha: fechaGrupo });
+            await auxiliaresAPI.actualizar(proc.id, { 
+              nombre: proc.nombre,
+              tiempo: proc.tiempo,
+              observaciones: proc.observaciones || undefined,
+              fecha: fechaGrupo
+            });
           }
         }
       }

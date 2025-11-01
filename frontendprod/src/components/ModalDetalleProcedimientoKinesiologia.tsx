@@ -277,7 +277,13 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
         const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id && proc.id > 0);
         for (const proc of procedimientosExistentes) {
           if (proc.id) {
-            await procedimientosKinesiologiaAPI.actualizar(proc.id, { fecha: fechaGrupo });
+            await procedimientosKinesiologiaAPI.actualizar(proc.id, { 
+              nombre: proc.nombre,
+              tiempo: proc.tiempo,
+              pacienteRut: proc.pacienteRut || undefined,
+              observaciones: proc.observaciones || undefined,
+              fecha: fechaGrupo
+            });
           }
         }
       }
