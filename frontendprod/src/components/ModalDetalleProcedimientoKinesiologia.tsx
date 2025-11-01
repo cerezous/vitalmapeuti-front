@@ -319,20 +319,6 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
         }
       }
 
-      // 3. Actualizar inmediatamente el estado local con los datos actualizados
-      const procedimientosActualizados = [
-        ...procedimientos.filter(proc => 
-          !procedimientosAEliminar.some(procEliminar => procEliminar.id === proc.id)
-        ),
-        ...nuevosProcedimientosDelBackend
-      ];
-
-      // Actualizar el estado local inmediatamente
-      setProcedimientosEditables(procedimientosActualizados);
-      
-      // Actualizar el array de procedimientos del prop para que se refleje en la vista
-      procedimientos.splice(0, procedimientos.length, ...procedimientosActualizados);
-      
       setMensaje({ tipo: 'success', texto: 'Cambios guardados exitosamente' });
       
       // Salir del modo edición inmediatamente
