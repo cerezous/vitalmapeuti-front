@@ -1313,58 +1313,73 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
       {/* Modal de filtro de fechas */}
       <dialog id="fecha-filter-modal" className="modal">
         <div className="modal-box w-11/12 max-w-md">
-          <h3 className="font-bold text-lg mb-4">Filtrar por Fechas</h3>
+          {/* Header del modal */}
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-xl text-gray-900">Filtrar por Fechas</h3>
+            <button
+              type="button"
+              onClick={() => {
+                const modal = document.getElementById('fecha-filter-modal') as HTMLDialogElement;
+                if (modal) modal.close();
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           
-          <div className="space-y-4">
+          {/* Contenido */}
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Fecha Desde
               </label>
               <input
                 type="date"
                 value={fechaDesde}
                 onChange={(e) => setFechaDesde(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors text-gray-900 bg-white hover:border-gray-300"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Fecha Hasta
               </label>
               <input
                 type="date"
                 value={fechaHasta}
                 onChange={(e) => setFechaHasta(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors text-gray-900 bg-white hover:border-gray-300"
               />
             </div>
           </div>
 
-          <div className="modal-action">
-            <form method="dialog" className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setFechaDesde('');
-                  setFechaHasta('');
-                  cargarProcedimientos();
-                }}
-                className="btn btn-sm"
-              >
-                Limpiar Filtros
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const modal = document.getElementById('fecha-filter-modal') as HTMLDialogElement;
-                  if (modal) modal.close();
-                }}
-                className="btn btn-sm btn-primary"
-              >
-                Cerrar
-              </button>
-            </form>
+          {/* Footer con botones */}
+          <div className="modal-action mt-6">
+            <button
+              type="button"
+              onClick={() => {
+                setFechaDesde('');
+                setFechaHasta('');
+                cargarProcedimientos();
+              }}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              Limpiar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const modal = document.getElementById('fecha-filter-modal') as HTMLDialogElement;
+                if (modal) modal.close();
+              }}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            >
+              Aplicar
+            </button>
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">
