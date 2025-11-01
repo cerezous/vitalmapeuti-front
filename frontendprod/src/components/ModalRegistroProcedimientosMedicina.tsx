@@ -494,6 +494,9 @@ const ModalRegistroProcedimientosMedicina: React.FC<ModalRegistroProcedimientosM
                     Ya tiene un registro de procedimientos para el {formatearFechaParaMostrar(fecha)} en el turno {turno}. 
                     No puede realizar múltiples registros en la misma fecha y turno.
                   </p>
+                  <p className="text-sm text-orange-700 mt-2 font-medium">
+                    Para continuar registrando actividades de su turno, diríjase al botón "Ver detalle" de su registro y presione el botón "Editar".
+                  </p>
                 </div>
               </div>
             </div>
