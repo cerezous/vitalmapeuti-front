@@ -27,6 +27,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     tiempo: '00:00',
     pacienteRut: ''
   });
+  const [fechaGrupo, setFechaGrupo] = useState<string>('');
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [pacientesEgresados, setPacientesEgresados] = useState<Paciente[]>([]);
   const [loadingPacientes, setLoadingPacientes] = useState(false);
@@ -71,6 +72,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
       setProcedimientosEditables([...procedimientos]);
       setProcedimientosNuevos([]);
       setModoEdicion(false);
+      setFechaGrupo(procedimientos[0]?.fecha || '');
     }
   }, [isOpen, procedimientos]);
 
@@ -270,10 +272,20 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     try {
       let nuevosProcedimientosDelBackend: ProcedimientoKinesiologia[] = [];
 
+      // 0. Si la fecha cambió, actualizar todos los procedimientos existentes
+      if (fechaGrupo && fechaGrupo !== primerProcedimiento.fecha) {
+        const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id && proc.id > 0);
+        for (const proc of procedimientosExistentes) {
+          if (proc.id) {
+            await procedimientosKinesiologiaAPI.actualizar(proc.id, { fecha: fechaGrupo });
+          }
+        }
+      }
+
       // 1. Agregar procedimientos nuevos
       if (procedimientosNuevos.length > 0) {
         const respuesta = await procedimientosKinesiologiaAPI.agregarProcedimientos({
-          fecha: primerProcedimiento.fecha,
+          fecha: fechaGrupo || primerProcedimiento.fecha,
           turno: primerProcedimiento.turno || 'Día',
           procedimientos: procedimientosNuevos.map(proc => ({
             nombre: proc.nombre,
@@ -403,6 +415,36 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
               </div>
             </div>
           </div>
+
+          {/* Campo de fecha editable - Solo en modo edición */}
+          {modoEdicion && puedeEditar && (
+            <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
+              <h3 className="text-base md:text-lg font-semibold text-blue-800 mb-3 md:mb-4">Información del Turno</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Turno <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                    <label className="text-sm font-medium text-gray-900">
+                      {primerProcedimiento.turno || 'No especificado'}
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={fechaGrupo}
+                    onChange={(e) => setFechaGrupo(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Formulario para agregar procedimiento - Solo en modo edición */}
           {modoEdicion && puedeEditar && (

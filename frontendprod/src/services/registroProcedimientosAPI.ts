@@ -144,6 +144,23 @@ const registroProcedimientosAPI = {
     }
   },
 
+  // Actualizar registro
+  actualizarRegistro: async (registroId: number, data: { fecha?: string; turno?: string }): Promise<RegistroProcedimiento> => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/registro-procedimientos/${registroId}`,
+        data,
+        { headers: getAuthHeader() }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data.message || 'Error al actualizar el registro');
+      }
+      throw error;
+    }
+  },
+
   // Agregar procedimientos a un registro existente
   agregarProcedimientos: async (registroId: number, procedimientos: ProcedimientoRegistroData[]): Promise<ProcedimientoRegistroItem[]> => {
     try {

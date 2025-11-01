@@ -14,6 +14,8 @@ export interface ProcedimientoAuxiliarData {
   nombre: string;
   tiempo: string; // Formato HH:MM
   observaciones?: string;
+  fecha?: string;
+  turno?: string;
 }
 
 export interface RegistroAuxiliarRequest {

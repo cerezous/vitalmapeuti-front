@@ -40,6 +40,7 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
     pacienteRut: '',
     observaciones: ''
   });
+  const [fechaGrupo, setFechaGrupo] = useState<string>('');
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [pacientesEgresados, setPacientesEgresados] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(false);
@@ -81,11 +82,14 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
   useEffect(() => {
     if (modoEdicion && procedimientos && procedimientos.length > 0) {
       setProcedimientosEditables([...procedimientos]);
+      setFechaGrupo(procedimientos[0]?.fecha || '');
     } else if (modoEdicion && procedimiento) {
       setProcedimientosEditables([procedimiento]);
+      setFechaGrupo(procedimiento.fecha || '');
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       setProcedimientosAEliminar([]);
+      setFechaGrupo('');
     }
   }, [modoEdicion, procedimientos, procedimiento]);
 
@@ -332,7 +336,8 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
               nombre: proc.nombre,
               tiempo: proc.tiempo,
               pacienteRut: proc.pacienteRut,
-              observaciones: proc.observaciones
+              observaciones: proc.observaciones,
+              fecha: fechaGrupo
             },
             {
               headers: {
@@ -564,9 +569,12 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fecha <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
-                  {formatearFechaParaMostrar(datosParaMostrar[0]?.fecha || '')}
-                </div>
+                <input
+                  type="date"
+                  value={fechaGrupo}
+                  onChange={(e) => setFechaGrupo(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                />
               </div>
             </div>
           )}

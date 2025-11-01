@@ -23,6 +23,7 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
     tiempo: '00:00',
     observaciones: ''
   });
+  const [fechaGrupo, setFechaGrupo] = useState<string>('');
   const [forzarActualizacion, setForzarActualizacion] = useState(0);
 
   // Verificar si el usuario actual puede editar (es el propietario del registro)
@@ -38,6 +39,7 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
       setProcedimientosEditables([...grupo.procedimientos]);
       setProcedimientosNuevos([]);
       setModoEdicion(false);
+      setFechaGrupo(grupo.fecha);
     }
   }, [isOpen, grupo]);
 
@@ -159,10 +161,20 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
     try {
       let nuevosProcedimientosDelBackend: ProcedimientoAuxiliar[] = [];
 
+      // 0. Si la fecha cambió, actualizar todos los procedimientos existentes
+      if (fechaGrupo && fechaGrupo !== grupo.fecha) {
+        const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id && proc.id > 0);
+        for (const proc of procedimientosExistentes) {
+          if (proc.id) {
+            await auxiliaresAPI.actualizar(proc.id, { fecha: fechaGrupo });
+          }
+        }
+      }
+
       // 1. Agregar procedimientos nuevos
       if (procedimientosNuevos.length > 0) {
         const respuesta = await auxiliaresAPI.crear({
-          fecha: grupo.fecha,
+          fecha: fechaGrupo || grupo.fecha,
           turno: grupo.turno as "Día" | "Noche" | "24 h",
           procedimientos: procedimientosNuevos.map(proc => ({
             nombre: proc.nombre,
@@ -197,6 +209,7 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
       
       // Actualizar el grupo prop con los datos actualizados para que se refleje en la vista
       grupo.procedimientos = procedimientosActualizados;
+      grupo.fecha = fechaGrupo || grupo.fecha; // Actualizar la fecha del grupo también
       
       // Recalcular el tiempo total
       const nuevoTiempoTotal = procedimientosActualizados.reduce((total, proc) => {
@@ -310,6 +323,36 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
               </div>
             </div>
           </div>
+
+          {/* Campo de fecha editable - Solo en modo edición */}
+          {modoEdicion && puedeEditar && (
+            <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
+              <h3 className="text-base md:text-lg font-semibold text-blue-800 mb-3 md:mb-4">Información del Turno</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Turno <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                    <label className="text-sm font-medium text-gray-900">
+                      {grupo.turno}
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={fechaGrupo}
+                    onChange={(e) => setFechaGrupo(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Formulario para agregar procedimiento - Solo en modo edición */}
           {modoEdicion && puedeEditar && (

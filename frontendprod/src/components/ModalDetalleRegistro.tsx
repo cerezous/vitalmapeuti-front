@@ -30,6 +30,7 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
     tiempo: '00:00',
     pacienteRut: ''
   });
+  const [fechaRegistro, setFechaRegistro] = useState<string>('');
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [pacientesEgresados, setPacientesEgresados] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(false);
@@ -74,9 +75,11 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
   useEffect(() => {
     if (modoEdicion && registro && registro.procedimientos) {
       setProcedimientosEditables([...registro.procedimientos]);
+      setFechaRegistro(registro.fecha);
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       setProcedimientosAEliminar([]);
+      setFechaRegistro('');
     }
   }, [modoEdicion, registro]);
 
@@ -367,6 +370,11 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
         return;
       }
 
+      // Si la fecha cambió, actualizarla
+      if (fechaRegistro && fechaRegistro !== registro.fecha) {
+        await registroProcedimientosAPI.actualizarRegistro(registro.id, { fecha: fechaRegistro });
+      }
+
       // Obtener solo los procedimientos nuevos (ID negativo)
       const procedimientosNuevos = procedimientosEditables.filter(proc => proc.id < 0);
 
@@ -493,9 +501,12 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fecha <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
-                  {formatearFechaSinZonaHoraria(registro.fecha)}
-                </div>
+                <input
+                  type="date"
+                  value={fechaRegistro}
+                  onChange={(e) => setFechaRegistro(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                />
               </div>
             </div>
 

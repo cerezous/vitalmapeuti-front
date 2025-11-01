@@ -175,6 +175,17 @@ class ProcedimientosKinesiologiaAPI {
     }
   }
 
+  // Actualizar procedimiento
+  async actualizar(id: number, data: Partial<ProcedimientoKinesiologia>): Promise<ProcedimientoKinesiologia> {
+    try {
+      const response = await api.put(`${this.baseURL}/${id}`, data);
+      return response.data.data;
+    } catch (error: any) {
+      console.error('Error al actualizar procedimiento:', error);
+      throw this.handleError(error);
+    }
+  }
+
   // Eliminar procedimiento
   async eliminar(id: number): Promise<void> {
     try {
