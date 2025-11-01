@@ -283,7 +283,7 @@ const MenuTENS = ({ onOpenModal }) => {
               {/* Botón de calendario para filtrar */}
               <button
                 onClick={() => {
-                  const modal = document.getElementById('fecha-filter-modal-tens') as HTMLDialogElement;
+                  const modal = document.getElementById('fecha-filter-modal-tens');
                   if (modal) modal.showModal();
                 }}
                 className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md transform hover:scale-105 cursor-pointer"
