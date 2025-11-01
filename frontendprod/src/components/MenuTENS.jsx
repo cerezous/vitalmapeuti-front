@@ -54,7 +54,7 @@ const MenuTENS = ({ onOpenModal }) => {
       
       const data = await procedimientosTENSAPI.obtenerTodos(params);
       // Los registros ya vienen filtrados para TENS desde el backend
-      const registrosTENS = (data.registros || []).slice(0, 10); // Limitar a 10
+      const registrosTENS = (data.registros || []).slice(0, 50); // Limitar a 50
       
       setRegistros(registrosTENS);
     } catch (error) {

@@ -172,7 +172,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
       // Filtrar solo registros de enfermería (excluir turno "24 h" que es de medicina)
       const registrosEnfermeria = (data.registros || [])
         .filter((r: RegistroProcedimiento) => r.turno === 'Día' || r.turno === 'Noche')
-        .slice(0, 10); // Limitar a 10 después de filtrar
+        .slice(0, 50); // Limitar a 50 después de filtrar
       
       setRegistros(registrosEnfermeria);
     } catch (error) {
