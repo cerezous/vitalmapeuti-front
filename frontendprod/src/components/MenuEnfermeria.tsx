@@ -75,9 +75,10 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
       setPacientes(pacientesData);
       const nasData: NASPorCama = {};
 
-      // Para cada paciente con cama asignada, obtener su último NAS
-      for (const paciente of pacientesData) {
-        if (paciente.camaAsignada) {
+      // Obtener todos los NAS en paralelo usando Promise.all
+      const promesasNAS = pacientesData
+        .filter(paciente => paciente.camaAsignada)
+        .map(async (paciente) => {
           try {
             const registros = await nasAPI.obtenerRegistrosPorPaciente(paciente.rut, { limit: 1 });
             if (registros && registros.length > 0) {
@@ -105,19 +106,33 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
                 categoria = 'Muy Alta';
               }
 
-              nasData[paciente.camaAsignada] = {
-                puntuacion,
-                color,
-                categoria,
-                fecha: ultimoNAS.fechaRegistro,
-                pacienteNombre: paciente.nombreCompleto
+              return {
+                cama: paciente.camaAsignada,
+                data: {
+                  puntuacion,
+                  color,
+                  categoria,
+                  fecha: ultimoNAS.fechaRegistro,
+                  pacienteNombre: paciente.nombreCompleto
+                }
               };
             }
+            return null;
           } catch (error) {
             console.error(`Error al obtener NAS del paciente ${paciente.rut}:`, error);
+            return null;
           }
+        });
+
+      // Esperar a que todas las promesas se resuelvan
+      const resultados = await Promise.all(promesasNAS);
+      
+      // Agregar resultados válidos al objeto nasData
+      resultados.forEach(resultado => {
+        if (resultado) {
+          nasData[resultado.cama] = resultado.data;
         }
-      }
+      });
 
       setNASPorCama(nasData);
     } catch (error) {

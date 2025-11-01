@@ -69,9 +69,10 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
       setPacientes(pacientesData);
       const categorizaciones: CategorizacionCama = {};
 
-      // Para cada paciente con cama asignada, obtener su última categorización
-      for (const paciente of pacientesData) {
-        if (paciente.camaAsignada) {
+      // Obtener todas las categorizaciones en paralelo usando Promise.all
+      const promesasCategorizaciones = pacientesData
+        .filter(paciente => paciente.camaAsignada)
+        .map(async (paciente) => {
           try {
             const data = await categorizacionKinesiologiaAPI.obtenerPorPaciente(paciente.rut, { limit: 1 });
             if (data.categorizaciones && data.categorizaciones.length > 0) {
@@ -92,19 +93,33 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
                 inicial = 'A';
               }
 
-              categorizaciones[paciente.camaAsignada] = {
-                complejidad,
-                color,
-                inicial,
-                fecha: ultimaCategorizacion.fechaCategorizacion,
-                pacienteNombre: paciente.nombreCompleto
+              return {
+                cama: paciente.camaAsignada,
+                data: {
+                  complejidad,
+                  color,
+                  inicial,
+                  fecha: ultimaCategorizacion.fechaCategorizacion,
+                  pacienteNombre: paciente.nombreCompleto
+                }
               };
             }
+            return null;
           } catch (error) {
             console.error(`Error al obtener categorización del paciente ${paciente.rut}:`, error);
+            return null;
           }
+        });
+
+      // Esperar a que todas las promesas se resuelvan
+      const resultados = await Promise.all(promesasCategorizaciones);
+      
+      // Agregar resultados válidos al objeto categorizaciones
+      resultados.forEach(resultado => {
+        if (resultado) {
+          categorizaciones[resultado.cama] = resultado.data;
         }
-      }
+      });
 
       setCategorizacionesPorCama(categorizaciones);
     } catch (error) {

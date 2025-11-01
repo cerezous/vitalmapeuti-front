@@ -99,9 +99,10 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
       setPacientes(pacientesData);
       const apache2Data: Apache2PorCama = {};
 
-      // Para cada paciente con cama asignada, obtener su Apache II
-      for (const paciente of pacientesData) {
-        if (paciente.camaAsignada) {
+      // Obtener todos los Apache II en paralelo usando Promise.all
+      const promesasApache2 = pacientesData
+        .filter(paciente => paciente.camaAsignada)
+        .map(async (paciente) => {
           try {
             const response = await apache2Service.obtenerPorPaciente(paciente.rut, { limit: 1 });
             if (response.evaluaciones && response.evaluaciones.length > 0) {
@@ -135,19 +136,33 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
                 nivelRiesgo = 'Crítico';
               }
 
-              apache2Data[paciente.camaAsignada] = {
-                puntajeTotal,
-                color,
-                nivelRiesgo,
-                fecha: ultimoApache.fechaEvaluacion || '',
-                pacienteNombre: paciente.nombreCompleto
+              return {
+                cama: paciente.camaAsignada,
+                data: {
+                  puntajeTotal,
+                  color,
+                  nivelRiesgo,
+                  fecha: ultimoApache.fechaEvaluacion || '',
+                  pacienteNombre: paciente.nombreCompleto
+                }
               };
             }
+            return null;
           } catch (error) {
             console.error(`Error al obtener Apache II del paciente ${paciente.rut}:`, error);
+            return null;
           }
+        });
+
+      // Esperar a que todas las promesas se resuelvan
+      const resultados = await Promise.all(promesasApache2);
+      
+      // Agregar resultados válidos al objeto apache2Data
+      resultados.forEach(resultado => {
+        if (resultado) {
+          apache2Data[resultado.cama] = resultado.data;
         }
-      }
+      });
 
       setApache2PorCama(apache2Data);
     } catch (error) {
