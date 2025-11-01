@@ -75,6 +75,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
 
   // Verificar si el usuario es médico o administrador
   const esMedico = user?.estamento === 'Médico' || user?.estamento === 'Medicina' || user?.estamento === 'Administrador';
+  const esAdministrador = user?.estamento === 'Administrador';
 
   // Cargar pacientes y sus Apache II
   useEffect(() => {
@@ -266,6 +267,32 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
   const handleVerDetalle = (grupoProcedimientos: ProcedimientoMedicina[]) => {
     setSelectedGrupoProcedimientos(grupoProcedimientos);
     setShowDetalleModal(true);
+  };
+
+  const handleEliminarGrupo = async (procedimientosGrupo: ProcedimientoMedicina[]) => {
+    if (!esAdministrador) return;
+    
+    const confirmacion = window.confirm('¿Está seguro de que desea eliminar este registro de procedimientos? Esta acción no se puede deshacer.');
+    if (!confirmacion) return;
+
+    try {
+      setLoadingRegistros(true);
+      
+      // Eliminar todos los procedimientos del grupo
+      const promesas = procedimientosGrupo.map(proc => medicinaAPI.eliminar(proc.id));
+      await Promise.all(promesas);
+      
+      // Recargar procedimientos y métricas
+      await cargarProcedimientos();
+      await cargarMetricas();
+      
+      alert('Registro eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar registro:', error);
+      alert(`Error al eliminar el registro: ${error.message || 'Error desconocido'}`);
+    } finally {
+      setLoadingRegistros(false);
+    }
   };
 
   // Agrupar procedimientos por fecha y usuario
@@ -1163,6 +1190,30 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
                       </div>
                     </div>
                   </div>
+                  {/* Botones móvil */}
+                  <div className="flex items-center gap-2 md:hidden">
+                    <button
+                      onClick={() => handleVerDetalle(grupo.procedimientos)}
+                      className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      title="Ver detalle"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    {esAdministrador && (
+                      <button
+                        onClick={() => handleEliminarGrupo(grupo.procedimientos)}
+                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                        title="Eliminar registro (Solo administrador)"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   
                   {/* Vista desktop */}
                   <div className="flex-1 hidden md:grid grid-cols-5 gap-4">
@@ -1193,16 +1244,29 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
                       <p className="font-semibold text-gray-800">{grupo.cantidadProcedimientos} procedimiento{grupo.cantidadProcedimientos > 1 ? 's' : ''}</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleVerDetalle(grupo.procedimientos)}
-                    className="ml-4 p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                    title="Ver detalle"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleVerDetalle(grupo.procedimientos)}
+                      className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      title="Ver detalle"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    {esAdministrador && (
+                      <button
+                        onClick={() => handleEliminarGrupo(grupo.procedimientos)}
+                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                        title="Eliminar registro (Solo administrador)"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
