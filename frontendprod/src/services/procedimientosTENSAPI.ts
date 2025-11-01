@@ -137,6 +137,23 @@ const procedimientosTENSAPI = {
     }
   },
 
+  // Actualizar registro TENS
+  actualizar: async (id: number, data: { fecha?: string; turno?: string }): Promise<RegistroProcedimientoTENS> => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/procedimientos-tens/${id}`,
+        data,
+        { headers: getAuthHeader() }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data.message || 'Error al actualizar el registro TENS');
+      }
+      throw error;
+    }
+  },
+
   // Eliminar registro
   eliminar: async (id: number): Promise<void> => {
     try {

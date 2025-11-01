@@ -22,6 +22,7 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     tiempo: '00:00',
     pacienteRut: ''
   });
+  const [fechaRegistro, setFechaRegistro] = useState('');
   const [pacientes, setPacientes] = useState([]);
   const [pacientesEgresados, setPacientesEgresados] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -107,9 +108,11 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
       const copia = (registro.procedimientos || []).map(p => ({ ...p }));
       setProcedimientosEditables(copia);
       procedimientosOriginalesRef.current = (registro.procedimientos || []).map(p => ({ ...p }));
+      setFechaRegistro(registro.fecha);
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       procedimientosOriginalesRef.current = [];
+      setFechaRegistro('');
     }
   }, [modoEdicion, registro]);
 
@@ -273,6 +276,11 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
       if (!registro) {
         setMensaje({ tipo: 'error', texto: 'Error: No se encontró el registro' });
         return;
+      }
+
+      // Si la fecha cambió, actualizarla
+      if (fechaRegistro && fechaRegistro !== registro.fecha) {
+        await procedimientosTENSAPI.actualizar(registro.id, { fecha: fechaRegistro });
       }
 
       // Obtener solo los procedimientos nuevos (ID negativo)
@@ -451,9 +459,12 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fecha <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center h-11 px-3 md:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm md:text-base">
-                  {formatearFechaSinZonaHoraria(registro.fecha)}
-                </div>
+                <input
+                  type="date"
+                  value={fechaRegistro}
+                  onChange={(e) => setFechaRegistro(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                />
               </div>
             </div>
 
