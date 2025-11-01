@@ -1277,18 +1277,22 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
     )}
 
       {/* Modal de filtro de fechas */}
-      <dialog id="fecha-filter-modal-enfermeria" className="modal">
-        <div className="modal-box w-11/12 max-w-md">
+      <dialog id="fecha-filter-modal-enfermeria" className="fixed inset-0 z-50 flex items-center justify-center w-full h-full">
+        <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => {
+          const modal = document.getElementById('fecha-filter-modal-enfermeria') as HTMLDialogElement;
+          if (modal) modal.close();
+        }}></div>
+        <div className="relative bg-white rounded-2xl shadow-2xl w-11/12 max-w-md p-8 border border-gray-200">
           {/* Header del modal */}
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-xl text-gray-900">Filtrar por Fechas</h3>
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+            <h3 className="text-2xl font-bold text-gray-900">Filtrar por Fechas</h3>
             <button
               type="button"
               onClick={() => {
                 const modal = document.getElementById('fecha-filter-modal-enfermeria') as HTMLDialogElement;
                 if (modal) modal.close();
               }}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1297,34 +1301,34 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
           </div>
           
           {/* Contenido */}
-          <div className="space-y-5">
+          <div className="space-y-6 mb-8">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
                 Fecha Desde
               </label>
               <input
                 type="date"
                 value={fechaDesde}
                 onChange={(e) => setFechaDesde(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 bg-white hover:border-gray-300"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 bg-white hover:border-gray-400 shadow-sm"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
                 Fecha Hasta
               </label>
               <input
                 type="date"
                 value={fechaHasta}
                 onChange={(e) => setFechaHasta(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 bg-white hover:border-gray-300"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 bg-white hover:border-gray-400 shadow-sm"
               />
             </div>
           </div>
 
           {/* Footer con botones */}
-          <div className="modal-action mt-6">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={() => {
@@ -1332,7 +1336,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
                 setFechaHasta('');
                 cargarRegistros();
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium shadow-sm hover:shadow-md"
             >
               Limpiar
             </button>
@@ -1342,15 +1346,12 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
                 const modal = document.getElementById('fecha-filter-modal-enfermeria') as HTMLDialogElement;
                 if (modal) modal.close();
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
             >
               Aplicar
             </button>
           </div>
         </div>
-        <form method="dialog" className="modal-backdrop">
-          <button>close</button>
-        </form>
       </dialog>
     </>
   );
