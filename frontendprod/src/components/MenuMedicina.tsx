@@ -52,6 +52,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
   const [showApache2Modal, setShowApache2Modal] = useState(false);
   const [showRegistroProcedimientosModal, setShowRegistroProcedimientosModal] = useState(false);
   const [showMapInfoModal, setShowMapInfoModal] = useState(false);
+  const [showFiltroFechasModal, setShowFiltroFechasModal] = useState(false);
   const [apache2PorCama, setApache2PorCama] = useState<Apache2PorCama>({});
   const [isLoading, setIsLoading] = useState(true);
   const [procedimientos, setProcedimientos] = useState<ProcedimientoMedicina[]>([]);
@@ -1087,10 +1088,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
           <div className="flex items-center gap-2">
             {/* Botón de calendario para filtrar */}
             <button
-              onClick={() => {
-                const modal = document.getElementById('fecha-filter-modal') as HTMLDialogElement;
-                if (modal) modal.showModal();
-              }}
+              onClick={() => setShowFiltroFechasModal(true)}
               className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md transform hover:scale-105 cursor-pointer"
               title="Filtrar por fechas"
             >
@@ -1311,81 +1309,74 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
     )}
 
       {/* Modal de filtro de fechas */}
-      <dialog id="fecha-filter-modal" className="modal backdrop:bg-black backdrop:opacity-50">
-        <div className="relative bg-white rounded-2xl shadow-2xl w-11/12 max-w-md p-8 border border-gray-200">
-          {/* Header del modal */}
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-900">Filtrar por Fechas</h3>
-            <button
-              type="button"
-              onClick={() => {
-                const modal = document.getElementById('fecha-filter-modal') as HTMLDialogElement;
-                if (modal) modal.close();
-              }}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          {/* Contenido */}
-          <div className="space-y-6 mb-8">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Fecha Desde
-              </label>
-              <input
-                type="date"
-                value={fechaDesde}
-                onChange={(e) => setFechaDesde(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-900 bg-white hover:border-gray-400 shadow-sm"
-              />
+      {showFiltroFechasModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-11/12 max-w-md p-8 border border-gray-200">
+            {/* Header del modal */}
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900">Filtrar por Fechas</h3>
+              <button
+                type="button"
+                onClick={() => setShowFiltroFechasModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
             
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Fecha Hasta
-              </label>
-              <input
-                type="date"
-                value={fechaHasta}
-                onChange={(e) => setFechaHasta(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-900 bg-white hover:border-gray-400 shadow-sm"
-              />
+            {/* Contenido */}
+            <div className="space-y-6 mb-8">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Fecha Desde
+                </label>
+                <input
+                  type="date"
+                  value={fechaDesde}
+                  onChange={(e) => setFechaDesde(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-900 bg-white hover:border-gray-400 shadow-sm"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Fecha Hasta
+                </label>
+                <input
+                  type="date"
+                  value={fechaHasta}
+                  onChange={(e) => setFechaHasta(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-900 bg-white hover:border-gray-400 shadow-sm"
+                />
+              </div>
+            </div>
+
+            {/* Footer con botones */}
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setFechaDesde('');
+                  setFechaHasta('');
+                  cargarProcedimientos();
+                }}
+                className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium shadow-sm hover:shadow-md"
+              >
+                Limpiar
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowFiltroFechasModal(false)}
+                className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm hover:shadow-md"
+              >
+                Aplicar
+              </button>
             </div>
           </div>
-
-          {/* Footer con botones */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={() => {
-                setFechaDesde('');
-                setFechaHasta('');
-                cargarProcedimientos();
-              }}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium shadow-sm hover:shadow-md"
-            >
-              Limpiar
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const modal = document.getElementById('fecha-filter-modal') as HTMLDialogElement;
-                if (modal) modal.close();
-              }}
-              className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm hover:shadow-md"
-            >
-              Aplicar
-            </button>
-          </div>
         </div>
-        <form method="dialog" className="modal-backdrop">
-          <button style={{ display: 'none' }}>close</button>
-        </form>
-      </dialog>
+      )}
     </>
   );
 };
