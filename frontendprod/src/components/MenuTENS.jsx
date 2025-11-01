@@ -449,6 +449,7 @@ const MenuTENS = ({ onOpenModal }) => {
                         </button>
                       )}
                     </div>
+                  </div>
                   );
                 })}
               </div>
