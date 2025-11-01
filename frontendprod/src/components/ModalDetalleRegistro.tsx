@@ -31,6 +31,7 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
     pacienteRut: ''
   });
   const [fechaRegistro, setFechaRegistro] = useState<string>('');
+  const [turnoRegistro, setTurnoRegistro] = useState<'Día' | 'Noche'>('Día');
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [pacientesEgresados, setPacientesEgresados] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(false);
@@ -76,10 +77,12 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
     if (modoEdicion && registro && registro.procedimientos) {
       setProcedimientosEditables([...registro.procedimientos]);
       setFechaRegistro(registro.fecha);
+      setTurnoRegistro(registro.turno as 'Día' | 'Noche');
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       setProcedimientosAEliminar([]);
       setFechaRegistro('');
+      setTurnoRegistro('Día');
     }
   }, [modoEdicion, registro]);
 
@@ -93,6 +96,7 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
       setProcedimientosAEliminar([]);
       setProcedimientoEditando(null);
       setProcedimientoEditado(null);
+      setTurnoRegistro('Día');
     }
   }, [isOpen]);
 
@@ -369,9 +373,12 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
         return;
       }
 
-      // Si la fecha cambió, actualizarla
+      // Si la fecha o turno cambiaron, actualizarlos
       if (fechaRegistro && fechaRegistro !== registro.fecha) {
         await registroProcedimientosAPI.actualizarRegistro(registro.id, { fecha: fechaRegistro });
+      }
+      if (turnoRegistro && turnoRegistro !== registro.turno) {
+        await registroProcedimientosAPI.actualizarRegistro(registro.id, { turno: turnoRegistro });
       }
 
       // Obtener solo los procedimientos nuevos (ID negativo)
@@ -484,15 +491,26 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Turno <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg">
-                  <input
-                    type="checkbox"
-                    checked={true}
-                    readOnly
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label className="ml-3 text-sm font-medium text-gray-900">
-                    {registro.turno}
+                <div className="flex space-x-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      value="Día"
+                      checked={turnoRegistro === 'Día'}
+                      onChange={(e) => setTurnoRegistro(e.target.value as 'Día' | 'Noche')}
+                      className="w-4 h-4 text-blue-900"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Día</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      value="Noche"
+                      checked={turnoRegistro === 'Noche'}
+                      onChange={(e) => setTurnoRegistro(e.target.value as 'Día' | 'Noche')}
+                      className="w-4 h-4 text-blue-900"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Noche</span>
                   </label>
                 </div>
               </div>

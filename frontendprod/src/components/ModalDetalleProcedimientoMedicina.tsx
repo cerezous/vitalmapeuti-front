@@ -41,6 +41,7 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
     observaciones: ''
   });
   const [fechaGrupo, setFechaGrupo] = useState<string>('');
+  const [turnoGrupo, setTurnoGrupo] = useState<'24 h' | '22 h' | '12 h'>('24 h');
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [pacientesEgresados, setPacientesEgresados] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(false);
@@ -83,13 +84,16 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
     if (modoEdicion && procedimientos && procedimientos.length > 0) {
       setProcedimientosEditables([...procedimientos]);
       setFechaGrupo(procedimientos[0]?.fecha || '');
+      setTurnoGrupo(procedimientos[0]?.turno || '24 h');
     } else if (modoEdicion && procedimiento) {
       setProcedimientosEditables([procedimiento]);
       setFechaGrupo(procedimiento.fecha || '');
+      setTurnoGrupo(procedimiento.turno || '24 h');
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       setProcedimientosAEliminar([]);
       setFechaGrupo('');
+      setTurnoGrupo('24 h');
     }
   }, [modoEdicion, procedimientos, procedimiento]);
 
@@ -118,6 +122,7 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
       setProcedimientosAEliminar([]);
       setProcedimientoEditando(null);
       setProcedimientoEditado(null);
+      setTurnoGrupo('24 h');
     }
   }, [isOpen]);
 
@@ -209,8 +214,8 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
     const nuevoProcTemporal: ProcedimientoMedicina = {
       id: -(Date.now()), // ID negativo temporal
       usuarioId: user?.id || 0,
-      turno: datosParaMostrar[0].turno,
-      fecha: datosParaMostrar[0].fecha,
+      turno: turnoGrupo,
+      fecha: fechaGrupo,
       nombre: nuevoProcedimiento.nombre,
       tiempo: nuevoProcedimiento.tiempo,
       pacienteRut: nuevoProcedimiento.pacienteRut || undefined,
@@ -371,8 +376,8 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
         }));
 
         await medicinaAPI.crear({
-          turno: datosParaMostrar[0].turno,
-          fecha: datosParaMostrar[0].fecha,
+          turno: turnoGrupo,
+          fecha: fechaGrupo,
           procedimientos: procedimientosData
         });
       }
@@ -554,17 +559,15 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Turno <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg">
-                  <input
-                    type="checkbox"
-                    checked={true}
-                    readOnly
-                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                  />
-                  <label className="ml-3 text-sm font-medium text-gray-900">
-                    {datosParaMostrar[0]?.turno || '24 h'}
-                  </label>
-                </div>
+                <select
+                  value={turnoGrupo}
+                  onChange={(e) => setTurnoGrupo(e.target.value as '24 h' | '22 h' | '12 h')}
+                  className="w-full px-4 py-2 h-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                >
+                  <option value="24 h">24 h</option>
+                  <option value="22 h">22 h</option>
+                  <option value="12 h">12 h</option>
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

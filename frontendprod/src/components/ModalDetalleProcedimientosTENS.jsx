@@ -23,6 +23,7 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     pacienteRut: ''
   });
   const [fechaRegistro, setFechaRegistro] = useState('');
+  const [turnoRegistro, setTurnoRegistro] = useState('Día');
   const [pacientes, setPacientes] = useState([]);
   const [pacientesEgresados, setPacientesEgresados] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -109,10 +110,12 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
       setProcedimientosEditables(copia);
       procedimientosOriginalesRef.current = (registro.procedimientos || []).map(p => ({ ...p }));
       setFechaRegistro(registro.fecha);
+      setTurnoRegistro(registro.turno);
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       procedimientosOriginalesRef.current = [];
       setFechaRegistro('');
+      setTurnoRegistro('Día');
     }
   }, [modoEdicion, registro]);
 
@@ -123,6 +126,7 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
       setNuevoProcedimiento({ nombre: '', tiempo: '00:00', pacienteRut: '' });
       setMensaje({ tipo: '', texto: '' });
       setProcedimientosEditables([]);
+      setTurnoRegistro('Día');
     }
   }, [isOpen]);
 
@@ -278,9 +282,12 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
         return;
       }
 
-      // Si la fecha cambió, actualizarla
+      // Si la fecha o turno cambiaron, actualizarlos
       if (fechaRegistro && fechaRegistro !== registro.fecha) {
         await procedimientosTENSAPI.actualizar(registro.id, { fecha: fechaRegistro });
+      }
+      if (turnoRegistro && turnoRegistro !== registro.turno) {
+        await procedimientosTENSAPI.actualizar(registro.id, { turno: turnoRegistro });
       }
 
       // Obtener solo los procedimientos nuevos (ID negativo)
@@ -443,15 +450,26 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Turno <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center h-11 px-3 md:px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg">
-                  <input
-                    type="checkbox"
-                    checked={true}
-                    readOnly
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label className="ml-3 text-sm font-medium text-gray-900">
-                    {registro.turno}
+                <div className="flex space-x-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      value="Día"
+                      checked={turnoRegistro === 'Día'}
+                      onChange={(e) => setTurnoRegistro(e.target.value)}
+                      className="w-4 h-4 text-blue-900"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Día</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      value="Noche"
+                      checked={turnoRegistro === 'Noche'}
+                      onChange={(e) => setTurnoRegistro(e.target.value)}
+                      className="w-4 h-4 text-blue-900"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Noche</span>
                   </label>
                 </div>
               </div>
