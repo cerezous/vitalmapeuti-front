@@ -28,6 +28,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     pacienteRut: ''
   });
   const [fechaGrupo, setFechaGrupo] = useState<string>('');
+  const [turnoGrupo, setTurnoGrupo] = useState<'Día' | 'Noche'>('Día');
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [pacientesEgresados, setPacientesEgresados] = useState<Paciente[]>([]);
   const [loadingPacientes, setLoadingPacientes] = useState(false);
@@ -73,6 +74,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
       setProcedimientosNuevos([]);
       setModoEdicion(false);
       setFechaGrupo(procedimientos[0]?.fecha || '');
+      setTurnoGrupo((procedimientos[0]?.turno as 'Día' | 'Noche') || 'Día');
     }
   }, [isOpen, procedimientos]);
 
@@ -229,8 +231,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
       id: -(Date.now()), // ID negativo temporal
       nombre: nuevoProcedimiento.nombre,
       tiempo: nuevoProcedimiento.tiempo,
-      fecha: primerProcedimiento.fecha,
-      turno: primerProcedimiento.turno,
+      fecha: fechaGrupo,
+      turno: turnoGrupo,
       pacienteRut: requierePaciente(nuevoProcedimiento.nombre) ? nuevoProcedimiento.pacienteRut : '', // Usar string vacío en lugar de null
       paciente: pacienteSeleccionado ? {
         nombreCompleto: pacienteSeleccionado.nombreCompleto,
@@ -274,8 +276,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     try {
       let nuevosProcedimientosDelBackend: ProcedimientoKinesiologia[] = [];
 
-      // 0. Si la fecha cambió, actualizar todos los procedimientos existentes
-      if (fechaGrupo && fechaGrupo !== primerProcedimiento.fecha) {
+      // 0. Si la fecha o turno cambiaron, actualizar todos los procedimientos existentes
+      if ((fechaGrupo && fechaGrupo !== primerProcedimiento.fecha) || (turnoGrupo && turnoGrupo !== primerProcedimiento.turno)) {
         const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id && proc.id > 0);
         for (const proc of procedimientosExistentes) {
           if (proc.id) {
@@ -284,7 +286,8 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
               tiempo: proc.tiempo,
               pacienteRut: proc.pacienteRut || undefined,
               observaciones: proc.observaciones || undefined,
-              fecha: fechaGrupo
+              fecha: fechaGrupo,
+              turno: turnoGrupo
             });
           }
         }
@@ -294,7 +297,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
       if (procedimientosNuevos.length > 0 && puedeAgregar) {
         const respuesta = await procedimientosKinesiologiaAPI.agregarProcedimientos({
           fecha: fechaGrupo || primerProcedimiento.fecha,
-          turno: primerProcedimiento.turno || 'Día',
+          turno: turnoGrupo || primerProcedimiento.turno || 'Día',
           procedimientos: procedimientosNuevos.map(proc => ({
             nombre: proc.nombre,
             tiempo: proc.tiempo,
@@ -433,9 +436,26 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Turno <span className="text-red-500">*</span>
                   </label>
-                  <div className="flex items-center h-11 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg">
-                    <label className="text-sm font-medium text-gray-900">
-                      {primerProcedimiento.turno || 'No especificado'}
+                  <div className="flex space-x-4">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        value="Día"
+                        checked={turnoGrupo === 'Día'}
+                        onChange={(e) => setTurnoGrupo(e.target.value as 'Día' | 'Noche')}
+                        className="w-4 h-4 text-gray-800"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Día</span>
+                    </label>
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        value="Noche"
+                        checked={turnoGrupo === 'Noche'}
+                        onChange={(e) => setTurnoGrupo(e.target.value as 'Día' | 'Noche')}
+                        className="w-4 h-4 text-gray-800"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Noche</span>
                     </label>
                   </div>
                 </div>
