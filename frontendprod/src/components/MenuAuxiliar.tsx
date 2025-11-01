@@ -20,6 +20,9 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [fechaDesde, setFechaDesde] = useState<string>('');
   const [fechaHasta, setFechaHasta] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 50;
 
   // Verificar si el usuario es auxiliar o administrador
   const esAuxiliar = user?.estamento === 'Auxiliares' || user?.estamento === 'Administrador';
@@ -31,19 +34,20 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
     cargarMetricas();
   }, []);
 
-  // Recargar procedimientos cuando cambien las fechas de filtro
+  // Recargar procedimientos cuando cambien las fechas de filtro o la página
   useEffect(() => {
-    if (fechaDesde || fechaHasta) {
-      cargarProcedimientos();
-    }
+    cargarProcedimientos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fechaDesde, fechaHasta]);
+  }, [fechaDesde, fechaHasta, currentPage]);
 
   const cargarProcedimientos = async () => {
     try {
       setLoadingProcedimientos(true);
+      // Calcular offset
+      const offset = (currentPage - 1) * itemsPerPage;
+      
       // Usar la API específica de auxiliares para obtener grupos
-      const params: any = { limit: 20 };
+      const params: any = { limit: itemsPerPage, offset };
       
       if (fechaDesde) {
         params.fechaDesde = fechaDesde;
@@ -52,8 +56,14 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
         params.fechaHasta = fechaHasta;
       }
       
-      const gruposData = await auxiliaresAPI.obtenerAgrupados(params);
+      // Obtener total de grupos y datos paginados en paralelo
+      const [gruposData, total] = await Promise.all([
+        auxiliaresAPI.obtenerAgrupados(params),
+        auxiliaresAPI.obtenerTotalAgrupados({ fechaDesde, fechaHasta })
+      ]);
+      
       setGrupos(gruposData);
+      setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (error) {
       console.error('Error al cargar procedimientos auxiliares:', error);
     } finally {
@@ -424,6 +434,43 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
             </div>
           )}
         </div>
+
+        {/* Paginación */}
+        {!loadingProcedimientos && grupos.length > 0 && totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+            <div className="text-sm text-gray-700">
+              Página {currentPage} de {totalPages}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg transition-colors font-medium ${
+                  currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-700 text-white hover:bg-gray-800 hover:shadow-md'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage >= totalPages}
+                className={`px-4 py-2 rounded-lg transition-colors font-medium ${
+                  currentPage >= totalPages
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-700 text-white hover:bg-gray-800 hover:shadow-md'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
 
@@ -503,6 +550,7 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
               onClick={() => {
                 setFechaDesde('');
                 setFechaHasta('');
+                setCurrentPage(1);
                 cargarProcedimientos();
               }}
               className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium shadow-sm hover:shadow-md"

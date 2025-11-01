@@ -154,6 +154,7 @@ const auxiliaresAPI = {
     fechaDesde?: string;
     fechaHasta?: string;
     limit?: number;
+    offset?: number;
   }): Promise<GrupoProcedimientosAuxiliares[]> => {
     try {
       const response = await axios.get(
@@ -167,6 +168,28 @@ const auxiliaresAPI = {
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(error.response.data.message || 'Error al obtener los procedimientos agrupados');
+      }
+      throw error;
+    }
+  },
+
+  // Obtener total de procedimientos agrupados
+  obtenerTotalAgrupados: async (params?: {
+    fechaDesde?: string;
+    fechaHasta?: string;
+  }): Promise<number> => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/auxiliares/agrupados`,
+        {
+          headers: getAuthHeader(),
+          params: { ...params, limit: 1 }
+        }
+      );
+      return response.data.total || 0;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data.message || 'Error al obtener el total de procedimientos agrupados');
       }
       throw error;
     }
