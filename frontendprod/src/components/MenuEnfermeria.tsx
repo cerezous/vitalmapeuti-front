@@ -1277,11 +1277,7 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
     )}
 
       {/* Modal de filtro de fechas */}
-      <dialog id="fecha-filter-modal-enfermeria" className="fixed inset-0 z-50 flex items-center justify-center w-full h-full">
-        <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => {
-          const modal = document.getElementById('fecha-filter-modal-enfermeria') as HTMLDialogElement;
-          if (modal) modal.close();
-        }}></div>
+      <dialog id="fecha-filter-modal-enfermeria" className="modal backdrop:bg-black backdrop:opacity-50">
         <div className="relative bg-white rounded-2xl shadow-2xl w-11/12 max-w-md p-8 border border-gray-200">
           {/* Header del modal */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
@@ -1352,6 +1348,9 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
             </button>
           </div>
         </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
     </>
   );
