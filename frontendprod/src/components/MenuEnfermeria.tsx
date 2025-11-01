@@ -45,6 +45,8 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
   const [showDetalleNASModal, setShowDetalleNASModal] = useState(false);
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState<{ rut: string; nombre: string } | null>(null);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [fechaDesde, setFechaDesde] = useState<string>('');
+  const [fechaHasta, setFechaHasta] = useState<string>('');
 
   // Verificar si el usuario es enfermera/o o administrador
   const esEnfermeria = user?.estamento === 'Enfermería' || user?.estamento === 'Administrador';
@@ -54,6 +56,14 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
     cargarNAS();
     cargarRegistros();
   }, []);
+
+  // Recargar registros cuando cambien las fechas de filtro
+  useEffect(() => {
+    if (fechaDesde || fechaHasta) {
+      cargarRegistros();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fechaDesde, fechaHasta]);
 
   // Cargar métricas después de cargar NAS
   useEffect(() => {
@@ -146,7 +156,16 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
     try {
       setLoadingRegistros(true);
       // Obtener todos los registros recientes
-      const data = await registroProcedimientosAPI.obtenerTodos({ limit: 100 });
+      const params: any = { limit: 100 };
+      
+      if (fechaDesde) {
+        params.fechaDesde = fechaDesde;
+      }
+      if (fechaHasta) {
+        params.fechaHasta = fechaHasta;
+      }
+      
+      const data = await registroProcedimientosAPI.obtenerTodos(params);
       
       // Filtrar solo registros de enfermería (excluir turno "24 h" que es de medicina)
       const registrosEnfermeria = (data.registros || [])
@@ -1035,29 +1054,45 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
 
       {/* Sección de Registro de Procedimientos */}
       <div>
-        {/* Header con título y botón */}
+        {/* Header con título y botones */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-gray-900">Registro de Procedimientos</h2>
-          <div className="relative group">
+          <div className="flex items-center gap-2">
+            {/* Botón de calendario para filtrar */}
             <button
-              onClick={() => esEnfermeria && setShowRegistroProcedimientosModal(true)}
-              disabled={!esEnfermeria}
-              className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 ${
-                esEnfermeria 
-                  ? 'bg-blue-900 hover:bg-blue-800 text-white hover:shadow-md transform hover:scale-105 cursor-pointer' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-              title={esEnfermeria ? "Agregar procedimiento" : "Solo usuarios de enfermería pueden agregar procedimientos"}
+              onClick={() => {
+                const modal = document.getElementById('fecha-filter-modal-enfermeria') as HTMLDialogElement;
+                if (modal) modal.showModal();
+              }}
+              className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md transform hover:scale-105 cursor-pointer"
+              title="Filtrar por fechas"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </button>
-            {!esEnfermeria && (
-              <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-64 bg-gray-800 text-white text-xs rounded-lg py-2 px-3 z-10">
-                Solo usuarios con estamento "Enfermería" pueden agregar procedimientos
-              </div>
-            )}
+            {/* Botón de agregar */}
+            <div className="relative group">
+              <button
+                onClick={() => esEnfermeria && setShowRegistroProcedimientosModal(true)}
+                disabled={!esEnfermeria}
+                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 ${
+                  esEnfermeria 
+                    ? 'bg-blue-900 hover:bg-blue-800 text-white hover:shadow-md transform hover:scale-105 cursor-pointer' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                title={esEnfermeria ? "Agregar procedimiento" : "Solo usuarios de enfermería pueden agregar procedimientos"}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+              {!esEnfermeria && (
+                <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-64 bg-gray-800 text-white text-xs rounded-lg py-2 px-3 z-10">
+                  Solo usuarios con estamento "Enfermería" pueden agregar procedimientos
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1240,6 +1275,68 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
         </div>
       </div>
     )}
+
+      {/* Modal de filtro de fechas */}
+      <dialog id="fecha-filter-modal-enfermeria" className="modal">
+        <div className="modal-box w-11/12 max-w-md">
+          <h3 className="font-bold text-lg mb-4">Filtrar por Fechas</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha Desde
+              </label>
+              <input
+                type="date"
+                value={fechaDesde}
+                onChange={(e) => setFechaDesde(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha Hasta
+              </label>
+              <input
+                type="date"
+                value={fechaHasta}
+                onChange={(e) => setFechaHasta(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+          </div>
+
+          <div className="modal-action">
+            <form method="dialog" className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setFechaDesde('');
+                  setFechaHasta('');
+                  cargarRegistros();
+                }}
+                className="btn btn-sm"
+              >
+                Limpiar Filtros
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const modal = document.getElementById('fecha-filter-modal-enfermeria') as HTMLDialogElement;
+                  if (modal) modal.close();
+                }}
+                className="btn btn-sm btn-primary"
+              >
+                Cerrar
+              </button>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </>
   );
 };
