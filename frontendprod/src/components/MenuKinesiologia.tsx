@@ -166,12 +166,13 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   };
 
-  // Agrupar procedimientos por fecha y turno
+  // Agrupar procedimientos por fecha, turno y usuario
   const agruparProcedimientos = () => {
     const grupos: { [key: string]: ProcedimientoKinesiologia[] } = {};
     
     procedimientos.forEach(proc => {
-      const key = `${proc.fecha}-${proc.turno || 'Sin turno'}`;
+      // Incluir el usuarioId en la clave para separar registros por usuario
+      const key = `${proc.fecha}-${proc.turno || 'Sin turno'}-${proc.usuarioId}`;
       if (!grupos[key]) {
         grupos[key] = [];
       }
