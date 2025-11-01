@@ -306,8 +306,12 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {grupos.map((grupo, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4 flex items-center justify-between hover:bg-gray-100 transition-colors">
+              {grupos.map((grupo, index) => {
+                // Verificar si el registro es del usuario actual
+                const registradoPorUsuario = user && grupo.usuarioId === user.id;
+                
+                return (
+                <div key={index} className={`${registradoPorUsuario ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'} rounded-lg p-4 flex items-center justify-between ${registradoPorUsuario ? 'hover:bg-blue-100' : 'hover:bg-gray-100'} transition-colors border`}>
                   {/* Vista móvil */}
                   <div className="flex-1 md:hidden">
                     <div className="space-y-1">
@@ -415,7 +419,8 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

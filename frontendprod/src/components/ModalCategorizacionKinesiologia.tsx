@@ -600,7 +600,7 @@ const ModalCategorizacionKinesiologia: React.FC<ModalCategorizacionKinesiologiaP
                                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                   }`}
                                 >
-                                  VMNI intermitente
+                                  VMNI/CNAF intermitente
                                 </button>
                               </td>
                               <td className="px-2 md:px-3 py-2 md:py-3 text-center border-b">
@@ -612,7 +612,7 @@ const ModalCategorizacionKinesiologia: React.FC<ModalCategorizacionKinesiologiaP
                                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                   }`}
                                 >
-                                  VMNI/VM continua
+                                  CNAF/VMNI/VM continua
                                 </button>
                               </td>
                             </tr>
@@ -701,7 +701,7 @@ const ModalCategorizacionKinesiologia: React.FC<ModalCategorizacionKinesiologiaP
 
                             {/* Asistencia */}
                             <tr>
-                              <td className="px-2 md:px-3 py-2 md:py-3 text-sm font-medium text-gray-900 border-b bg-gray-100">Asistencia</td>
+                              <td className="px-2 md:px-3 py-2 md:py-3 text-sm font-medium text-gray-900 border-b bg-gray-100">Asistencia en movilización</td>
                               <td className="px-2 md:px-3 py-2 md:py-3 text-center border-b">
                                 <button
                                   onClick={() => handleCategorizacionChange('asistenciaNueva', 1)}

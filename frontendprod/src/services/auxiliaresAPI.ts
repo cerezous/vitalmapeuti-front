@@ -52,6 +52,7 @@ export interface ProcedimientoAuxiliar {
 export interface GrupoProcedimientosAuxiliares {
   fecha: string;
   turno: string;
+  usuarioId: number;
   procedimientos: ProcedimientoAuxiliar[];
   tiempoTotal: number; // En minutos
   cantidadProcedimientos: number;
