@@ -177,12 +177,12 @@ const ModalRegistroProcedimientosEnfermeria: React.FC<ModalRegistroProcedimiento
   const tareasHabituales = [
     'Entrega de turno',
     'Recepción de turno',
-    'Tareas Administrativas (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
+    'Tareas Administrativas (excluye redacción de ingresos/traslados)',
     'Curación avanzada',
     'Diálisis',
     'Atención de enfermería (evaluación, curación simple, administración de medicamentos, etc)',
     'Hemocultivos (incluye registro administrativo)',
-    'Ingreso (recepción de paciente)',
+    'Ingreso (recepción de paciente y redacción de ingreso)',
     'Instalación LA',
     'Instalación SNG',
     'Instalación de Sonda Foley',
@@ -230,7 +230,7 @@ const ModalRegistroProcedimientosEnfermeria: React.FC<ModalRegistroProcedimiento
 
   // Procedimientos que no requieren paciente
   const procedimientosSinPaciente = [
-    'Tareas Administrativas (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
+    'Tareas Administrativas (excluye redacción de ingresos/traslados)',
     'Entrega de turno',
     'Recepción de turno',
     'Preparación de medicamentos',
