@@ -157,7 +157,7 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
 
   // Procedimientos que no requieren paciente - deben coincidir con ModalRegistroProcedimientosEnfermeria
   const procedimientosSinPaciente = [
-    'Tareas Administrativas (redacción de ingresos/traslados, evoluciones, categorización, estadística, etc)',
+    'Tareas Administrativas (excluye redacción de ingresos/traslados)',
     'Entrega de turno',
     'Recepción de turno',
     'Preparación de medicamentos',
@@ -315,6 +315,12 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
     // Validar datos
     if (!procedimientoEditado.nombre || !procedimientoEditado.tiempo) {
       setMensaje({ tipo: 'error', texto: 'Debe especificar el nombre del procedimiento y el tiempo' });
+      return;
+    }
+
+    // Validar que se haya seleccionado un paciente si el procedimiento lo requiere
+    if (requierePaciente(procedimientoEditado.nombre) && !procedimientoEditado.pacienteRut) {
+      setMensaje({ tipo: 'error', texto: 'Por favor selecciona un paciente' });
       return;
     }
 
