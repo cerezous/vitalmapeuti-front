@@ -145,22 +145,26 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
     try {
       const fechaParaVerificar = fecha || obtenerFechaLocal();
       
-      // Obtener todos los registros NAS para verificar manualmente
-      const todosLosRegistros = await nasAPI.obtenerRegistros({
-        limit: 100
-      });
-      
-      // Verificar manualmente si algún registro coincide con la fecha actual
-      const fechaActualISO = obtenerFechaLocal();
-      const registrosCoincidentes = todosLosRegistros.registros.filter(r => {
-        const fechaRegistroISO = new Date(r.fechaRegistro).toISOString().split('T')[0];
-        return fechaRegistroISO === fechaActualISO;
-      });
-      
       // Buscar por la fecha específica usando la API
       const registros = await nasAPI.obtenerRegistros({
         fechaInicio: fechaParaVerificar,
         fechaFin: fechaParaVerificar
+      });
+      
+      // Obtener todos los registros NAS para verificación manual adicional si la API no encuentra
+      const todosLosRegistros = await nasAPI.obtenerRegistros({
+        limit: 100
+      });
+      
+      // Verificar manualmente si algún registro coincide con la fecha seleccionada
+      const registrosCoincidentes = todosLosRegistros.registros.filter(r => {
+        // Convertir la fecha del registro a fecha local (YYYY-MM-DD)
+        const fechaRegistro = new Date(r.fechaRegistro);
+        const year = fechaRegistro.getFullYear();
+        const month = String(fechaRegistro.getMonth() + 1).padStart(2, '0');
+        const day = String(fechaRegistro.getDate()).padStart(2, '0');
+        const fechaRegistroFormateada = `${year}-${month}-${day}`;
+        return fechaRegistroFormateada === fechaParaVerificar;
       });
       
       // Usar la verificación manual si la API no encuentra registros
