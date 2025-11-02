@@ -175,6 +175,9 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
     'Traslado a TAC con contraste',
     'Traslado a RMN',
     'Traslado de paciente',
+    'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
+    'Traslado a pabellón',
+    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
   ];
 
   // Otras tareas de TENS
@@ -202,7 +205,8 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
     'Tareas administrativas (registros, evoluciones, etc)',
     'Preparación de medicamentos',
     'Entrega de turno',
-    'Recepción de turno'
+    'Recepción de turno',
+    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)'
   ];
 
   // Cargar pacientes cuando se abre el modal

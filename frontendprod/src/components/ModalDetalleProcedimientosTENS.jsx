@@ -51,7 +51,10 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, etc)',
     'Administración de medicamentos oral/SNG/SNY/Gastrostomía',
     'Medición de diuresis',
-    'Administración de broncodilatadores o nebulización'
+    'Administración de broncodilatadores o nebulización',
+    'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
+    'Traslado a pabellón',
+    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)'
   ];
 
   // Otras tareas de TENS
@@ -74,7 +77,8 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Tareas administrativas (registros, evoluciones, etc)',
     'Entrega de turno',
     'Recepción de turno',
-    'Preparación de medicamentos'
+    'Preparación de medicamentos',
+    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)'
   ];
 
   // Verificar si el procedimiento seleccionado requiere paciente
@@ -87,11 +91,16 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     const cargarPacientes = async () => {
       if (modoEdicion && pacientes.length === 0) {
         try {
-          const pacientesData = await pacienteService.obtenerPacientes();
-          // Ordenar pacientes por número de cama
-          const pacientesOrdenados = pacientesData.sort((a, b) => (a.camaAsignada || 0) - (b.camaAsignada || 0));
+          const { activos, egresadosRecientes } = await pacienteService.obtenerPacientesParaProcedimientos();
+          // Ordenar por número de cama
+          const pacientesOrdenados = activos.sort((a, b) => {
+            if (!a.camaAsignada && !b.camaAsignada) return 0;
+            if (!a.camaAsignada) return 1;
+            if (!b.camaAsignada) return -1;
+            return (a.camaAsignada || 0) - (b.camaAsignada || 0);
+          });
           setPacientes(pacientesOrdenados);
-          setPacientesEgresados([]);
+          setPacientesEgresados(egresadosRecientes);
         } catch (error) {
           console.error('Error al cargar pacientes:', error);
         }
@@ -537,11 +546,11 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
                         </optgroup>
                       )}
                       
-                      {/* Pacientes egresados */}
+                      {/* Pacientes egresados en las últimas 24h */}
                       {pacientesEgresados.length > 0 && (
-                        <optgroup label="📅 Pacientes egresados">
+                        <optgroup label="📅 Egresados en últimas 24h">
                           {pacientesEgresados.map((paciente) => (
-                            <option key={`egresado-${paciente.id}`} value={paciente.rut}>
+                            <option key={`egresado-${paciente.rut}`} value={paciente.rut}>
                               {paciente.nombreCompleto} - Egresado {formatearFechaEgreso(paciente.fechaEgresoUTI)}
                             </option>
                           ))}
