@@ -55,7 +55,6 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
     'Traslado a pabellón',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
-    'Conteo de materiales',
     'Recepción de ropa',
     'Limpieza de estación de enfermería y/o sala de estar'
   ];
@@ -82,7 +81,6 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Recepción de turno',
     'Preparación de medicamentos',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
-    'Conteo de materiales',
     'Recepción de ropa',
     'Limpieza de estación de enfermería y/o sala de estar'
   ];

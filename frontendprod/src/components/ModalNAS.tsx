@@ -57,13 +57,10 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
     const fechaActual = obtenerFechaLocal();
     const fechaIngreso = formatearFechaIngreso(paciente.fechaIngresoUTI);
 
-    // Convertir fechas a objetos Date para comparación correcta
-    const fechaSeleccionadaDate = new Date(fechaSeleccionada);
-    const fechaActualDate = new Date(fechaActual);
-    const fechaIngresoDate = fechaIngreso ? new Date(fechaIngreso) : null;
-
+    // Comparar fechas como strings en formato YYYY-MM-DD para evitar problemas de zona horaria
+    // Las fechas en formato YYYY-MM-DD se pueden comparar directamente como strings
     // Validar que no sea posterior a la fecha actual
-    if (fechaSeleccionadaDate > fechaActualDate) {
+    if (fechaSeleccionada > fechaActual) {
       return { 
         valida: false, 
         mensaje: 'No se puede seleccionar una fecha posterior a la actual' 
@@ -71,8 +68,10 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
     }
 
     // Validar que no sea anterior a la fecha de ingreso
-    if (fechaIngresoDate && fechaSeleccionadaDate < fechaIngresoDate) {
-      const fechaIngresoFormateada = fechaIngresoDate.toLocaleDateString('es-ES');
+    if (fechaIngreso && fechaSeleccionada < fechaIngreso) {
+      // Formatear fecha de ingreso para mostrar al usuario
+      const [year, month, day] = fechaIngreso.split('-');
+      const fechaIngresoFormateada = `${day}/${month}/${year}`;
       return { 
         valida: false, 
         mensaje: `No se puede seleccionar una fecha anterior al ingreso del paciente (${fechaIngresoFormateada})` 
