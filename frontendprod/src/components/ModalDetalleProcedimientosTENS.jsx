@@ -54,7 +54,10 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Administración de broncodilatadores o nebulización',
     'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
     'Traslado a pabellón',
-    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)'
+    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
+    'Conteo de materiales',
+    'Recepción de ropa',
+    'Limpieza de estación de enfermería y/o sala de estar'
   ];
 
   // Otras tareas de TENS
@@ -78,7 +81,10 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Entrega de turno',
     'Recepción de turno',
     'Preparación de medicamentos',
-    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)'
+    'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
+    'Conteo de materiales',
+    'Recepción de ropa',
+    'Limpieza de estación de enfermería y/o sala de estar'
   ];
 
   // Verificar si el procedimiento seleccionado requiere paciente
