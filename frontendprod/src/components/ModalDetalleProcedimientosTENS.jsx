@@ -46,40 +46,50 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Tareas administrativas (registros, evoluciones, etc)',
     'Entrega de turno',
     'Recepción de turno',
+    'Toma de signos vitales (registro por paciente)',
+    'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, medición de deposiciones, etc)',
+    'Administración de medicamentos oral/SNG/SNY/Gastrostomía/Broncodilatadores',
     'Preparación de medicamentos',
-    'Toma de signos vitales',
-    'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, etc)',
-    'Administración de medicamentos oral/SNG/SNY/Gastrostomía',
+    'Preparación de carro para aseos',
+    'Cambio de posición',
     'Medición de diuresis',
-    'Administración de broncodilatadores o nebulización',
+    'Toma de exámenes (hisopado rectal, muestra de orina, etc)',
+    'Traslado a endoscopia',
+    'Traslado a TAC sin contraste',
+    'Traslado a TAC con contraste',
+    'Traslado a RMN',
+    'Traslado de paciente',
     'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
     'Traslado a pabellón',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
     'Recepción de ropa',
-    'Limpieza de estación de enfermería y/o sala de estar'
+    'Limpieza de estación de enfermería y/o sala de estar',
   ];
 
   // Otras tareas de TENS
   const otrasTareas = [
     'Control de glicemia',
-    'Curación simple (asistencia)',
-    'Curación avanzada (asistencia)',
-    'Cambio de posición',
+    'Instalación de CVC (asistencia)',
+    'Instalación de CHD (asistencia)',
+    'Asistencia en procedimientos de enfermería (instalación de LA, curaciones, toma de exámenes, etc)',
+    'Asistencia en procedimientos de kinesiología (Kine motora o respiratoria, etc)',
+    'IOT (asistencia)',
+    'PCR (asistencia)',
     'Alimentación asistida',
     'Traslado interno',
-    'Traslado a TAC sin contraste',
-    'Traslado a TAC con contraste',
     'Control de drenajes (vaciado y registro)',
-    'Educación familiar'
+    'Educación familiar',
+    'Acompañamiento familiar'
   ];
 
   // Procedimientos que no requieren paciente específico (marcados con *)
   const procedimientosSinPaciente = [
     'Esterilización (conteo de materiales, recolección y traslados)',
     'Tareas administrativas (registros, evoluciones, etc)',
+    'Preparación de medicamentos',
+    'Preparación de carro para aseos',
     'Entrega de turno',
     'Recepción de turno',
-    'Preparación de medicamentos',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
     'Recepción de ropa',
     'Limpieza de estación de enfermería y/o sala de estar'
