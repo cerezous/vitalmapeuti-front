@@ -178,6 +178,7 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
     'Traslado de paciente',
     'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
     'Traslado a pabellón',
+    'Ingreso',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
     'Recepción de ropa',
     'Limpieza de estación de enfermería y/o sala de estar',
