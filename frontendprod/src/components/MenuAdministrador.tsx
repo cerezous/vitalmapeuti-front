@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import MenuCuestionariosBurnout from './MenuCuestionariosBurnout';
 import GestionUsuarios from './GestionUsuarios';
@@ -8,8 +8,11 @@ const MenuAdministrador: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('cuestionarios');
 
-  // Verificar que el usuario sea administrador
-  if (user?.estamento !== 'Administrador') {
+  const esAdministrador = user?.estamento === 'Administrador';
+  const esSupervisor = user?.estamento === 'Supervisor';
+
+  // Verificar que el usuario sea administrador o supervisor
+  if (!esAdministrador && !esSupervisor) {
     return (
       <div className="text-center py-12">
         <div className="max-w-md mx-auto">
@@ -21,7 +24,7 @@ const MenuAdministrador: React.FC = () => {
             </div>
             <h3 className="text-lg font-medium text-red-900 mb-2">Acceso Restringido</h3>
             <p className="text-red-700">
-              Solo los administradores pueden acceder a esta sección.
+              Solo los administradores y supervisores pueden acceder a esta sección.
             </p>
           </div>
         </div>
@@ -29,6 +32,7 @@ const MenuAdministrador: React.FC = () => {
     );
   }
 
+  // Supervisor solo puede ver Cuestionarios Burnout, Administrador puede ver todo
   const tabs = [
     {
       id: 'cuestionarios',
@@ -37,7 +41,8 @@ const MenuAdministrador: React.FC = () => {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-      )
+      ),
+      visible: true // Todos pueden ver esta pestaña
     },
     {
       id: 'usuarios',
@@ -46,7 +51,8 @@ const MenuAdministrador: React.FC = () => {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
         </svg>
-      )
+      ),
+      visible: esAdministrador // Solo administradores
     },
     {
       id: 'procedimientos',
@@ -55,18 +61,39 @@ const MenuAdministrador: React.FC = () => {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
         </svg>
-      )
+      ),
+      visible: esAdministrador // Solo administradores
     }
-  ];
+  ].filter(tab => tab.visible);
+
+  // Si Supervisor intenta acceder a una pestaña no permitida, redirigir a cuestionarios
+  useEffect(() => {
+    if (esSupervisor && activeTab !== 'cuestionarios') {
+      setActiveTab('cuestionarios');
+    }
+  }, [activeTab, esSupervisor]);
+
+  const handleTabChange = (tabId: string) => {
+    // Si Supervisor intenta cambiar a una pestaña no permitida, no hacer nada
+    if (esSupervisor && tabId !== 'cuestionarios') {
+      return;
+    }
+    setActiveTab(tabId);
+  };
 
   const renderTabContent = () => {
+    // Supervisor solo puede ver cuestionarios
+    if (esSupervisor && activeTab !== 'cuestionarios') {
+      return <MenuCuestionariosBurnout />;
+    }
+
     switch (activeTab) {
       case 'cuestionarios':
         return <MenuCuestionariosBurnout />;
       case 'usuarios':
-        return <GestionUsuarios />;
+        return esAdministrador ? <GestionUsuarios /> : <MenuCuestionariosBurnout />;
       case 'procedimientos':
-        return <GestionProcedimientosNueva />;
+        return esAdministrador ? <GestionProcedimientosNueva /> : <MenuCuestionariosBurnout />;
       default:
         return <MenuCuestionariosBurnout />;
     }
@@ -90,7 +117,7 @@ const MenuAdministrador: React.FC = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
