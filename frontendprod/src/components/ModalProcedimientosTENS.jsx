@@ -164,7 +164,7 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
     'Entrega de turno',
     'Recepción de turno',
     'Toma de signos vitales (registro por paciente)',
-    'Aseo y cuidados del paciente (aseo parcial o completo, cuidados de la piel, medición de deposiciones, etc)',
+    'Aseo y cuidados del paciente (aseo parcial o completo, traslado a baño, cuidados de la piel, medición de deposiciones, etc)',
     'Administración de medicamentos oral/SNG/SNY/Gastrostomía/Broncodilatadores',
     'Preparación de medicamentos',
     'Preparación de carro para aseos',
@@ -185,7 +185,7 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
 
   // Otras tareas de TENS
   const otrasTareas = [
-    'Control de glicemia',
+    'Instalación de tunelizado (asistencia)',
     'Instalación de CVC (asistencia)',
     'Instalación de CHD (asistencia)',
     'Asistencia en procedimientos de enfermería (instalación de LA, curaciones, toma de exámenes, etc)',
