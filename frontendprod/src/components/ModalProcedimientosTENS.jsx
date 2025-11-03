@@ -181,7 +181,7 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
     'Ingreso',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
     'Recepción de ropa',
-    'Limpieza de estación de enfermería y/o sala de estar',
+    'Limpieza de estación de enfermería',
   ];
 
   // Otras tareas de TENS
@@ -213,7 +213,7 @@ const ModalProcedimientosTENS = ({ isOpen, onClose, onSuccess }) => {
     'Recepción de turno',
     'Preparación de habitación para nuevo paciente (orden de cama e insumos clínicos)',
     'Recepción de ropa',
-    'Limpieza de estación de enfermería y/o sala de estar'
+    'Limpieza de estación de enfermería'
   ];
 
   // Cargar pacientes cuando se abre el modal
