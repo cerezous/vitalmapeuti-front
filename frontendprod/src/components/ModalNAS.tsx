@@ -8,18 +8,12 @@ interface ModalNASProps {
   onClose: () => void;
 }
 
-// Función para obtener fecha local sin problemas de zona horaria
-// Mantiene la fecha del día hasta las 08:00 AM del siguiente día
-const obtenerFechaLocal = () => {
+// Función para obtener la fecha actual del día (siempre la fecha actual, sin ajustes)
+const obtenerFechaActual = () => {
   const today = new Date();
-  const hora = today.getHours();
-  
-  // Si es antes de las 08:00, usar el día anterior
-  const fechaAUsar = hora < 8 ? new Date(today.getTime() - 24 * 60 * 60 * 1000) : today;
-  
-  const year = fechaAUsar.getFullYear();
-  const month = String(fechaAUsar.getMonth() + 1).padStart(2, '0');
-  const day = String(fechaAUsar.getDate()).padStart(2, '0');
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
@@ -40,7 +34,7 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
   
   // Estado para las selecciones NAS
   const [nasSelections, setNasSelections] = useState<{[key: string]: boolean}>({});
-  const [fecha, setFecha] = useState<string>(obtenerFechaLocal);
+  const [fecha, setFecha] = useState<string>(obtenerFechaActual());
 
   // Función para formatear fecha de ingreso (de YYYY-MM-DD HH:MM:SS a YYYY-MM-DD)
   const formatearFechaIngreso = (fechaIngreso: string) => {
@@ -54,7 +48,7 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
     const paciente = pacientes.find(p => p.rut === rutPaciente);
     if (!paciente) return { valida: false, mensaje: 'Paciente no encontrado' };
 
-    const fechaActual = obtenerFechaLocal();
+    const fechaActual = obtenerFechaActual(); // Siempre usar la fecha actual del día
     const fechaIngreso = formatearFechaIngreso(paciente.fechaIngresoUTI);
 
     // Comparar fechas como strings en formato YYYY-MM-DD para evitar problemas de zona horaria
@@ -141,13 +135,14 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
 
   // Función para verificar qué pacientes ya fueron evaluados en la fecha seleccionada
   const verificarPacientesEvaluados = async () => {
+    if (!fecha) return; // No verificar si no hay fecha seleccionada
+    
     try {
-      const fechaParaVerificar = fecha || obtenerFechaLocal();
-      
+      // Usar la fecha seleccionada directamente (sin ajuste de turno)
       // Buscar por la fecha específica usando la API
       const registros = await nasAPI.obtenerRegistros({
-        fechaInicio: fechaParaVerificar,
-        fechaFin: fechaParaVerificar
+        fechaInicio: fecha,
+        fechaFin: fecha
       });
       
       // Obtener todos los registros NAS para verificación manual adicional si la API no encuentra
@@ -163,7 +158,7 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
         const month = String(fechaRegistro.getMonth() + 1).padStart(2, '0');
         const day = String(fechaRegistro.getDate()).padStart(2, '0');
         const fechaRegistroFormateada = `${year}-${month}-${day}`;
-        return fechaRegistroFormateada === fechaParaVerificar;
+        return fechaRegistroFormateada === fecha;
       });
       
       // Usar la verificación manual si la API no encuentra registros
@@ -198,7 +193,7 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
       resetearFormulario();
       
       // Validar la fecha actual cuando se selecciona un paciente
-      const fechaActual = obtenerFechaLocal();
+      const fechaActual = obtenerFechaActual();
       const validacion = validarFecha(fechaActual, rutPaciente);
       if (!validacion.valida) {
         // Si la fecha actual no es válida, establecer la fecha de ingreso
@@ -209,17 +204,16 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
             setFecha(fechaIngreso);
           }
         }
+      } else {
+        // Si la fecha actual es válida, usarla
+        setFecha(fechaActual);
       }
     }
   };
 
   const resetearFormulario = () => {
     setNasSelections({});
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    setFecha(`${year}-${month}-${day}`);
+    setFecha(obtenerFechaActual());
     setMensaje({ tipo: '', texto: '' });
   };
 
@@ -510,7 +504,7 @@ const ModalNAS: React.FC<ModalNASProps> = ({ isOpen, onClose }) => {
                             value={fecha}
                             onChange={(e) => handleFechaChange(e.target.value)}
                             min={pacienteSeleccionado ? formatearFechaIngreso(pacientes.find(p => p.rut === pacienteSeleccionado)?.fechaIngresoUTI || '') || '' : ''}
-                            max={obtenerFechaLocal()}
+                            max={obtenerFechaActual()}
                             className="w-full px-3 py-2 bg-white text-gray-900 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900"
                             disabled={loading}
                           />

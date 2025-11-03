@@ -73,9 +73,9 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
   const [fechaDesde, setFechaDesde] = useState<string>('');
   const [fechaHasta, setFechaHasta] = useState<string>('');
 
-  // Verificar si el usuario es médico o administrador
-  const esMedico = user?.estamento === 'Médico' || user?.estamento === 'Medicina' || user?.estamento === 'Administrador';
-  const esAdministrador = user?.estamento === 'Administrador';
+  // Verificar si el usuario es médico o administrador/supervisor
+  const esMedico = user?.estamento === 'Médico' || user?.estamento === 'Medicina' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
+  const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
 
   // Cargar pacientes y sus Apache II
   useEffect(() => {

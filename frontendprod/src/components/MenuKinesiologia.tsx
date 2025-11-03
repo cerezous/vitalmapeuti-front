@@ -49,9 +49,9 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
   const [fechaDesde, setFechaDesde] = useState<string>('');
   const [fechaHasta, setFechaHasta] = useState<string>('');
 
-  // Verificar si el usuario es kinesiólogo/a o administrador
-  const esKinesiologia = user?.estamento === 'Kinesiología' || user?.estamento === 'Administrador';
-  const esAdministrador = user?.estamento === 'Administrador';
+  // Verificar si el usuario es kinesiólogo/a o administrador/supervisor
+  const esKinesiologia = user?.estamento === 'Kinesiología' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
+  const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
 
   // Cargar pacientes y sus categorizaciones
   useEffect(() => {

@@ -41,8 +41,8 @@ const ModalDetalleRegistro: React.FC<ModalDetalleRegistroProps> = ({ isOpen, onC
   const [procedimientoEditando, setProcedimientoEditando] = useState<number | null>(null);
   const [procedimientoEditado, setProcedimientoEditado] = useState<any | null>(null);
 
-  // Verificar si el usuario actual puede editar (es el propietario del registro o es administrador)
-  const puedeEditar = user && registro && (registro.usuarioId === user.id || user.estamento === 'Administrador');
+  // Verificar si el usuario actual puede editar (es el propietario del registro o es administrador/supervisor)
+  const puedeEditar = user && registro && (registro.usuarioId === user.id || user.estamento === 'Administrador' || user.estamento === 'Supervisor');
 
   // Cargar pacientes cuando se abre el modal y entra en modo edición
   useEffect(() => {

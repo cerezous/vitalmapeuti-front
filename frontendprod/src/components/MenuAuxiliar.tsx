@@ -24,9 +24,9 @@ const MenuAuxiliar: React.FC<MenuAuxiliarProps> = ({ onOpenModal }) => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 50;
 
-  // Verificar si el usuario es auxiliar o administrador
-  const esAuxiliar = user?.estamento === 'Auxiliares' || user?.estamento === 'Administrador';
-  const esAdministrador = user?.estamento === 'Administrador';
+  // Verificar si el usuario es auxiliar o administrador/supervisor
+  const esAuxiliar = user?.estamento === 'Auxiliares' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
+  const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
 
   // Cargar datos iniciales
   useEffect(() => {

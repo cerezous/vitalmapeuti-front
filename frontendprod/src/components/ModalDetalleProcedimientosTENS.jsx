@@ -31,8 +31,8 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
   const [procedimientosEditables, setProcedimientosEditables] = useState([]);
   const procedimientosOriginalesRef = useRef([]);
 
-  // Verificar si el usuario actual puede editar (es el propietario del registro o es administrador)
-  const puedeEditar = user && registro && (registro.usuarioId === user.id || user.estamento === 'Administrador');
+  // Verificar si el usuario actual puede editar (es el propietario del registro o es administrador/supervisor)
+  const puedeEditar = user && registro && (registro.usuarioId === user.id || user.estamento === 'Administrador' || user.estamento === 'Supervisor');
   
   // Debug: Log para verificar los valores
   useEffect(() => {

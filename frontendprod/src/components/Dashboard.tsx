@@ -498,8 +498,13 @@ const Dashboard: React.FC = () => {
     submenus: []
   };
 
-  // Agregar menú de Estadísticas y Administrador solo para administradores
-  const menuItems = user?.estamento === 'Administrador' 
+  // Agregar menú de Estadísticas para administradores y supervisores
+  // El menú Administrador solo para administradores
+  const esAdministrador = user?.estamento === 'Administrador';
+  const esSupervisor = user?.estamento === 'Supervisor';
+  const tieneAccesoEstadisticas = esAdministrador || esSupervisor;
+  
+  const menuItems = esAdministrador
     ? [
         ...baseMenuItems,
         estadisticasMenuItem,
@@ -514,6 +519,8 @@ const Dashboard: React.FC = () => {
           submenus: []
         }
       ]
+    : tieneAccesoEstadisticas
+    ? [...baseMenuItems, estadisticasMenuItem]
     : baseMenuItems;
 
   const handleLogout = () => {
@@ -1458,8 +1465,8 @@ const Dashboard: React.FC = () => {
         );
 
       case 'Estadísticas':
-        // Verificar permisos de administrador
-        if (user?.estamento !== 'Administrador') {
+        // Verificar permisos de administrador o supervisor
+        if (user?.estamento !== 'Administrador' && user?.estamento !== 'Supervisor') {
           return (
             <div className="space-y-6 pb-16 md:pb-8">
               <div className="text-center py-12">
@@ -1619,6 +1626,29 @@ const Dashboard: React.FC = () => {
         return <MenuEstadisticasUTI />;
 
       case 'Administrador':
+        // Solo administradores pueden acceder al menú de administrador
+        if (user?.estamento !== 'Administrador') {
+          return (
+            <div className="space-y-6 pb-16 md:pb-8">
+              <div className="text-center py-12">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                  <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Acceso Restringido
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  No tienes permisos para acceder al menú de administración del sistema.
+                </p>
+                <p className="text-sm text-gray-500">
+                  Esta sección está disponible únicamente para administradores.
+                </p>
+              </div>
+            </div>
+          );
+        }
         return <MenuAdministrador />;
 
       default:

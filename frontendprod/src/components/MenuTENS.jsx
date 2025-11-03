@@ -17,9 +17,9 @@ const MenuTENS = ({ onOpenModal }) => {
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
 
-  // Verificar si el usuario es TENS o administrador
-  const esTENS = user?.estamento === 'TENS' || user?.estamento === 'Administrador';
-  const esAdministrador = user?.estamento === 'Administrador';
+  // Verificar si el usuario es TENS o administrador/supervisor
+  const esTENS = user?.estamento === 'TENS' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
+  const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
 
   useEffect(() => {
     cargarRegistros();

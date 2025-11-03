@@ -50,7 +50,7 @@ const MenuCuestionariosBurnout: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (user?.estamento === 'Administrador') {
+    if (user?.estamento === 'Administrador' || user?.estamento === 'Supervisor') {
       cargarDatos();
     }
   }, [user]);

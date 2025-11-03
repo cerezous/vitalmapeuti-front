@@ -97,11 +97,11 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
 
   const primerProcedimiento = procedimientos[0];  // Verificar permisos de edición - solo el usuario que creó el primer procedimiento o administradores pueden editar
   const puedeEditar = user && (
-    user.estamento === 'Administrador' || 
+    user.estamento === 'Administrador' || user.estamento === 'Supervisor' || 
     procedimientos.some(proc => proc.usuarioId === user.id)
   );
-  // El usuario que creó el registro o un administrador pueden agregar procedimientos
-  const puedeAgregar = user && (user.estamento === 'Administrador' || procedimientos.some(proc => proc.usuarioId === user.id));
+  // El usuario que creó el registro o un administrador/supervisor pueden agregar procedimientos
+  const puedeAgregar = user && (user.estamento === 'Administrador' || user.estamento === 'Supervisor' || procedimientos.some(proc => proc.usuarioId === user.id));
 
   // Catálogo alineado con ModalRegistroProcedimientos
   const procedimientosKinesiologia = [

@@ -28,7 +28,7 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
 
   // Verificar si el usuario actual puede editar (es el propietario del registro)
   const puedeEditar = user && (
-    user.estamento === 'Administrador' || 
+    user.estamento === 'Administrador' || user.estamento === 'Supervisor' || 
     (grupo && grupo.procedimientos.length > 0 && 
      grupo.procedimientos.every(proc => proc.usuarioId === user.id))
   );

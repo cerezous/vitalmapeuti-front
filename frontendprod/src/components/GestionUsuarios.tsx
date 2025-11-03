@@ -42,7 +42,7 @@ const GestionUsuarios: React.FC = () => {
     contraseña: ''
   });
 
-  const estamentos = ['Administrador', 'Medicina', 'Enfermería', 'Kinesiología', 'Auxiliares', 'TENS'];
+  const estamentos = ['Administrador', 'Supervisor', 'Medicina', 'Enfermería', 'Kinesiología', 'Auxiliares', 'TENS'];
 
   useEffect(() => {
     if (user?.estamento === 'Administrador') {

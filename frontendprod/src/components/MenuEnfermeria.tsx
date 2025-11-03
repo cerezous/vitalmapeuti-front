@@ -49,9 +49,9 @@ const MenuEnfermeria: React.FC<MenuEnfermeriaProps> = ({ onOpenModal }) => {
   const [fechaDesde, setFechaDesde] = useState<string>('');
   const [fechaHasta, setFechaHasta] = useState<string>('');
 
-  // Verificar si el usuario es enfermera/o o administrador
-  const esEnfermeria = user?.estamento === 'Enfermería' || user?.estamento === 'Administrador';
-  const esAdministrador = user?.estamento === 'Administrador';
+  // Verificar si el usuario es enfermera/o o administrador/supervisor
+  const esEnfermeria = user?.estamento === 'Enfermería' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
+  const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
 
   // Cargar pacientes y sus NAS
   useEffect(() => {
