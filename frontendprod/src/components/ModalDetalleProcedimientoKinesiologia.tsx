@@ -103,7 +103,7 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
   // El usuario que creó el registro o un administrador/supervisor pueden agregar procedimientos
   const puedeAgregar = user && (user.estamento === 'Administrador' || user.estamento === 'Supervisor' || procedimientos.some(proc => proc.usuarioId === user.id));
 
-  // Catálogo alineado con ModalRegistroProcedimientos
+  // Procedimientos de Kinesiología
   const procedimientosKinesiologia = [
     'Tareas administrativas (evoluciones, estadísticas, reuniones clínicas, etc)',
     'Recepción de turno',
@@ -127,8 +127,10 @@ const ModalDetalleProcedimientoKinesiologia: React.FC<ModalDetalleProcedimientoK
     'TAC con contraste',
     'RMN',
     'RMN con traslado a BUPA',
+
   ];
 
+  // Otros procedimientos
   const otrosProcedimientos = [
     'Asistencia en aseos (general o parcial)',
     'Instalación VVP',
