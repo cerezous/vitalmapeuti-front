@@ -58,7 +58,7 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
     'Traslado a TAC sin contraste',
     'Traslado a TAC con contraste',
     'Traslado a RMN',
-    'Traslado de paciente',
+    'Traslado de paciente (egreso)',
     'Atención post mortem (taponamiento de cuerpo, traslado, tarea administrativa etc)',
     'Traslado a pabellón',
     'Ingreso',
