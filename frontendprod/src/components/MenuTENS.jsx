@@ -20,7 +20,8 @@ const MenuTENS = ({ onOpenModal }) => {
   // Verificar si el usuario es TENS o administrador/supervisor
   const esTENS = user?.estamento === 'TENS' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
   const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
-  const puedeVerRegistros = esTENS; // Solo TENS, Administradores y Supervisores pueden ver registros
+  // Todos los usuarios pueden visualizar los registros (TENS, Auxiliares, Administradores, Supervisores, etc.)
+  const puedeVerRegistros = true;
 
   useEffect(() => {
     if (puedeVerRegistros) {
