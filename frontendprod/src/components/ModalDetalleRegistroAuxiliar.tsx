@@ -11,6 +11,16 @@ interface ModalDetalleRegistroAuxiliarProps {
   onUpdate?: () => void; // Callback para refrescar datos cuando se actualicen
 }
 
+// Función para formatear fecha sin problemas de zona horaria
+const formatearFechaSinZonaHoraria = (fechaStr: string): string => {
+  // Si la fecha viene como "2025-10-13", la mostramos directamente sin conversiones
+  if (fechaStr && fechaStr.includes('-')) {
+    const [year, month, day] = fechaStr.split('-');
+    return `${day}/${month}/${year}`;
+  }
+  return fechaStr;
+};
+
 const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> = ({ isOpen, onClose, grupo, onUpdate }) => {
   const { user } = useAuth();
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -265,11 +275,7 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
           <div>
             <h2 className="text-lg md:text-xl font-bold">Registro de Procedimientos - Auxiliares</h2>
             <p className="text-xs md:text-sm text-gray-300">
-              {new Date(grupo.fecha).toLocaleDateString('es-ES', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric' 
-              })} - Turno {grupo.turno}
+              {formatearFechaSinZonaHoraria(grupo.fecha)} - Turno {grupo.turno}
             </p>
           </div>
           <div className="flex items-center space-x-1 md:space-x-2">

@@ -145,7 +145,10 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
     try {
       setLoadingProcedimientos(true);
       // Obtener procedimientos de kinesiología (incluye los que no tienen paciente asociado)
-      const params: any = { limit: 50 };
+      const params: any = { 
+        page: 1,
+        limit: 50 
+      };
       
       if (fechaDesde) {
         params.fechaDesde = fechaDesde;
