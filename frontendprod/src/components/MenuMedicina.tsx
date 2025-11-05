@@ -188,6 +188,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
     try {
       setLoadingRegistros(true);
       const params: any = { 
+        page: 1,
         limit: 50
       };
       
