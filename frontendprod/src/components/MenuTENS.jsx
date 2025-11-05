@@ -20,24 +20,27 @@ const MenuTENS = ({ onOpenModal }) => {
   // Verificar si el usuario es TENS o administrador/supervisor
   const esTENS = user?.estamento === 'TENS' || user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
   const esAdministrador = user?.estamento === 'Administrador' || user?.estamento === 'Supervisor';
+  const puedeVerRegistros = esTENS; // Solo TENS, Administradores y Supervisores pueden ver registros
 
   useEffect(() => {
-    cargarRegistros();
-  }, []);
+    if (puedeVerRegistros) {
+      cargarRegistros();
+    }
+  }, [puedeVerRegistros]);
 
   // Recargar registros cuando cambien las fechas de filtro
   useEffect(() => {
-    if (fechaDesde || fechaHasta) {
+    if (puedeVerRegistros && (fechaDesde || fechaHasta)) {
       cargarRegistros();
     }
-  }, [fechaDesde, fechaHasta]);
+  }, [fechaDesde, fechaHasta, puedeVerRegistros]);
 
   // Cargar métricas después de cargar registros
   useEffect(() => {
-    if (!loadingRegistros) {
+    if (puedeVerRegistros && !loadingRegistros) {
       cargarMetricas();
     }
-  }, [registros, loadingRegistros]);
+  }, [registros, loadingRegistros, puedeVerRegistros]);
 
   const cargarRegistros = async () => {
     try {
@@ -264,6 +267,25 @@ const MenuTENS = ({ onOpenModal }) => {
       subtitulo: `${metricas.promedioProcedimientos.totalTurnosDia} turnos día / ${metricas.promedioProcedimientos.totalTurnosNoche} turnos noche`
     }
   ];
+
+  // Si el usuario no tiene permisos para ver registros, mostrar mensaje
+  if (!puedeVerRegistros) {
+    return (
+      <div className="space-y-8 pb-16 md:pb-8">
+        <div className="bg-white bg-opacity-60 backdrop-blur-xl rounded-2xl shadow-sm p-8">
+          <div className="text-center py-12">
+            <svg className="w-24 h-24 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Acceso Restringido</h2>
+            <p className="text-gray-600">
+              Solo usuarios con estamento TENS, Administradores o Supervisores pueden visualizar los registros de procedimientos TENS.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
