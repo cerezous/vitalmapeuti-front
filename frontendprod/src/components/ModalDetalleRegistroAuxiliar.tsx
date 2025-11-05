@@ -46,7 +46,18 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
   // Inicializar procedimientos editables cuando se abre el modal
   useEffect(() => {
     if (isOpen && grupo && grupo.procedimientos.length > 0) {
-      setProcedimientosEditables([...grupo.procedimientos]);
+      // Validar que todos los procedimientos pertenezcan al mismo usuario
+      const usuarioIdGrupo = grupo.usuarioId || grupo.procedimientos[0]?.usuarioId;
+      const procedimientosDelMismoUsuario = grupo.procedimientos.filter(proc => 
+        proc.usuarioId === usuarioIdGrupo
+      );
+      
+      // Solo mostrar procedimientos del mismo usuario
+      if (procedimientosDelMismoUsuario.length > 0) {
+        setProcedimientosEditables([...procedimientosDelMismoUsuario]);
+      } else {
+        setProcedimientosEditables([...grupo.procedimientos]);
+      }
       setProcedimientosNuevos([]);
       setModoEdicion(false);
       setFechaGrupo(grupo.fecha);
@@ -56,7 +67,18 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
   // Actualizar procedimientos editables cuando cambian los datos del grupo (después de guardar)
   useEffect(() => {
     if (isOpen && grupo && !modoEdicion) {
-      setProcedimientosEditables([...grupo.procedimientos]);
+      // Validar que todos los procedimientos pertenezcan al mismo usuario
+      const usuarioIdGrupo = grupo.usuarioId || grupo.procedimientos[0]?.usuarioId;
+      const procedimientosDelMismoUsuario = grupo.procedimientos.filter(proc => 
+        proc.usuarioId === usuarioIdGrupo
+      );
+      
+      // Solo mostrar procedimientos del mismo usuario
+      if (procedimientosDelMismoUsuario.length > 0) {
+        setProcedimientosEditables([...procedimientosDelMismoUsuario]);
+      } else {
+        setProcedimientosEditables([...grupo.procedimientos]);
+      }
       setProcedimientosNuevos([]);
     }
   }, [grupo, isOpen, modoEdicion, forzarActualizacion]);
@@ -123,6 +145,13 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
       return;
     }
 
+    // Validar que el usuario actual sea el mismo que el del grupo
+    const usuarioIdGrupo = grupo.usuarioId || grupo.procedimientos[0]?.usuarioId;
+    if (user?.id !== usuarioIdGrupo) {
+      setMensaje({ tipo: 'error', texto: 'No puedes agregar procedimientos a un registro de otro usuario' });
+      return;
+    }
+
     // Crear procedimiento temporal con ID negativo
     const nuevoProcTemporal: ProcedimientoAuxiliar = {
       id: -(Date.now()), // ID negativo temporal
@@ -131,14 +160,14 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
       observaciones: nuevoProcedimiento.observaciones || '',
       fecha: grupo.fecha,
       turno: grupo.turno as "Día" | "Noche" | "24 h",
-      usuarioId: user?.id || 0,
+      usuarioId: user.id,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       usuario: {
-        nombres: user?.nombres || '',
-        apellidos: user?.apellidos || '',
-        usuario: user?.usuario || '',
-        estamento: user?.estamento || ''
+        nombres: user.nombres || '',
+        apellidos: user.apellidos || '',
+        usuario: user.usuario || '',
+        estamento: user.estamento || ''
       }
     };
 
@@ -169,13 +198,28 @@ const ModalDetalleRegistroAuxiliar: React.FC<ModalDetalleRegistroAuxiliarProps> 
   const guardarCambios = async () => {
     setLoading(true);
     try {
+      // Validar que todos los procedimientos pertenezcan al mismo usuario
+      const usuarioIdGrupo = grupo.usuarioId || grupo.procedimientos[0]?.usuarioId;
+      const procedimientosConUsuarioIncorrecto = procedimientosEditables.filter(proc => 
+        proc.usuarioId !== usuarioIdGrupo
+      );
+      
+      if (procedimientosConUsuarioIncorrecto.length > 0) {
+        setMensaje({ 
+          tipo: 'error', 
+          texto: 'Error: Se detectaron procedimientos de diferentes usuarios. Solo se pueden modificar procedimientos del mismo usuario.' 
+        });
+        setLoading(false);
+        return;
+      }
+
       let nuevosProcedimientosDelBackend: ProcedimientoAuxiliar[] = [];
 
       // 0. Si la fecha cambió, actualizar todos los procedimientos existentes
       if (fechaGrupo && fechaGrupo !== grupo.fecha) {
         const procedimientosExistentes = procedimientosEditables.filter(proc => proc.id && proc.id > 0);
         for (const proc of procedimientosExistentes) {
-          if (proc.id) {
+          if (proc.id && proc.usuarioId === usuarioIdGrupo) {
             await auxiliaresAPI.actualizar(proc.id, { 
               nombre: proc.nombre,
               tiempo: proc.tiempo,
