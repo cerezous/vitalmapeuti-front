@@ -30,9 +30,41 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
   const [procedimientosEditables, setProcedimientosEditables] = useState([]);
   const procedimientosOriginalesRef = useRef([]);
+  const [yaExisteRegistroDuplicado, setYaExisteRegistroDuplicado] = useState(false);
 
   // Verificar si el usuario actual puede editar (es el propietario del registro o es administrador/supervisor)
   const puedeEditar = user && registro && (registro.usuarioId === user.id || user.estamento === 'Administrador' || user.estamento === 'Supervisor');
+
+  // Función para verificar si ya existe otro registro (distinto al actual) para la fecha y turno seleccionados
+  const verificarRegistroDuplicado = async (fechaSeleccionada, turnoSeleccionado) => {
+    if (!user || !registro) return false;
+    
+    try {
+      const { registros } = await procedimientosTENSAPI.obtenerTodos({
+        fechaDesde: fechaSeleccionada,
+        fechaHasta: fechaSeleccionada,
+        turno: turnoSeleccionado,
+        limit: 100 // Obtener todos para verificar duplicados
+      });
+      
+      // Buscar registros del mismo usuario que NO sean el registro actual
+      const registroDuplicado = registros.find(r => 
+        r.usuarioId === user.id && 
+        r.id !== registro.id // Excluir el registro actual
+      );
+      return !!registroDuplicado;
+    } catch (error) {
+      console.warn('No se pudo verificar registro duplicado:', error);
+      return false; // En caso de error, permitir continuar
+    }
+  };
+
+  // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
+  const formatearFechaParaMostrar = (fecha) => {
+    if (!fecha) return '';
+    const [year, month, day] = fecha.split('-');
+    return `${day}/${month}/${year}`;
+  };
   
   // Debug: Log para verificar los valores
   useEffect(() => {
@@ -135,13 +167,34 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
       procedimientosOriginalesRef.current = (registro.procedimientos || []).map(p => ({ ...p }));
       setFechaRegistro(registro.fecha);
       setTurnoRegistro(registro.turno);
+      setYaExisteRegistroDuplicado(false);
     } else if (!modoEdicion) {
       setProcedimientosEditables([]);
       procedimientosOriginalesRef.current = [];
       setFechaRegistro('');
       setTurnoRegistro('Día');
+      setYaExisteRegistroDuplicado(false);
     }
   }, [modoEdicion, registro]);
+
+  // Verificar registro duplicado cuando cambia la fecha o turno en modo edición
+  useEffect(() => {
+    const verificarDuplicado = async () => {
+      if (modoEdicion && fechaRegistro && turnoRegistro && registro) {
+        // Solo verificar si la fecha o turno son diferentes al registro original
+        if (fechaRegistro !== registro.fecha || turnoRegistro !== registro.turno) {
+          const existeDuplicado = await verificarRegistroDuplicado(fechaRegistro, turnoRegistro);
+          setYaExisteRegistroDuplicado(existeDuplicado);
+        } else {
+          setYaExisteRegistroDuplicado(false);
+        }
+      }
+    };
+
+    if (modoEdicion && fechaRegistro && turnoRegistro) {
+      verificarDuplicado();
+    }
+  }, [modoEdicion, fechaRegistro, turnoRegistro, registro]);
 
   // Limpiar estado al cerrar modal
   useEffect(() => {
@@ -306,11 +359,39 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
         return;
       }
 
-      // Si la fecha o turno cambiaron, actualizarlos
+      // Verificar si hay un registro duplicado antes de guardar
+      if (yaExisteRegistroDuplicado) {
+        setMensaje({ 
+          tipo: 'error', 
+          texto: `Ya existe un registro para el turno ${turnoRegistro} del ${formatearFechaParaMostrar(fechaRegistro)}. No puede tener múltiples registros en el mismo turno y fecha.` 
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Si la fecha o turno cambiaron, verificar duplicado antes de actualizar
       if (fechaRegistro && fechaRegistro !== registro.fecha) {
+        const existeDuplicado = await verificarRegistroDuplicado(fechaRegistro, turnoRegistro);
+        if (existeDuplicado) {
+          setMensaje({ 
+            tipo: 'error', 
+            texto: `Ya existe otro registro para el turno ${turnoRegistro} del ${formatearFechaParaMostrar(fechaRegistro)}. No puede tener múltiples registros en el mismo turno y fecha.` 
+          });
+          setLoading(false);
+          return;
+        }
         await procedimientosTENSAPI.actualizar(registro.id, { fecha: fechaRegistro });
       }
       if (turnoRegistro && turnoRegistro !== registro.turno) {
+        const existeDuplicado = await verificarRegistroDuplicado(fechaRegistro, turnoRegistro);
+        if (existeDuplicado) {
+          setMensaje({ 
+            tipo: 'error', 
+            texto: `Ya existe otro registro para el turno ${turnoRegistro} del ${formatearFechaParaMostrar(fechaRegistro)}. No puede tener múltiples registros en el mismo turno y fecha.` 
+          });
+          setLoading(false);
+          return;
+        }
         await procedimientosTENSAPI.actualizar(registro.id, { turno: turnoRegistro });
       }
 
@@ -509,6 +590,29 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
                 />
               </div>
             </div>
+
+            {/* Aviso de registro duplicado */}
+            {yaExisteRegistroDuplicado && (
+              <div className="mb-4 p-4 rounded-lg bg-orange-50 border border-orange-200">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-orange-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-orange-800">
+                      Registro duplicado detectado
+                    </p>
+                    <p className="text-sm text-orange-700 mt-1">
+                      Ya existe otro registro para el turno {turnoRegistro} del {formatearFechaParaMostrar(fechaRegistro)}. 
+                      No puede tener múltiples registros en el mismo turno y fecha.
+                    </p>
+                    <p className="text-sm text-orange-700 mt-2 font-medium">
+                      Por favor, cambie la fecha o el turno para continuar.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Agregar procedimiento - Solo en modo edición */}
             <div className="bg-gray-50 p-3 md:p-4 rounded-lg space-y-3 md:space-y-4">
@@ -752,10 +856,10 @@ const ModalDetalleProcedimientosTENS = ({ isOpen, onClose, registro, onUpdate })
               <button
                 type="button"
                 onClick={guardarCambios}
-                disabled={loading}
+                disabled={loading || yaExisteRegistroDuplicado}
                 className="px-4 md:px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm md:text-base"
               >
-                {loading ? 'Guardando...' : 'Guardar Cambios'}
+                {loading ? 'Guardando...' : yaExisteRegistroDuplicado ? 'Registro duplicado' : 'Guardar Cambios'}
               </button>
             </>
           ) : (

@@ -84,7 +84,7 @@ const ModalKinesiologia: React.FC<ModalKinesiologiaProps> = ({ isOpen, onClose, 
       if (isOpen && activeTab === 'procedimientos' && pacienteRut) {
         setLoadingProcedimientos(true);
         try {
-          const data = await procedimientosKinesiologiaAPI.obtenerPorPaciente(pacienteRut, { limit: 100 });
+          const data = await procedimientosKinesiologiaAPI.obtenerPorPaciente(pacienteRut, { limit: 50 });
           
           // Convertir los procedimientos del backend al formato local
           const procedimientosFormateados = data.procedimientos.map((proc: ProcedimientoKinesiologia) => ({
@@ -226,7 +226,7 @@ const ModalKinesiologia: React.FC<ModalKinesiologiaProps> = ({ isOpen, onClose, 
       });
 
       // Recargar la lista de procedimientos desde el backend
-      const data = await procedimientosKinesiologiaAPI.obtenerPorPaciente(pacienteRut, { limit: 100 });
+      const data = await procedimientosKinesiologiaAPI.obtenerPorPaciente(pacienteRut, { limit: 50 });
       const procedimientosFormateados = data.procedimientos.map((proc: ProcedimientoKinesiologia) => ({
         id: proc.id,
         nombre: proc.nombre,
