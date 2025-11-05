@@ -189,7 +189,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
       setLoadingRegistros(true);
       const params: any = { 
         page: 1,
-        limit: 50
+        limit: 500 // Aumentar límite para obtener más procedimientos y generar más grupos
       };
       
       if (fechaDesde) {
@@ -1167,7 +1167,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {agruparProcedimientos().map((grupo, index) => (
+              {agruparProcedimientos().slice(0, 50).map((grupo, index) => (
                 <div key={index} className={`${grupo.registradoPorUsuario ? 'bg-green-50 border border-green-200' : 'bg-gray-50'} rounded-lg p-4 flex items-center justify-between ${grupo.registradoPorUsuario ? 'hover:bg-green-100' : 'hover:bg-gray-100'} transition-colors`}>
                   {/* Vista móvil */}
                   <div className="flex-1 md:hidden">

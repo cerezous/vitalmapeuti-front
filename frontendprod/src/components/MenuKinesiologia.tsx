@@ -147,7 +147,7 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
       // Obtener procedimientos de kinesiología (incluye los que no tienen paciente asociado)
       const params: any = { 
         page: 1,
-        limit: 50 
+        limit: 500 // Aumentar límite para obtener más procedimientos y generar más grupos
       };
       
       if (fechaDesde) {
@@ -1015,7 +1015,7 @@ const MenuKinesiologia: React.FC<MenuKinesiologiaProps> = ({ onOpenModal }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {agruparProcedimientos().map((grupo, index) => (
+              {agruparProcedimientos().slice(0, 50).map((grupo, index) => (
                 <div key={index} className={`${
                   grupo.registradoPorUsuario 
                     ? 'bg-green-50 border-green-200 hover:bg-green-100' 
