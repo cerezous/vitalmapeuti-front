@@ -24,24 +24,22 @@ const MenuTENS = ({ onOpenModal }) => {
   const puedeVerRegistros = true;
 
   useEffect(() => {
-    if (puedeVerRegistros) {
-      cargarRegistros();
-    }
-  }, [puedeVerRegistros]);
+    cargarRegistros();
+  }, []);
 
   // Recargar registros cuando cambien las fechas de filtro
   useEffect(() => {
-    if (puedeVerRegistros && (fechaDesde || fechaHasta)) {
+    if (fechaDesde || fechaHasta) {
       cargarRegistros();
     }
-  }, [fechaDesde, fechaHasta, puedeVerRegistros]);
+  }, [fechaDesde, fechaHasta]);
 
   // Cargar métricas después de cargar registros
   useEffect(() => {
-    if (puedeVerRegistros && !loadingRegistros) {
+    if (!loadingRegistros) {
       cargarMetricas();
     }
-  }, [registros, loadingRegistros, puedeVerRegistros]);
+  }, [registros, loadingRegistros]);
 
   const cargarRegistros = async () => {
     try {
@@ -60,9 +58,11 @@ const MenuTENS = ({ onOpenModal }) => {
       // Los registros ya vienen filtrados para TENS desde el backend
       const registrosTENS = (data.registros || []).slice(0, 50); // Limitar a 50
       
+      console.log('Registros TENS cargados:', registrosTENS.length, registrosTENS);
       setRegistros(registrosTENS);
     } catch (error) {
-      console.error('Error al cargar registros:', error);
+      console.error('Error al cargar registros TENS:', error);
+      setRegistros([]); // Asegurar que se establezca un array vacío en caso de error
     } finally {
       setLoadingRegistros(false);
     }
