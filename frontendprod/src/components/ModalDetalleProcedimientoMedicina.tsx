@@ -347,7 +347,8 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
               tiempo: proc.tiempo,
               pacienteRut: proc.pacienteRut,
               observaciones: proc.observaciones,
-              fecha: fechaGrupo
+              fecha: fechaGrupo,
+              turno: turnoGrupo
             },
             {
               headers: {
@@ -387,7 +388,21 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
       }
 
       // Actualizar inmediatamente el estado local con los datos actualizados
-      const procedimientosActualizados = procedimientosEditables.filter(proc => proc.id > 0);
+      const procedimientosActualizados = procedimientosEditables
+        .filter(proc => proc.id > 0)
+        .map(proc => ({
+          ...proc,
+          turno: turnoGrupo,
+          fecha: fechaGrupo
+        }));
+
+      setProcedimientosEditables(prev =>
+        prev.map(proc => ({
+          ...proc,
+          turno: turnoGrupo,
+          fecha: fechaGrupo
+        }))
+      );
       
       // Actualizar el array de procedimientos del prop para que se refleje en la vista
       if (procedimientos) {
