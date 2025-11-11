@@ -270,6 +270,23 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
     setShowDetalleModal(true);
   };
 
+  const handleProcedimientosActualizados = (procedimientosActualizados: ProcedimientoMedicina[]) => {
+    setSelectedGrupoProcedimientos(procedimientosActualizados);
+
+    setProcedimientos(prev => {
+      if (!prev || prev.length === 0) return prev;
+
+      const actualizadosPorId = new Map<number, ProcedimientoMedicina>();
+      procedimientosActualizados
+        .filter(proc => proc.id > 0)
+        .forEach(proc => {
+          actualizadosPorId.set(proc.id, proc);
+        });
+
+      return prev.map(proc => actualizadosPorId.get(proc.id) ?? proc);
+    });
+  };
+
   const handleEliminarGrupo = async (procedimientosGrupo: ProcedimientoMedicina[]) => {
     if (!esAdministrador) return;
     
@@ -1302,6 +1319,7 @@ const MenuMedicina: React.FC<MenuMedicinaProps> = ({ onOpenModal }) => {
         cargarProcedimientos();
         cargarMetricas();
       }}
+      onProcedimientosActualizados={handleProcedimientosActualizados}
     />
 
     {/* Modal de detalle Apache II del paciente */}

@@ -13,6 +13,7 @@ interface ModalDetalleProcedimientoMedicinaProps {
   procedimiento?: ProcedimientoMedicina | null;
   procedimientos?: ProcedimientoMedicina[];
   onUpdate?: () => void; // Callback para refrescar datos cuando se actualicen
+  onProcedimientosActualizados?: (procedimientosActualizados: ProcedimientoMedicina[]) => void;
 }
 
 // Función para formatear fecha sin problemas de zona horaria
@@ -30,7 +31,8 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
   onClose, 
   procedimiento,
   procedimientos,
-  onUpdate
+  onUpdate,
+  onProcedimientosActualizados
 }) => {
   const { user } = useAuth();
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -388,25 +390,23 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
       }
 
       // Actualizar inmediatamente el estado local con los datos actualizados
-      const procedimientosActualizados = procedimientosEditables
-        .filter(proc => proc.id > 0)
-        .map(proc => ({
-          ...proc,
-          turno: turnoGrupo,
-          fecha: fechaGrupo
-        }));
+      const procedimientosActualizadosCompleto = procedimientosEditables.map(proc => ({
+        ...proc,
+        turno: turnoGrupo,
+        fecha: fechaGrupo
+      }));
 
-      setProcedimientosEditables(prev =>
-        prev.map(proc => ({
-          ...proc,
-          turno: turnoGrupo,
-          fecha: fechaGrupo
-        }))
-      );
+      const procedimientosActualizados = procedimientosActualizadosCompleto.filter(proc => proc.id > 0);
+
+      setProcedimientosEditables(procedimientosActualizadosCompleto);
       
       // Actualizar el array de procedimientos del prop para que se refleje en la vista
       if (procedimientos) {
-        procedimientos.splice(0, procedimientos.length, ...procedimientosActualizados);
+        procedimientos.splice(0, procedimientos.length, ...procedimientosActualizadosCompleto);
+      }
+
+      if (onProcedimientosActualizados) {
+        onProcedimientosActualizados(procedimientosActualizadosCompleto);
       }
 
       setMensaje({ tipo: 'success', texto: 'Cambios guardados exitosamente' });
