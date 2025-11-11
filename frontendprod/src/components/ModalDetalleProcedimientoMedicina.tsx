@@ -132,8 +132,12 @@ const ModalDetalleProcedimientoMedicina: React.FC<ModalDetalleProcedimientoMedic
   const esGrupo = procedimientos && procedimientos.length > 0;
   const datosParaMostrar = esGrupo ? procedimientos : [procedimiento!];
   
-  // Verificar si el usuario actual puede editar (es el propietario del registro)
-  const puedeEditar = user && datosParaMostrar.length > 0 && datosParaMostrar.every(proc => proc.usuarioId === user.id);
+  const esAdministrador = user?.estamento === 'Administrador';
+  // Verificar si el usuario actual puede editar (es el propietario del registro o administrador)
+  const puedeEditar = !!user && datosParaMostrar.length > 0 && (
+    esAdministrador ||
+    datosParaMostrar.every(proc => proc.usuarioId === user.id)
+  );
 
   // Obtener procedimientos válidos - deben coincidir con ModalRegistroProcedimientosMedicina
   const procedimientosMedicina = [
