@@ -57,7 +57,7 @@ const api = axios.create({
 // Interceptor para agregar el token (excluyendo rutas públicas)
 api.interceptors.request.use((config) => {
   // Rutas que NO necesitan token
-  const rutasPublicas = ['/auth/login', '/auth/register'];
+  const rutasPublicas = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password', '/auth/validate-reset-token'];
   const esRutaPublica = rutasPublicas.some(ruta => config.url?.includes(ruta));
   
   if (!esRutaPublica) {
