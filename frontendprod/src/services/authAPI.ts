@@ -15,7 +15,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Rutas que NO necesitan token
-    const rutasPublicas = ['/api/auth/login', '/api/auth/register'];
+    const rutasPublicas = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
     const esRutaPublica = rutasPublicas.some(ruta => config.url?.includes(ruta));
     
     if (!esRutaPublica) {
@@ -33,7 +33,7 @@ api.interceptors.request.use(
 
 const authAPI = {
   login: async (usuario: string, contraseña: string) => {
-    const response = await api.post('/api/auth/login', {
+    const response = await api.post('/auth/login', {
       usuario,
       contraseña,
     });
@@ -57,7 +57,7 @@ const authAPI = {
       contraseña: userData.contraseña,
       estamento: userData.estamento  // Cambiado de 'rol' a 'estamento'
     };
-    const response = await api.post('/api/auth/register', backendData);  // Nueva ruta
+    const response = await api.post('/auth/register', backendData);
     return response.data;
   },
 
@@ -67,7 +67,7 @@ const authAPI = {
   },
 
   getCurrentUser: async () => {
-    const response = await api.get('/api/auth/me');
+    const response = await api.get('/auth/me');
     return response.data;
   },
 
@@ -78,7 +78,7 @@ const authAPI = {
         throw new Error('No hay token para renovar');
       }
 
-      const response = await api.post('/api/auth/refresh-token');
+      const response = await api.post('/auth/refresh-token');
       const { token } = response.data;
       
       // Actualizar el token en localStorage
@@ -94,12 +94,12 @@ const authAPI = {
   },
 
   forgotPassword: async (correo: string) => {
-    const response = await api.post('/api/auth/forgot-password', { correo });
+    const response = await api.post('/auth/forgot-password', { correo });
     return response.data;
   },
 
   resetPassword: async (token: string, nuevaContraseña: string) => {
-    const response = await api.post('/api/auth/reset-password', { 
+    const response = await api.post('/auth/reset-password', { 
       token, 
       nuevaContraseña 
     });
